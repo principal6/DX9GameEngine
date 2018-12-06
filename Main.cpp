@@ -42,7 +42,13 @@ int MainLoop() {
 	gDXBase->BeginRender();
 
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
-		gSprX += 1.0f;
+		gSprX += 2.0f;
+	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
+		gSprX -= 2.0f;
+	if (gDXInput->OnKeyDown(DIK_UPARROW))
+		gSprY -= 2.0f;
+	if (gDXInput->OnKeyDown(DIK_DOWNARROW))
+		gSprY += 2.0f;
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();
 
