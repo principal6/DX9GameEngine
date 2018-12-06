@@ -44,7 +44,7 @@ int MainLoop() {
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 		gSprX += 1.0f;
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
-		gSprX += 1.0f;
+		gDXBase->Halt();
 
 	gDXImage->SetPosition(gSprX, gSprY);
 	gDXImage->Draw();

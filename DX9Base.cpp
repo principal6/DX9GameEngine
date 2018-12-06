@@ -85,6 +85,12 @@ int DX9Base::Run(int(*pMainLoop)()) {
 	return 0;
 }
 
+int DX9Base::Halt(){
+	DestroyWindow(mhWnd);
+
+	return 0;
+}
+
 HRESULT DX9Base::InitD3D() {
 	if (NULL == (mpD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return E_FAIL;

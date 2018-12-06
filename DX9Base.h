@@ -36,6 +36,7 @@ public:
 		CINT X, CINT Y, CINT Width, CINT Height,
 		DX9WINDOW_STYLE WindowStyle, DX9COLOR BackColor);
 	int DX9Base::Run(int(*pMainLoop)());
+	int DX9Base::Halt();
 
 // DX9 ÇÔ¼ö
 public:
