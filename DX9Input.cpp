@@ -147,9 +147,9 @@ DIMOUSESTATE2 DX9Input::OnMouseMove(void)
 			m_diMouse->Acquire();
 	}
 
-	p.lX = (float)m_MouseState.lX;
-	p.lY = (float)m_MouseState.lY;
-	p.lZ = (float)m_MouseState.lZ;
+	p.lX = m_MouseState.lX;
+	p.lY = m_MouseState.lY;
+	p.lZ = m_MouseState.lZ;
 
 	return p;
 }

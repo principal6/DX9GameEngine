@@ -13,6 +13,11 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 
 	mX = 0.0f;
 	mY = 0.0f;
+	mScaleX = 1.0f;
+	mScaleY = 1.0f;
+	mHFlip = false;
+	mVFlip = false;
+
 	mWidth = 10.0f;
 	mHeight = 10.0f;
 
@@ -64,16 +69,65 @@ int DX9Image::SetSize(float Width, float Height) {
 	return 0;
 }
 
+int DX9Image::SetScale(float ScaleX, float ScaleY) {
+	mScaleX = ScaleX;
+	mScaleY = ScaleY;
+	UpdateVertData();
+	return 0;
+}
+
+int DX9Image::SetHFlip(bool Value) {
+	mHFlip = Value;
+	UpdateVertData();
+	return 0;
+};
+int DX9Image::SetVFlip(bool Value) {
+	mVFlip = Value;
+	UpdateVertData();
+	return 0;
+};
+
 int DX9Image::UpdateVertData() {
 	mVert[0].x = mX;
 	mVert[0].y = mY;
-	mVert[1].x = mX + mWidth;
+	mVert[1].x = mX + mWidth * mScaleX;
 	mVert[1].y = mY;
 	mVert[2].x = mX;
-	mVert[2].y = mY + mHeight;
-	mVert[3].x = mX + mWidth;
-	mVert[3].y = mY + mHeight;
+	mVert[2].y = mY + mHeight * mScaleY;
+	mVert[3].x = mX + mWidth * mScaleX;
+	mVert[3].y = mY + mHeight * mScaleY;
+
+	float tempu1 = mVert[0].u;
+	float tempv1 = mVert[0].v;
+
+	if (mHFlip) {
+		mVert[0].u = mVert[1].u;
+		mVert[2].u = mVert[3].u;
+		mVert[1].u = tempu1;
+		mVert[3].u = tempu1;
+	}
+
+	if (mVFlip) {
+		mVert[0].v = mVert[2].v;
+		mVert[1].v = mVert[3].v;
+		mVert[2].v = tempv1;
+		mVert[3].v = tempv1;
+	}
+
 	UpdateVB();
+	return 0;
+}
+
+int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2) {
+	mVert[0].u = u1;
+	mVert[0].v = v1;
+	mVert[1].u = u2;
+	mVert[1].v = v1;
+	mVert[2].u = u1;
+	mVert[2].v = v2;
+	mVert[3].u = u2;
+	mVert[3].v = v2;
+	UpdateVertData();
 	return 0;
 }
 

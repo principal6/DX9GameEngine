@@ -38,31 +38,41 @@ private:
 	DX9INDEX	*mInd;
 	int			mnIndCount;
 
-	float mX;
-	float mY;
-	float mWidth;
-	float mHeight;
+	float	mX;
+	float	mY;
+	float	mScaleX;
+	float	mScaleY;
+	bool	mHFlip; // Horizontal Flip
+	bool	mVFlip; // Vertical Flip
 
-public:
+protected:
+	float	mWidth;
+	float	mHeight;
 
 private:
 	int DX9Image::CreateVB();
 	int DX9Image::CreateIB();
-	int DX9Image::UpdateVertData();
 	int DX9Image::UpdateVB();
+
+protected:
+	int DX9Image::UpdateVertData();
+	int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2);
 
 public:
 	DX9Image() {};
 	~DX9Image() {};
 
 	int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev);
-	
+	int DX9Image::Draw();
+	int DX9Image::Destroy();
+
+	// Setter
 	int DX9Image::SetPosition(float X, float Y);
 	int DX9Image::SetSize(float Width, float Height);
+	int DX9Image::SetScale(float ScaleX, float ScaleY);
 	int DX9Image::SetTexture(wchar_t* FileName);
-	int DX9Image::Draw();
-
-	int DX9Image::Destroy();
+	int DX9Image::SetHFlip(bool Value);
+	int DX9Image::SetVFlip(bool Value);
 };
 
 #endif

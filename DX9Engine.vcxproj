@@ -158,11 +158,13 @@
     <ClInclude Include="DX9Base.h" />
     <ClInclude Include="DX9Image.h" />
     <ClInclude Include="DX9Input.h" />
+    <ClInclude Include="DX9Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DX9Base.cpp" />
     <ClCompile Include="DX9Image.cpp" />
     <ClCompile Include="DX9Input.cpp" />
+    <ClCompile Include="DX9Sprite.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
