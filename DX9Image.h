@@ -9,7 +9,7 @@
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
 struct DX9VERTEX {
-	DX9VERTEX() : x(0), y(0), z(0), rhw(1), color(0), u(0), v(0) {};
+	DX9VERTEX() : x(0), y(0), z(0), rhw(1), color(0xffffffff), u(0), v(0) {};
 	DX9VERTEX(float _x, float _y, float _z, float _rhw,
 		DWORD _color, float _u, float _v) : x(_x), y(_y), z(_z), rhw(_rhw),
 		color(_color), u(_u), v(_v) {};
