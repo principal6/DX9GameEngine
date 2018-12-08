@@ -6,6 +6,10 @@
 int MainLoop();
 int DetectInput();
 
+ULONGLONG	gTimerSec = 0;
+ULONGLONG	gTimerAnim = 0;
+int			gFPS = 0;
+
 DX9Base* gDXBase;
 DX9Input* gDXInput;
 DX9Image* gDXImage;
@@ -32,6 +36,8 @@ int main() {
 	gDXSprite->SetScale(2.0f, 2.0f);
 	gDXSprite->SetTexture(L"advnt_full.png");
 	gDXSprite->SetNumRowsAndCols(10, 10);
+	gDXSprite->AddAnimation(0, 1, 5, false);
+	gDXSprite->AddAnimation(1, 1, 5, true);
 
 	// 메인 루프 실행
 	gDXBase->Run(MainLoop);
@@ -51,6 +57,24 @@ int main() {
 }
 
 int MainLoop() {
+	// FPS용 타이머
+	if (GetTickCount64() >= gTimerSec + 1000)
+	{
+		gTimerSec = GetTickCount64();
+		wchar_t tempstr[20];
+		_itow_s(gFPS, tempstr, 10);
+		OutputDebugString(tempstr);
+		gFPS = 0;
+	}
+
+	// 애니메이션용 타이머
+	if (GetTickCount64() >= gTimerAnim + 50)
+	{
+		gTimerAnim = GetTickCount64();
+
+		gDXSprite->Animate();
+	}
+
 	DetectInput();
 
 	gDXBase->BeginRender();
@@ -62,14 +86,22 @@ int MainLoop() {
 
 	gDXBase->EndRender();
 
+	gFPS++;
+
 	return 0;
 }
 
 int DetectInput() {
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
+	{
 		gSprX += 2.0f;
+		gDXSprite->SetAnimation(0);
+	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
+	{
 		gSprX -= 2.0f;
+		gDXSprite->SetAnimation(1);
+	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 		gSprY -= 2.0f;
 	if (gDXInput->OnKeyDown(DIK_DOWNARROW))

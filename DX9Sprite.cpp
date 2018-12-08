@@ -5,6 +5,9 @@ DX9Sprite::DX9Sprite() {
 	mnCols = 0;
 	mSheetWidth = 0.0f;
 	mSheetHeight = 0.0f;
+	mNumAnims = 0;
+	mCurrAnimID = 0;
+	mCurrFrame = 0;
 }
 
 int DX9Sprite::SetNumRowsAndCols(int numRows, int numCols)
@@ -35,7 +38,44 @@ int DX9Sprite::SetFrame(int FrameID)
 	float v1 = ((float)FrameY / (float)mnRows);
 	float v2 = ((float)(FrameY + 1) / (float)mnRows);
 
-	UpdateVertData(u1, v1, u2, v2);
+	if (mAnims[mCurrAnimID].HFlip)
+	{
+		UpdateVertData(u2, v1, u1, v2);
+	}
+	else
+	{
+		UpdateVertData(u1, v1, u2, v2);
+	}
+	
+	return 0;
+}
 
+int DX9Sprite::AddAnimation(int AnimID, int StartFrame, int EndFrame, bool HFlip) {
+	mAnims[AnimID].FrameS = StartFrame;
+	mAnims[AnimID].FrameE = EndFrame;
+	mAnims[AnimID].HFlip = HFlip;
+
+	return 0;
+}
+
+int DX9Sprite::SetAnimation(int AnimID) {
+	if (mCurrAnimID != AnimID)
+	{
+		mCurrAnimID = AnimID;
+		mCurrFrame = mAnims[AnimID].FrameS;
+	}
+	return 0;
+}
+
+int DX9Sprite::Animate() {
+	
+	if (mCurrFrame < mAnims[mCurrAnimID].FrameE) {
+		mCurrFrame++;
+	}
+	else {
+		mCurrFrame = mAnims[mCurrAnimID].FrameS;
+	}
+	
+	SetFrame(mCurrFrame);
 	return 0;
 }

@@ -44,8 +44,6 @@ private:
 	float	mY;
 	float	mScaleX;
 	float	mScaleY;
-	bool	mHFlip; // Horizontal Flip
-	bool	mVFlip; // Vertical Flip
 
 // 상속 클래스에서 접근할 변수들
 protected:
@@ -70,13 +68,14 @@ public:
 	int DX9Image::Destroy();
 	int DX9Image::Draw();
 
+	int DX9Image::FlipHorizontal();
+	int DX9Image::FlipVertical();
+
 	// Setter
 	int DX9Image::SetPosition(float X, float Y);
 	int DX9Image::SetSize(float Width, float Height);
 	int DX9Image::SetScale(float ScaleX, float ScaleY);
 	int DX9Image::SetTexture(wchar_t* FileName);
-	int DX9Image::SetHFlip(bool Value);
-	int DX9Image::SetVFlip(bool Value);
 };
 
 #endif
