@@ -2,6 +2,7 @@
 #include "DX9Image.h"
 #include "DX9Input.h"
 #include "DX9Sprite.h"
+#include "DX9Map.h"
 
 int MainLoop();
 int DetectInput();
@@ -14,6 +15,7 @@ DX9Base* gDXBase;
 DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Sprite* gDXSprite;
+DX9Map* gDXMap;
 
 float gSprX = 0.0f;
 float gSprY = 0.0f;
@@ -41,15 +43,27 @@ int main() {
 	gDXSprite->AddAnimation(2, 1, 5);
 	gDXSprite->AddAnimation(3, 1, 5, true);
 
+	gDXMap = new DX9Map;
+	gDXMap->Create(gDXBase->GetDevice());
+	gDXMap->SetTexture(L"maptile32x32.png");
+	gDXMap->SetTileInfo(32.0f, 32.0f, 17, 6);
+	gDXMap->AddMapFragment(2, 0.0f, 530.0f);
+	gDXMap->AddMapFragment(2, 32.0f, 530.0f);
+	gDXMap->AddMapFragment(2, 64.0f, 530.0f);
+	gDXMap->AddMapFragment(2, 96.0f, 530.0f);
+	gDXMap->AddEnd();
+
 	// 메인 루프 실행
 	gDXBase->Run(MainLoop);
 	
 	// 종료 전 객체 파괴
+	gDXMap->Destroy();
 	gDXSprite->Destroy();
 	gDXImage->Destroy();
 	gDXInput->Destroy();
 	gDXBase->Destroy();
 
+	delete gDXMap;
 	delete gDXSprite;
 	delete gDXImage;
 	delete gDXInput;
@@ -82,6 +96,8 @@ int MainLoop() {
 	gDXBase->BeginRender();
 
 		gDXImage->Draw();
+
+		gDXMap->Draw();
 
 		gDXSprite->SetPosition(gSprX, gSprY);
 		gDXSprite->Draw();
