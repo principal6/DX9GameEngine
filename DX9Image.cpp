@@ -21,10 +21,10 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 
 	// 정점 및 색인 정보 대입, 버퍼 생성
 	mnVertCount = 4;
-	mVert.push_back({ mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f });
-	mVert.push_back({ mX + mWidth, mY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f });
-	mVert.push_back({ mX, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f });
-	mVert.push_back({ mX + mWidth, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f });
+	mVert.push_back(DX9VERTEX(mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+	mVert.push_back(DX9VERTEX(mX + mWidth, mY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+	mVert.push_back(DX9VERTEX(mX, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+	mVert.push_back(DX9VERTEX(mX + mWidth, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
 
 	CreateVB();
 	CreateIB();
