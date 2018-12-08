@@ -36,8 +36,10 @@ int main() {
 	gDXSprite->SetScale(2.0f, 2.0f);
 	gDXSprite->SetTexture(L"advnt_full.png");
 	gDXSprite->SetNumRowsAndCols(10, 10);
-	gDXSprite->AddAnimation(0, 1, 5, false);
-	gDXSprite->AddAnimation(1, 1, 5, true);
+	gDXSprite->AddAnimation(0, 0, 0);
+	gDXSprite->AddAnimation(1, 0, 0, true);
+	gDXSprite->AddAnimation(2, 1, 5);
+	gDXSprite->AddAnimation(3, 1, 5, true);
 
 	// 메인 루프 실행
 	gDXBase->Run(MainLoop);
@@ -92,15 +94,19 @@ int MainLoop() {
 }
 
 int DetectInput() {
+	bool bSpriteIdle = true;
+
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
-		gSprX += 2.0f;
-		gDXSprite->SetAnimation(0);
+		bSpriteIdle = false;
+		gSprX += 3.0f;
+		gDXSprite->SetAnimation(2);
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
-		gSprX -= 2.0f;
-		gDXSprite->SetAnimation(1);
+		bSpriteIdle = false;
+		gSprX -= 3.0f;
+		gDXSprite->SetAnimation(3);
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 		gSprY -= 2.0f;
@@ -108,6 +114,19 @@ int DetectInput() {
 		gSprY += 2.0f;
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();
+
+	if (bSpriteIdle)
+	{
+		if (gDXSprite->GetSpriteDir())
+		{
+			gDXSprite->SetAnimation(1);
+		}
+		else
+		{
+			gDXSprite->SetAnimation(0);
+		}
+	}
+		
 
 	return 0;
 }

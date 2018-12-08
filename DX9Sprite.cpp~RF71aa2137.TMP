@@ -5,8 +5,6 @@ DX9Sprite::DX9Sprite() {
 	mnCols = 0;
 	mSheetWidth = 0.0f;
 	mSheetHeight = 0.0f;
-
-	mSprDir = 0;
 	mNumAnims = 0;
 	mCurrAnimID = 0;
 	mCurrFrame = 0;
@@ -65,7 +63,6 @@ int DX9Sprite::SetAnimation(int AnimID) {
 	{
 		mCurrAnimID = AnimID;
 		mCurrFrame = mAnims[AnimID].FrameS;
-		mSprDir = mAnims[AnimID].HFlip;
 	}
 	return 0;
 }
