@@ -15,13 +15,12 @@ struct DX9SpriteAnim {
 	DX9SpriteAnim() { FrameS = 0; FrameE = 0; HFlip = false; };
 };
 
-class DX9Sprite : public DX9Image
-{
+class DX9Sprite : public DX9Image {
 private:
 	int		mnRows;
 	int		mnCols;
-	float	mSheetWidth;
-	float	mSheetHeight;
+	float	mfSheetWidth;
+	float	mfSheetHeight;
 
 	int				mSprDir;
 	int				mCurrAnimID;

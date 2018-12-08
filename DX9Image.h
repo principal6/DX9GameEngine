@@ -7,23 +7,20 @@
 
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
-struct DX9VERTEX
-{
+struct DX9VERTEX {
 	FLOAT x, y, z, rhw;
 	DWORD color;
 	FLOAT u, v;
 };
 
-struct DX9INDEX
-{
+struct DX9INDEX {
 	DX9INDEX() : _0(0), _1(0), _2(0) {};
 	DX9INDEX(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
 
 	WORD	_0, _1, _2;
 };
 
-class DX9Image
-{
+class DX9Image {
 // 현재 클래스에서 참조만 한 변수들
 private:
 	LPDIRECT3DDEVICE9       mpDevice;

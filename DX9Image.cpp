@@ -92,7 +92,7 @@ int DX9Image::SetScale(float ScaleX, float ScaleY) {
 	return 0;
 }
 
-int DX9Image::FlipHorizontal(){
+int DX9Image::FlipHorizontal() {
 	float tempu1 = mVert[0].u;
 
 	mVert[0].u = mVert[1].u;
@@ -131,8 +131,7 @@ int DX9Image::SetTexture(wchar_t* FileName) {
 	return 0;
 }
 
-int DX9Image::CreateVB()
-{
+int DX9Image::CreateVB() {
 	int rVertSize = sizeof(DX9VERTEX) * mnVertCount;
 	if (FAILED(mpDevice->CreateVertexBuffer(rVertSize, 0,
 		D3DFVF_TEXTURE, D3DPOOL_DEFAULT, &mpVB, NULL)))
@@ -143,8 +142,7 @@ int DX9Image::CreateVB()
 	return 0;
 }
 
-int DX9Image::CreateIB()
-{
+int DX9Image::CreateIB() {
 	mnIndCount = 2;
 	mInd = new DX9INDEX[mnIndCount];
 	mInd[0] = DX9INDEX(0, 1, 3);
