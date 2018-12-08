@@ -8,8 +8,8 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 	mpIB = NULL;
 	mpTexture = NULL;
 	
-	mVert = NULL;
-	mInd = NULL;
+	mVert.clear();
+	mInd.clear();
 
 	mX = 0.0f;
 	mY = 0.0f;
@@ -21,11 +21,10 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 
 	// 정점 및 색인 정보 대입, 버퍼 생성
 	mnVertCount = 4;
-	mVert = new DX9VERTEX[mnVertCount];
-	mVert[0] = { mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f };
-	mVert[1] = { mX + mWidth, mY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f };
-	mVert[2] = { mX, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f };
-	mVert[3] = { mX + mWidth, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f };
+	mVert.push_back({ mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f });
+	mVert.push_back({ mX + mWidth, mY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f });
+	mVert.push_back({ mX, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f });
+	mVert.push_back({ mX + mWidth, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f });
 
 	CreateVB();
 	CreateIB();
@@ -36,11 +35,8 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 int DX9Image::Destroy() {
 	mpDevice = NULL; // DX9Base에서 생성했으므로 여기선 참조만 해제!
 	
-	if (mVert != NULL)
-		delete[] mVert;
-
-	if (mInd != NULL)
-		delete[] mInd;
+	mVert.clear();
+	mInd.clear();
 
 	if (mpTexture != NULL)
 		mpTexture->Release();
@@ -144,9 +140,8 @@ int DX9Image::CreateVB() {
 
 int DX9Image::CreateIB() {
 	mnIndCount = 2;
-	mInd = new DX9INDEX[mnIndCount];
-	mInd[0] = DX9INDEX(0, 1, 3);
-	mInd[1] = DX9INDEX(0, 3, 2);
+	mInd.push_back(DX9INDEX(0, 1, 3));
+	mInd.push_back(DX9INDEX(0, 3, 2));
 
 	int rIndSize = sizeof(DX9INDEX) * mnIndCount;
 	if (FAILED(mpDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &mpIB, NULL)))
@@ -154,7 +149,7 @@ int DX9Image::CreateIB() {
 	VOID* pIndices;
 	if (FAILED(mpIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
 		return -1;
-	memcpy(pIndices, mInd, rIndSize);
+	memcpy(pIndices, &mInd[0], rIndSize);
 	mpIB->Unlock();
 
 	return 0;
@@ -165,7 +160,7 @@ int DX9Image::UpdateVB() {
 	VOID* pVertices;
 	if (FAILED(mpVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
 		return -1;
-	memcpy(pVertices, mVert, rVertSize);
+	memcpy(pVertices, &mVert[0], rVertSize);
 	mpVB->Unlock();
 
 	return 0;

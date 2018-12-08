@@ -4,6 +4,7 @@
 #define DX9IMAGE_H
 
 #include "DX9Common.h"
+#include <vector>
 
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 
@@ -22,28 +23,25 @@ struct DX9INDEX {
 
 class DX9Image {
 // 현재 클래스에서 참조만 한 변수들
-private:
+protected:
 	LPDIRECT3DDEVICE9       mpDevice;
 
 // 현재 클래스 내에서 선언한 변수들
-private:
+protected:
 	LPDIRECT3DVERTEXBUFFER9 mpVB;
 	LPDIRECT3DINDEXBUFFER9	mpIB;
 	LPDIRECT3DTEXTURE9		mpTexture;
 
-	DX9VERTEX	*mVert;
+	std::vector<DX9VERTEX>	mVert;
 	int			mnVertCount;
 
-	DX9INDEX	*mInd;
+	std::vector<DX9INDEX>	mInd;
 	int			mnIndCount;
 
 	float	mX;
 	float	mY;
 	float	mScaleX;
 	float	mScaleY;
-
-// 상속 클래스에서 접근할 변수들
-protected:
 	float	mWidth;
 	float	mHeight;
 
