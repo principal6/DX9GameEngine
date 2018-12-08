@@ -40,7 +40,7 @@ public:
 
 // DX9 ÇÔ¼ö
 public:
-	HRESULT DX9Base::InitD3D();
+	int DX9Base::InitD3D();
 	int DX9Base::BeginRender();
 	int DX9Base::EndRender();
 

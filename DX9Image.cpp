@@ -21,6 +21,7 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 	mWidth = 10.0f;
 	mHeight = 10.0f;
 
+	// 정점 및 색인 정보 대입, 버퍼 생성
 	mnVertCount = 4;
 	mVert = new DX9VERTEX[mnVertCount];
 	mVert[0] = { mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f };
@@ -51,6 +52,23 @@ int DX9Image::Destroy() {
 
 	if (mpVB != NULL)
 		mpVB->Release();
+
+	return 0;
+}
+
+int DX9Image::Draw() {
+	mpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
+	mpDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	mpDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	mpDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+
+	if (mpTexture)
+		mpDevice->SetTexture(0, mpTexture);
+
+	mpDevice->SetStreamSource(0, mpVB, 0, sizeof(DX9VERTEX));
+	mpDevice->SetFVF(D3DFVF_TEXTURE);
+	mpDevice->SetIndices(mpIB);
+	mpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mnVertCount, 0, mnIndCount);
 
 	return 0;
 }
@@ -87,47 +105,18 @@ int DX9Image::SetVFlip(bool Value) {
 	return 0;
 };
 
-int DX9Image::UpdateVertData() {
-	mVert[0].x = mX;
-	mVert[0].y = mY;
-	mVert[1].x = mX + mWidth * mScaleX;
-	mVert[1].y = mY;
-	mVert[2].x = mX;
-	mVert[2].y = mY + mHeight * mScaleY;
-	mVert[3].x = mX + mWidth * mScaleX;
-	mVert[3].y = mY + mHeight * mScaleY;
+int DX9Image::SetTexture(wchar_t* FileName) {
+	if (mpTexture)
+		return -1;
 
-	float tempu1 = mVert[0].u;
-	float tempv1 = mVert[0].v;
+	// 텍스처 불러오기
+	wchar_t	NewFileName[255] = { 0 };
+	wcscpy_s(NewFileName, L"Data\\");
+	wcscat_s(NewFileName, FileName);
 
-	if (mHFlip) {
-		mVert[0].u = mVert[1].u;
-		mVert[2].u = mVert[3].u;
-		mVert[1].u = tempu1;
-		mVert[3].u = tempu1;
-	}
+	if (FAILED(D3DXCreateTextureFromFile(mpDevice, NewFileName, &mpTexture)))
+		return -1;
 
-	if (mVFlip) {
-		mVert[0].v = mVert[2].v;
-		mVert[1].v = mVert[3].v;
-		mVert[2].v = tempv1;
-		mVert[3].v = tempv1;
-	}
-
-	UpdateVB();
-	return 0;
-}
-
-int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2) {
-	mVert[0].u = u1;
-	mVert[0].v = v1;
-	mVert[1].u = u2;
-	mVert[1].v = v1;
-	mVert[2].u = u1;
-	mVert[2].v = v2;
-	mVert[3].u = u2;
-	mVert[3].v = v2;
-	UpdateVertData();
 	return 0;
 }
 
@@ -173,34 +162,46 @@ int DX9Image::UpdateVB() {
 	return 0;
 }
 
-int DX9Image::SetTexture(wchar_t* FileName) {
-	if (mpTexture)
-		return -1;
+int DX9Image::UpdateVertData() {
+	mVert[0].x = mX;
+	mVert[0].y = mY;
+	mVert[1].x = mX + mWidth * mScaleX;
+	mVert[1].y = mY;
+	mVert[2].x = mX;
+	mVert[2].y = mY + mHeight * mScaleY;
+	mVert[3].x = mX + mWidth * mScaleX;
+	mVert[3].y = mY + mHeight * mScaleY;
 
-	// 텍스처 불러오기
-	wchar_t	NewFileName[255] = { 0 };
-	wcscpy_s(NewFileName, L"Data\\");
-	wcscat_s(NewFileName, FileName);
+	float tempu1 = mVert[0].u;
+	float tempv1 = mVert[0].v;
 
-	if (FAILED(D3DXCreateTextureFromFile(mpDevice, NewFileName, &mpTexture)))
-		return -1;
+	if (mHFlip) {
+		mVert[0].u = mVert[1].u;
+		mVert[2].u = mVert[3].u;
+		mVert[1].u = tempu1;
+		mVert[3].u = tempu1;
+	}
 
+	if (mVFlip) {
+		mVert[0].v = mVert[2].v;
+		mVert[1].v = mVert[3].v;
+		mVert[2].v = tempv1;
+		mVert[3].v = tempv1;
+	}
+
+	UpdateVB();
 	return 0;
 }
 
-int DX9Image::Draw() {
-	mpDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
-	mpDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	mpDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	mpDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-
-	if (mpTexture)
-		mpDevice->SetTexture(0, mpTexture);
-
-	mpDevice->SetStreamSource(0, mpVB, 0, sizeof(DX9VERTEX));
-	mpDevice->SetFVF(D3DFVF_TEXTURE);
-	mpDevice->SetIndices(mpIB);
-	mpDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, mnVertCount, 0, mnIndCount);
-
+int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2) {
+	mVert[0].u = u1;
+	mVert[0].v = v1;
+	mVert[1].u = u2;
+	mVert[1].v = v1;
+	mVert[2].u = u1;
+	mVert[2].v = v2;
+	mVert[3].u = u2;
+	mVert[3].v = v2;
+	UpdateVertData();
 	return 0;
 }

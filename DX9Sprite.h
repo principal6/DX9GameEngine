@@ -14,6 +14,7 @@ private:
 	float	mSheetHeight = 0.0f;
 
 public:
+	DX9Sprite();
 	int DX9Sprite::SetNumRowsAndCols(int numRows, int numCols);
 	int DX9Sprite::SetFrame(int FrameID);
 };

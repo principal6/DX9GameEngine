@@ -17,16 +17,18 @@ struct DX9VERTEX
 struct DX9INDEX
 {
 	DX9INDEX() : _0(0), _1(0), _2(0) {};
-	DX9INDEX(int A, int B, int C) : _0(A), _1(B), _2(C) {};
+	DX9INDEX(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
 
 	WORD	_0, _1, _2;
 };
 
 class DX9Image
 {
+// 현재 클래스에서 참조만 한 변수들
 private:
-	LPDIRECT3DDEVICE9       mpDevice; // 참조용★
+	LPDIRECT3DDEVICE9       mpDevice;
 
+// 현재 클래스 내에서 선언한 변수들
 private:
 	LPDIRECT3DVERTEXBUFFER9 mpVB;
 	LPDIRECT3DINDEXBUFFER9	mpIB;
@@ -45,6 +47,7 @@ private:
 	bool	mHFlip; // Horizontal Flip
 	bool	mVFlip; // Vertical Flip
 
+// 상속 클래스에서 접근할 변수들
 protected:
 	float	mWidth;
 	float	mHeight;
@@ -54,6 +57,7 @@ private:
 	int DX9Image::CreateIB();
 	int DX9Image::UpdateVB();
 
+// 상속 클래스에서 접근할 함수들
 protected:
 	int DX9Image::UpdateVertData();
 	int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2);
@@ -63,8 +67,8 @@ public:
 	~DX9Image() {};
 
 	int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev);
-	int DX9Image::Draw();
 	int DX9Image::Destroy();
+	int DX9Image::Draw();
 
 	// Setter
 	int DX9Image::SetPosition(float X, float Y);

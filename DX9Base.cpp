@@ -8,8 +8,13 @@ DX9Base::DX9Base(){
 
 int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height){
 	DX9COLOR rBGColor = DX9COLOR(255, 0, 255);
-	CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor);
-	InitD3D();
+
+	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor)
+		== NULL)
+		return -1;
+
+	if (InitD3D() == -1)
+		return -1;
 
 	return 0;
 }
@@ -91,9 +96,9 @@ int DX9Base::Halt(){
 	return 0;
 }
 
-HRESULT DX9Base::InitD3D() {
+int DX9Base::InitD3D() {
 	if (NULL == (mpD3D = Direct3DCreate9(D3D_SDK_VERSION)))
-		return E_FAIL;
+		return -1;
 
 	D3DPRESENT_PARAMETERS D3DPP;
 	ZeroMemory(&D3DPP, sizeof(D3DPP));
@@ -104,10 +109,10 @@ HRESULT DX9Base::InitD3D() {
 	if (FAILED(mpD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, mhWnd,
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &D3DPP, &mpD3DDevice)))
 	{
-		return E_FAIL;
+		return -1;
 	}
 
-	return S_OK;
+	return 0;
 }
 
 int DX9Base::BeginRender() {

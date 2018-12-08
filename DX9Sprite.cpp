@@ -1,5 +1,12 @@
 #include "DX9Sprite.h"
 
+DX9Sprite::DX9Sprite() {
+	mnRows = 0;
+	mnCols = 0;
+	mSheetWidth = 0.0f;
+	mSheetHeight = 0.0f;
+}
+
 int DX9Sprite::SetNumRowsAndCols(int numRows, int numCols)
 {
 	mnRows = numRows;
