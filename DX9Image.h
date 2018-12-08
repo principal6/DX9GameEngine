@@ -51,12 +51,12 @@ protected:
 	float	mHeight;
 
 private:
-	int DX9Image::CreateVB();
-	int DX9Image::CreateIB();
 	int DX9Image::UpdateVB();
 
 // 상속 클래스에서 접근할 함수들
 protected:
+	int DX9Image::CreateVB();
+	int DX9Image::CreateIB();
 	int DX9Image::UpdateVertData();
 	int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2);
 

@@ -19,14 +19,18 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 	mWidth = 10.0f;
 	mHeight = 10.0f;
 
-	// 정점 및 색인 정보 대입, 버퍼 생성
+	// 정점 정보 대입, 버퍼 생성
 	mnVertCount = 4;
 	mVert.push_back(DX9VERTEX(mX,  mY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
 	mVert.push_back(DX9VERTEX(mX + mWidth, mY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
 	mVert.push_back(DX9VERTEX(mX, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
 	mVert.push_back(DX9VERTEX(mX + mWidth, mY + mHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
-
 	CreateVB();
+
+	// 색인 정보 대입, 버퍼 생성
+	mnIndCount = 2;
+	mInd.push_back(DX9INDEX(0, 1, 3));
+	mInd.push_back(DX9INDEX(0, 3, 2));
 	CreateIB();
 
 	return 0;
@@ -139,10 +143,6 @@ int DX9Image::CreateVB() {
 }
 
 int DX9Image::CreateIB() {
-	mnIndCount = 2;
-	mInd.push_back(DX9INDEX(0, 1, 3));
-	mInd.push_back(DX9INDEX(0, 3, 2));
-
 	int rIndSize = sizeof(DX9INDEX) * mnIndCount;
 	if (FAILED(mpDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &mpIB, NULL)))
 		return -1;
