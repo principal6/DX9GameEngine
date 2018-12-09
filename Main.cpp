@@ -22,7 +22,7 @@ float gSprY = 0.0f;
 
 int main() {
 	gDXBase = new DX9Base;
-	gDXBase->Create(0, 0, 800, 600);
+	gDXBase->Create(50, 50, 800, 600);
 
 	gDXInput = new DX9Input;
 	gDXInput->Create(gDXBase->GetInstance(), gDXBase->GetHWND());
@@ -47,10 +47,10 @@ int main() {
 	gDXMap->Create(gDXBase->GetDevice());
 	gDXMap->SetTexture(L"maptile32x32.png");
 	gDXMap->SetTileInfo(32.0f, 32.0f, 17, 6);
-	gDXMap->AddMapFragment(2, 0.0f, 530.0f);
-	gDXMap->AddMapFragment(2, 32.0f, 530.0f);
-	gDXMap->AddMapFragment(2, 64.0f, 530.0f);
-	gDXMap->AddMapFragment(2, 96.0f, 530.0f);
+	gDXMap->AddMapFragment(2, 0.0f, 568.0f);
+	gDXMap->AddMapFragment(2, 32.0f, 568.0f);
+	gDXMap->AddMapFragment(2, 64.0f, 568.0f);
+	gDXMap->AddMapFragment(2, 96.0f, 568.0f);
 	gDXMap->AddEnd();
 
 	// 메인 루프 실행

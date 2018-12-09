@@ -60,8 +60,14 @@ HWND DX9Base::CreateWND(const wchar_t* Name,
 	r_WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&r_WndClass);
 
+	// 윈도우 정확한 픽셀 크기로 맞추기
+	RECT rWndRect = { X, Y, X + Width, Y + Height };
+	AdjustWindowRect(&rWndRect, (DWORD)WindowStyle, false);
+
 	// 윈도우 생성
-	mhWnd = CreateWindow(Name, Name, (DWORD)WindowStyle, X, Y, Width, Height,
+	mhWnd = CreateWindow(Name, Name, (DWORD)WindowStyle,
+		rWndRect.left, rWndRect.top,
+		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top,
 		NULL, (HMENU)NULL, mhInstance, NULL);
 
 	// 윈도우 표시
