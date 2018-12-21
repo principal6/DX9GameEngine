@@ -35,8 +35,19 @@ int DX9Map::Destroy() {
 	return 0;
 }
 
-int DX9Map::SetTexture(wchar_t* FileName) {
-	DX9Image::SetTexture(FileName);
+int DX9Map::SetTexture(std::wstring FileName) {
+	
+	std::wstring NewFileName;
+	NewFileName = FileName;
+	if (FileName.find(L'\\') == -1)
+	{
+		NewFileName = L"Data\\";
+		NewFileName += FileName;
+	}
+
+	if (D3DXCreateTextureFromFile(mpDevice, NewFileName.c_str(), &mpTexture))
+		return -1;
+	
 	return 0;
 }
 

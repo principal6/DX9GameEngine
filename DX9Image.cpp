@@ -116,17 +116,28 @@ int DX9Image::FlipVertical() {
 	return 0;
 }
 
-int DX9Image::SetTexture(wchar_t* FileName) {
+int DX9Image::SetTexture(std::wstring FileName) {
 	if (mpTexture)
 		return -1;
 
-	// 텍스처 불러오기
-	wchar_t	NewFileName[255] = { 0 };
-	wcscpy_s(NewFileName, L"Data\\");
-	wcscat_s(NewFileName, FileName);
+	std::wstring NewFileName;
+	NewFileName = FileName;
+	if (FileName.find(L'\\') == -1)
+	{
+		NewFileName = L"Data\\";
+		NewFileName += FileName;
+	}
 
-	if (FAILED(D3DXCreateTextureFromFile(mpDevice, NewFileName, &mpTexture)))
+	// 텍스처 불러오기
+	D3DXIMAGE_INFO tImgInfo;
+	if (D3DXCreateTextureFromFileEx(mpDevice, NewFileName.c_str(), 0, 0, 0, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0,
+		&tImgInfo, NULL, &mpTexture))
 		return -1;
+
+	mWidth = (float)tImgInfo.Width;
+	mHeight = (float)tImgInfo.Height;
+	UpdateVertData();
 
 	return 0;
 }

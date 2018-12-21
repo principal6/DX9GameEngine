@@ -18,7 +18,7 @@ public:
 
 	int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev);
 	int DX9Map::Destroy();
-	int DX9Map::SetTexture(wchar_t* FileName);
+	int DX9Map::SetTexture(std::wstring FileName);
 	int DX9Map::SetTileInfo(float TileW, float TileH, int numRows, int numCols);
 	int DX9Map::AddMapFragment(int TileID, float X, float Y);
 	int DX9Map::AddEnd();

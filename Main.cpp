@@ -29,14 +29,13 @@ int main() {
 
 	gDXImage = new DX9Image;
 	gDXImage->Create(gDXBase->GetDevice());
-	gDXImage->SetSize(960.0f, 672.0f);
 	gDXImage->SetTexture(L"bg.png");
 
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice());
+	gDXSprite->SetTexture(L"advnt_full.png");
 	gDXSprite->SetSize(32.0f, 64.0f);
 	gDXSprite->SetScale(2.0f, 2.0f);
-	gDXSprite->SetTexture(L"advnt_full.png");
 	gDXSprite->SetNumRowsAndCols(10, 10);
 	gDXSprite->AddAnimation(0, 0, 0);
 	gDXSprite->AddAnimation(1, 0, 0, true);

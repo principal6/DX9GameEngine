@@ -73,7 +73,7 @@ public:
 	int DX9Image::SetPosition(float X, float Y);
 	int DX9Image::SetSize(float Width, float Height);
 	int DX9Image::SetScale(float ScaleX, float ScaleY);
-	int DX9Image::SetTexture(wchar_t* FileName);
+	int DX9Image::SetTexture(std::wstring FileName);
 };
 
 #endif
