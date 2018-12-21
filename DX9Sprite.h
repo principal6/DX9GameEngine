@@ -17,10 +17,10 @@ struct DX9SpriteAnim {
 
 class DX9Sprite : public DX9Image {
 private:
-	int		mnRows;
-	int		mnCols;
-	float	mfSheetWidth;
-	float	mfSheetHeight;
+	int	m_nRows;
+	int	m_nCols;
+	int	m_nSheetWidth;
+	int	m_nSheetHeight;
 
 	int				mSprDir;
 	int				mCurrAnimID;

@@ -34,7 +34,7 @@ int main() {
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice());
 	gDXSprite->SetTexture(L"advnt_full.png");
-	gDXSprite->SetSize(32.0f, 64.0f);
+	gDXSprite->SetSize(32, 64);
 	gDXSprite->SetScale(2.0f, 2.0f);
 	gDXSprite->SetNumRowsAndCols(10, 10);
 	gDXSprite->AddAnimation(0, 0, 0);
@@ -45,11 +45,11 @@ int main() {
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice());
 	gDXMap->SetTexture(L"maptile32x32.png");
-	gDXMap->SetTileInfo(32.0f, 32.0f);
-	gDXMap->AddMapFragment(2, 0.0f, 568.0f);
-	gDXMap->AddMapFragment(2, 32.0f, 568.0f);
-	gDXMap->AddMapFragment(2, 64.0f, 568.0f);
-	gDXMap->AddMapFragment(2, 96.0f, 568.0f);
+	gDXMap->SetTileInfo(32, 32);
+	gDXMap->AddMapFragment(2, 0, 4);
+	gDXMap->AddMapFragment(2, 1, 4);
+	gDXMap->AddMapFragment(2, 2, 4);
+	gDXMap->AddMapFragment(2, 3, 4);
 	gDXMap->AddEnd();
 
 	// 메인 루프 실행

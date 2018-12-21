@@ -7,10 +7,6 @@
 
 class DX9Base
 {
-// 공용 변수
-private:
-	int (*m_pMainLoop);
-
 // 윈도우 변수
 private:
 	HINSTANCE	m_hInstance;
@@ -21,6 +17,7 @@ private:
 private:
 	LPDIRECT3D9             m_pD3D;
 	LPDIRECT3DDEVICE9       m_pD3DDevice;
+	D3DCOLOR				m_BGColor;
 
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name,
@@ -28,7 +25,6 @@ private:
 		DX9WINDOW_STYLE WindowStyle, DX9COLOR BackColor);
 	int DX9Base::InitD3D();
 
-// 공용 함수
 public:
 	DX9Base();
 	~DX9Base() {};
@@ -42,6 +38,10 @@ public:
 	int DX9Base::Resize(HWND hWnd);
 	int DX9Base::BeginRender();
 	int DX9Base::EndRender();
+
+// Setter
+public:
+	int DX9Base::SetBGColor(D3DCOLOR color);
 
 // Getter
 public:

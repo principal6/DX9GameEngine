@@ -15,6 +15,7 @@ DX9Base::DX9Base(){
 	// 멤버 변수 초기화
 	m_pD3D = NULL;
 	m_pD3DDevice = NULL;
+	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
 int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height){
@@ -90,6 +91,11 @@ HWND DX9Base::CreateWND(const wchar_t* Name,
 	return m_hWnd;
 }
 
+int DX9Base::SetBGColor(D3DCOLOR color) {
+	m_BGColor = color;
+	return 0;
+}
+
 int DX9Base::Run(int(*pMainLoop)()) {
 
 	while (m_MSG.message != WM_QUIT)
@@ -162,7 +168,7 @@ int DX9Base::Resize(HWND hWnd) {
 }
 
 int DX9Base::BeginRender() {
-	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
+	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, m_BGColor, 1.0f, 0);
 
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 		return 0;

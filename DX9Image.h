@@ -29,26 +29,26 @@ struct DX9INDEX {
 class DX9Image {
 // 현재 클래스에서 참조만 한 변수들
 protected:
-	LPDIRECT3DDEVICE9       mpDevice;
+	LPDIRECT3DDEVICE9       m_pDevice;
 
 // 현재 클래스 내에서 선언한 변수들
 protected:
-	LPDIRECT3DVERTEXBUFFER9 mpVB;
-	LPDIRECT3DINDEXBUFFER9	mpIB;
-	LPDIRECT3DTEXTURE9		mpTexture;
+	LPDIRECT3DVERTEXBUFFER9 m_pVB;
+	LPDIRECT3DINDEXBUFFER9	m_pIB;
+	LPDIRECT3DTEXTURE9		m_pTexture;
 
-	std::vector<DX9VERTEX>	mVert;
-	int			mnVertCount;
+	std::vector<DX9VERTEX>	m_Vert;
+	int						m_nVertCount;
 
-	std::vector<DX9INDEX>	mInd;
-	int			mnIndCount;
+	std::vector<DX9INDEX>	m_Ind;
+	int						m_nIndCount;
 
-	float	mX;
-	float	mY;
-	float	mScaleX;
-	float	mScaleY;
-	float	mWidth;
-	float	mHeight;
+	float	m_fX;
+	float	m_fY;
+	float	m_fScaleX;
+	float	m_fScaleY;
+	int		m_nWidth;
+	int		m_nHeight;
 
 // 상속 클래스에서 접근할 함수들
 protected:
@@ -71,9 +71,16 @@ public:
 
 	// Setter
 	int DX9Image::SetPosition(float X, float Y);
-	int DX9Image::SetSize(float Width, float Height);
+	int DX9Image::SetSize(int Width, int Height);
 	int DX9Image::SetScale(float ScaleX, float ScaleY);
 	int DX9Image::SetTexture(std::wstring FileName);
+
+	// Getter
+	int DX9Image::GetWidth() { return m_nWidth;	};
+	int DX9Image::GetHeight() { return m_nHeight; };
+
+	// Asker
+	bool DX9Image::IsTextureLoaded();
 };
 
 #endif
