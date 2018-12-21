@@ -22,11 +22,11 @@ private:
 	int	m_nSheetWidth;
 	int	m_nSheetHeight;
 
-	int				mSprDir;
-	int				mCurrAnimID;
-	int				mCurrFrame;
-	DX9SpriteAnim	mAnims[DX9MAXSPRANIMNUM];
-	int				mNumAnims;
+	int				m_nSprDir;
+	int				m_nCurrAnimID;
+	int				m_nCurrFrame;
+	DX9SpriteAnim	m_Anims[DX9MAXSPRANIMNUM];
+	int				m_nAnimCount;
 
 public:
 	DX9Sprite();
@@ -37,7 +37,7 @@ public:
 	int DX9Sprite::AddAnimation(int AnimID, int StartFrame, int EndFrame, bool HFlip = false);
 	int DX9Sprite::SetAnimation(int AnimID);
 	int DX9Sprite::Animate();
-	int DX9Sprite::GetSpriteDir() { return mSprDir; };
+	int DX9Sprite::GetSpriteDir() { return m_nSprDir; };
 };
 
 #endif
