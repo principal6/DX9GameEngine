@@ -45,7 +45,7 @@ int main() {
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice());
 	gDXMap->SetTexture(L"maptile32x32.png");
-	gDXMap->SetTileInfo(32.0f, 32.0f, 17, 6);
+	gDXMap->SetTileInfo(32.0f, 32.0f);
 	gDXMap->AddMapFragment(2, 0.0f, 568.0f);
 	gDXMap->AddMapFragment(2, 32.0f, 568.0f);
 	gDXMap->AddMapFragment(2, 64.0f, 568.0f);

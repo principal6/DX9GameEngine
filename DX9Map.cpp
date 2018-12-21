@@ -36,30 +36,21 @@ int DX9Map::Destroy() {
 }
 
 int DX9Map::SetTexture(std::wstring FileName) {
-	
-	std::wstring NewFileName;
-	NewFileName = FileName;
-	if (FileName.find(L'\\') == -1)
-	{
-		NewFileName = L"Data\\";
-		NewFileName += FileName;
-	}
-
-	if (D3DXCreateTextureFromFile(mpDevice, NewFileName.c_str(), &mpTexture))
-		return -1;
+	DX9Image::SetTexture(FileName);
 	
 	return 0;
 }
 
-int DX9Map::SetTileInfo(float TileW, float TileH, int numRows, int numCols) {
+int DX9Map::SetTileInfo(float TileW, float TileH) {
+
+	mfSheetWidth = mWidth;
+	mfSheetHeight = mHeight;
+
 	mWidth = TileW;
 	mHeight = TileH;
 
-	mnRows = numRows;
-	mnCols = numCols;
-
-	mfSheetWidth = mWidth * mnCols;
-	mfSheetHeight = mHeight * mnRows;
+	mnRows = (int)(mfSheetWidth / mWidth);
+	mnCols = (int)(mfSheetHeight / mHeight);
 
 	return 0;
 }

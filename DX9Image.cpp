@@ -178,6 +178,9 @@ int DX9Image::UpdateVB() {
 }
 
 int DX9Image::UpdateVertData() {
+	if (mVert.size() < 4)
+		return -1;
+
 	mVert[0].x = mX;
 	mVert[0].y = mY;
 	mVert[1].x = mX + mWidth * mScaleX;
@@ -192,6 +195,9 @@ int DX9Image::UpdateVertData() {
 }
 
 int DX9Image::UpdateVertData(float u1, float v1, float u2, float v2) {
+	if (mVert.size() < 4)
+		return -1;
+
 	mVert[0].u = u1;
 	mVert[0].v = v1;
 	mVert[1].u = u2;
