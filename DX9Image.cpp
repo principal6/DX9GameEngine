@@ -118,7 +118,10 @@ int DX9Image::FlipVertical() {
 
 int DX9Image::SetTexture(std::wstring FileName) {
 	if (mpTexture)
-		return -1;
+	{
+		mpTexture->Release();
+		mpTexture = NULL;
+	}
 
 	std::wstring NewFileName;
 	NewFileName = FileName;
