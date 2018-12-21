@@ -134,7 +134,7 @@ int DX9Image::SetTexture(std::wstring FileName) {
 	// 텍스처 불러오기
 	D3DXIMAGE_INFO tImgInfo;
 	if (D3DXCreateTextureFromFileEx(mpDevice, NewFileName.c_str(), 0, 0, 0, 0,
-		D3DFMT_UNKNOWN, D3DPOOL_DEFAULT, D3DX_DEFAULT, D3DX_DEFAULT, 0,
+		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
 		&tImgInfo, NULL, &mpTexture))
 		return -1;
 
@@ -148,7 +148,7 @@ int DX9Image::SetTexture(std::wstring FileName) {
 int DX9Image::CreateVB() {
 	int rVertSize = sizeof(DX9VERTEX) * mnVertCount;
 	if (FAILED(mpDevice->CreateVertexBuffer(rVertSize, 0,
-		D3DFVF_TEXTURE, D3DPOOL_DEFAULT, &mpVB, NULL)))
+		D3DFVF_TEXTURE, D3DPOOL_MANAGED, &mpVB, NULL)))
 	{
 		return -1;
 	}
@@ -158,7 +158,7 @@ int DX9Image::CreateVB() {
 
 int DX9Image::CreateIB() {
 	int rIndSize = sizeof(DX9INDEX) * mnIndCount;
-	if (FAILED(mpDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &mpIB, NULL)))
+	if (FAILED(mpDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &mpIB, NULL)))
 		return -1;
 	VOID* pIndices;
 	if (FAILED(mpIB->Lock(0, rIndSize, (void **)&pIndices, 0)))

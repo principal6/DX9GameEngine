@@ -1,5 +1,16 @@
 #include "DX9Base.h"
 
+LRESULT CALLBACK WndProcBase(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	switch (Message)
+	{
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+	return(DefWindowProc(hWnd, Message, wParam, lParam));
+}
+
 DX9Base::DX9Base(){
 	// 멤버 변수 초기화
 	m_pD3D = NULL;
@@ -31,17 +42,6 @@ int DX9Base::CreateOnWindow(HWND hWnd) {
 	return 0;
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	switch (Message)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-	}
-	return(DefWindowProc(hWnd, Message, wParam, lParam));
-}
-
 int DX9Base::Destroy() {
 	if (m_pD3DDevice != NULL)
 		m_pD3DDevice->Release();
@@ -66,7 +66,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name,
 	r_WndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	r_WndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	r_WndClass.hInstance = m_hInstance;
-	r_WndClass.lpfnWndProc = WndProc;
+	r_WndClass.lpfnWndProc = WndProcBase;
 	r_WndClass.lpszClassName = Name;
 	r_WndClass.lpszMenuName = NULL;
 	r_WndClass.style = CS_HREDRAW | CS_VREDRAW;
@@ -108,6 +108,17 @@ int DX9Base::Run(int(*pMainLoop)()) {
 	return 0;
 }
 
+int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel) {
+	while (GetMessage(&m_MSG, 0, 0, 0)) {
+		if (!TranslateAccelerator(m_hWnd, hAccel, &m_MSG)) {
+			TranslateMessage(&m_MSG);
+			DispatchMessage(&m_MSG);
+			pMainLoop();
+		}
+	}
+	return (int)m_MSG.wParam;
+}
+
 int DX9Base::Halt(){
 	DestroyWindow(m_hWnd);
 
@@ -129,6 +140,23 @@ int DX9Base::InitD3D() {
 	{
 		return -1;
 	}
+
+	return 0;
+}
+
+int DX9Base::Resize(HWND hWnd) {
+
+	if (!m_pD3DDevice)
+		return -1;
+
+	D3DPRESENT_PARAMETERS D3DPP;
+	ZeroMemory(&D3DPP, sizeof(D3DPP));
+	D3DPP.Windowed = TRUE;
+	D3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
+	D3DPP.BackBufferFormat = D3DFMT_UNKNOWN;
+	D3DPP.hDeviceWindow = hWnd;
+
+	m_pD3DDevice->Reset(&D3DPP);
 
 	return 0;
 }

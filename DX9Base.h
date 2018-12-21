@@ -37,7 +37,9 @@ public:
 	int DX9Base::CreateOnWindow(HWND hWnd);
 	int DX9Base::Destroy();
 	int DX9Base::Run(int(*pMainLoop)());
+	int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel);
 	int DX9Base::Halt();
+	int DX9Base::Resize(HWND hWnd);
 	int DX9Base::BeginRender();
 	int DX9Base::EndRender();
 
@@ -48,7 +50,7 @@ public:
 	HWND				DX9Base::GetHWND() { return m_hWnd; };
 
 private:
-	friend LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
+	friend LRESULT CALLBACK WndProcBase(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
 };
 
