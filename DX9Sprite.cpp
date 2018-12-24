@@ -14,13 +14,16 @@ DX9Sprite::DX9Sprite() {
 	m_nCurrAnimID = 0;
 	m_nCurrFrame = 0;
 
-	m_SprX = 0.0f;
-	m_SprY = 0.0f;
+	m_SprPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_SprFeetY = 0.0f;
 }
 
 int DX9Sprite::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
 	DX9Image::Create(pD3DDev, BaseDir);
+
+	m_BB.Create(pD3DDev);
+	m_BB.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
+	m_BB.AddEnd();
 	return 0;
 }
 
@@ -31,7 +34,7 @@ int DX9Sprite::MakeSprite(std::wstring TextureFN, int numCols, int numRows, floa
 	m_nSprScaledW = (int)(m_nSprW * Scale);
 	m_nSprScaledH = (int)(m_nSprH * Scale);
 
-	SetPosition(0.0f, 0.0f);
+	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	return 0;
 }
 
@@ -105,28 +108,34 @@ int DX9Sprite::Animate() {
 	return 0;
 }
 
-int DX9Sprite::SetPosition(float X, float Y) {
-	DX9Image::SetPosition(X, Y);
-	m_SprX = X;
-	m_SprY = Y;
-	m_SprFeetX = X + m_nSprScaledW / 2;
-	m_SprFeetY = Y + m_nSprScaledH;
+int DX9Sprite::DrawBB() {
+	m_BB.SetBoxPosition(m_SprPos, D3DXVECTOR2((float)m_nSprScaledW, (float)m_nSprScaledH));
+	m_BB.Draw();
+	return 0;
+}
+
+int DX9Sprite::SetPosition(D3DXVECTOR2 Pos) {
+	DX9Image::SetPosition(Pos.x, Pos.y);
+	m_SprPos.x = Pos.x;
+	m_SprPos.y = Pos.y;
+	m_SprFeetX = Pos.x + m_nSprScaledW / 2;
+	m_SprFeetY = Pos.y + m_nSprScaledH;
 	return 0;
 }
 
 int DX9Sprite::SetPositionY(float Y) {
-	DX9Image::SetPosition(m_SprX, Y);
-	m_SprY = Y;
+	DX9Image::SetPosition(m_SprPos.x, Y);
+	m_SprPos.y = Y;
 	m_SprFeetY = Y + m_nSprScaledH;
 	return 0;
 }
 
 int DX9Sprite::Move(float dX, float dY) {
-	m_SprX += dX;
-	m_SprY += dY;
+	m_SprPos.x += dX;
+	m_SprPos.y += dY;
 	m_SprFeetX += dX;
 	m_SprFeetY += dY;
 
-	DX9Image::SetPosition(m_SprX, m_SprY);
+	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
 	return 0;
 }

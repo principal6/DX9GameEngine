@@ -6,26 +6,6 @@
 #include "DX9Common.h"
 #include <vector>
 
-#define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
-
-struct DX9VERTEX {
-	DX9VERTEX() : x(0), y(0), z(0), rhw(1), color(0xffffffff), u(0), v(0) {};
-	DX9VERTEX(float _x, float _y, float _z, float _rhw,
-		DWORD _color, float _u, float _v) : x(_x), y(_y), z(_z), rhw(_rhw),
-		color(_color), u(_u), v(_v) {};
-
-	FLOAT x, y, z, rhw;
-	DWORD color;
-	FLOAT u, v;
-};
-
-struct DX9INDEX {
-	DX9INDEX() : _0(0), _1(0), _2(0) {};
-	DX9INDEX(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
-
-	WORD	_0, _1, _2;
-};
-
 class DX9Image {
 // 현재 클래스에서 참조만 한 변수들
 protected:
@@ -37,10 +17,10 @@ protected:
 	LPDIRECT3DINDEXBUFFER9	m_pIB;
 	LPDIRECT3DTEXTURE9		m_pTexture;
 
-	std::vector<DX9VERTEX>	m_Vert;
-	int						m_nVertCount;
+	std::vector<DX9VERTEX_IMAGE>	m_Vert;
+	int								m_nVertCount;
 
-	std::vector<DX9INDEX>	m_Ind;
+	std::vector<DX9INDEX3>	m_Ind;
 	int						m_nIndCount;
 
 	std::wstring			m_strBaseDir;

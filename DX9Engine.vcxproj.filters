@@ -33,6 +33,9 @@
     <ClInclude Include="DX9Map.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DX9Line.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -51,6 +54,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DX9Map.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9Line.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

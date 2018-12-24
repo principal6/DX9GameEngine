@@ -4,6 +4,7 @@
 #define DX9SPRITE_H
 
 #include "DX9Image.h"
+#include "DX9Line.h"
 
 #define DX9MAXSPRANIMNUM 20
 
@@ -30,8 +31,9 @@ private:
 	DX9SpriteAnim	m_Anims[DX9MAXSPRANIMNUM];
 	int				m_nAnimCount;
 
-	float m_SprX;
-	float m_SprY;
+	DX9Line			m_BB;
+
+	D3DXVECTOR2 m_SprPos;
 	float m_SprFeetX;
 	float m_SprFeetY;
 
@@ -40,7 +42,7 @@ public:
 	~DX9Sprite() {};
 
 	int DX9Sprite::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir);
-	int DX9Sprite::Destroy() { return DX9Image::Destroy(); };
+	int DX9Sprite::Destroy() { m_BB.Destroy(); return DX9Image::Destroy(); };
 	
 	int DX9Sprite::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float Scale);
 	int DX9Sprite::SetNumRowsAndCols(int numCols, int numRows);
@@ -51,8 +53,9 @@ public:
 	int DX9Sprite::Animate();
 
 	int DX9Sprite::Draw() { return DX9Image::Draw(); };
+	int DX9Sprite::DrawBB();
 
-	int DX9Sprite::SetPosition(float X, float Y);
+	int DX9Sprite::SetPosition(D3DXVECTOR2 Pos);
 	int DX9Sprite::SetPositionY(float Y);
 	int DX9Sprite::Move(float dX, float dY);
 

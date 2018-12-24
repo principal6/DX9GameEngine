@@ -159,6 +159,7 @@
     <ClInclude Include="DX9Image.h" />
     <ClInclude Include="DX9Input.h" />
     <ClInclude Include="DX9Map.h" />
+    <ClInclude Include="DX9Line.h" />
     <ClInclude Include="DX9Sprite.h" />
   </ItemGroup>
   <ItemGroup>
@@ -166,6 +167,7 @@
     <ClCompile Include="DX9Image.cpp" />
     <ClCompile Include="DX9Input.cpp" />
     <ClCompile Include="DX9Map.cpp" />
+    <ClCompile Include="DX9Line.cpp" />
     <ClCompile Include="DX9Sprite.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>

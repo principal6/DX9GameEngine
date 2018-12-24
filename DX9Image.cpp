@@ -16,23 +16,23 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
 	m_fScaleX = 1.0f;
 	m_fScaleY = 1.0f;
 
-	m_nWidth = 10;
-	m_nHeight = 10;
+	m_nWidth = 10.0f;
+	m_nHeight = 10.0f;
 
 	m_strBaseDir = BaseDir;
 
 	// 정점 정보 대입, 버퍼 생성
 	m_nVertCount = 4;
-	m_Vert.push_back(DX9VERTEX(m_fX,  m_fY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX(m_fX + m_nWidth, m_fY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX(m_fX, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-	m_Vert.push_back(DX9VERTEX(m_fX + m_nWidth, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX,  m_fY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX + m_nWidth, m_fY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX + m_nWidth, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
 	CreateVB();
 
 	// 색인 정보 대입, 버퍼 생성
 	m_nIndCount = 2;
-	m_Ind.push_back(DX9INDEX(0, 1, 3));
-	m_Ind.push_back(DX9INDEX(0, 3, 2));
+	m_Ind.push_back(DX9INDEX3(0, 1, 3));
+	m_Ind.push_back(DX9INDEX3(0, 3, 2));
 	CreateIB();
 
 	return 0;
@@ -72,7 +72,7 @@ int DX9Image::Draw() {
 		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 	}
 
-	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX));
+	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_IMAGE));
 	m_pDevice->SetFVF(D3DFVF_TEXTURE);
 	m_pDevice->SetIndices(m_pIB);
 	m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertCount, 0, m_nIndCount);
@@ -176,7 +176,7 @@ int DX9Image::SetTexture(std::wstring FileName) {
 }
 
 int DX9Image::CreateVB() {
-	int rVertSize = sizeof(DX9VERTEX) * m_nVertCount;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertCount;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0,
 		D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, NULL)))
 	{
@@ -187,7 +187,7 @@ int DX9Image::CreateVB() {
 }
 
 int DX9Image::CreateIB() {
-	int rIndSize = sizeof(DX9INDEX) * m_nIndCount;
+	int rIndSize = sizeof(DX9INDEX3) * m_nIndCount;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, NULL)))
 		return -1;
 	VOID* pIndices;
@@ -200,7 +200,7 @@ int DX9Image::CreateIB() {
 }
 
 int DX9Image::UpdateVB() {
-	int rVertSize = sizeof(DX9VERTEX) * m_nVertCount;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertCount;
 	VOID* pVertices;
 	if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
 		return -1;

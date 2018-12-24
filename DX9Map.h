@@ -32,19 +32,6 @@ struct DXUV {
 	DXUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
 };
 
-struct DXMAPXY {
-	int X;
-	int Y;
-	DXMAPXY() : X(0), Y(0) {};
-	DXMAPXY(int _X, int _Y) : X(_X), Y(_Y) {};
-
-	bool operator ==(DXMAPXY New) {
-		if ((New.X == this->X) && (New.Y == this->Y))
-			return true;
-		return false;
-	}
-};
-
 struct DXMAPDATA {
 	int TileID;
 	int MoveID;
@@ -70,7 +57,7 @@ private:
 	bool m_bMoveTextureLoaded;
 	LPDIRECT3DTEXTURE9		m_pTextureMove;
 	LPDIRECT3DVERTEXBUFFER9 m_pVBMove;
-	std::vector<DX9VERTEX>	m_VertMove;
+	std::vector<DX9VERTEX_IMAGE>	m_VertMove;
 	int						m_nVertMoveCount;
 
 	float m_fOffsetX;
@@ -120,8 +107,7 @@ public:
 	int DX9Map::GetMapRows() { return m_nMapRows; };
 	int DX9Map::GetWidth() { return (m_nMapCols * TILE_W); };
 	int DX9Map::GetHeight() { return (m_nMapRows * TILE_H); };
-	DXMAPXY DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY);
-	float DX9Map::GetTopFromMapXY(DXMAPXY XY);
+	D3DXVECTOR2 DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY);
 
 	// Asker
 	bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir);

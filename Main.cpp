@@ -3,6 +3,7 @@
 #include "DX9Input.h"
 #include "DX9Sprite.h"
 #include "DX9Map.h"
+#include "DX9Line.h"
 
 int MainLoop();
 int DetectInput();
@@ -16,11 +17,11 @@ ULONGLONG	gTimerSec = 0;
 ULONGLONG	gTimerAnim = 0;
 int			gFPS = 0;
 
-DX9Base* gDXBase;
-DX9Input* gDXInput;
-DX9Image* gDXImage;
-DX9Sprite* gDXSprite;
-DX9Map* gDXMap;
+DX9Base*	gDXBase;
+DX9Input*	gDXInput;
+DX9Image*	gDXImage;
+DX9Sprite*	gDXSprite;
+DX9Map*		gDXMap;
 
 float gSprGroundOffsetY = 0.0f;
 float gMapGroundOffsetY = 0.0f;
@@ -46,7 +47,7 @@ int main() {
 	gDXSprite->AddAnimation(2, 1, 5);
 	gDXSprite->AddAnimation(3, 1, 5, true);
 	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
-	gDXSprite->SetPosition(160.0f, gSprGroundOffsetY - 140.0f);
+	gDXSprite->SetPosition(D3DXVECTOR2(160.0f, gSprGroundOffsetY - 140.0f));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), gBaseDir);
@@ -98,6 +99,7 @@ int MainLoop() {
 		gDXMap->Draw();
 
 		gDXSprite->Draw();
+		gDXSprite->DrawBB();
 
 	gDXBase->EndRender();
 
@@ -106,16 +108,23 @@ int MainLoop() {
 	return 0;
 }
 
+int ChechkCollision() {
+
+
+	return 0;
+}
+
 int MoveSprite(DXMAPDIR Dir) {
 	float tX = gDXSprite->GetSpriteFeetX();
 	float tY = gDXSprite->GetSpriteFeetY();
 
-	DXMAPXY tMapPos = gDXMap->GetMapXYFromPosition(tX, tY);
+	D3DXVECTOR2 tMapPos = gDXMap->GetMapXYFromPosition(tX, tY);
 	
 	float dX = 0.0f;
 	float dY = 0.0f;
 
 	bool tMovable = gDXMap->IsAbleToMove(Dir, tX, tY - 1.0f, gStride, &dX, &dY);
+	bool tMovable2 = gDXMap->IsAbleToMove(Dir, tX, tY - 1.0f, gStride, &dX, &dY);
 
 	if (tMovable == false)
 	{
@@ -124,7 +133,7 @@ int MoveSprite(DXMAPDIR Dir) {
 	else
 	{
 		gDXSprite->Move(dX, dY);
-		std::cout << tMapPos.X << "/" << tMapPos.Y << std::endl;
+		std::cout << tMapPos.x << "/" << tMapPos.y << std::endl;
 	}
 	return 0;
 }

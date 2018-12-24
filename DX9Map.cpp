@@ -231,14 +231,14 @@ int DX9Map::AddMapFragmentTile(int TileID, int X, int Y) {
 	float tX = (float)(X * TILE_W);
 	float tY = (float)(Y * TILE_H);
 
-	m_Vert.push_back(DX9VERTEX(tX, tY, 0, 1, tColor, tUV.u1, tUV.v1));
-	m_Vert.push_back(DX9VERTEX(tX + TILE_W, tY, 0, 1, tColor, tUV.u2, tUV.v1));
-	m_Vert.push_back(DX9VERTEX(tX, tY + TILE_H, 0, 1, tColor, tUV.u1, tUV.v2));
-	m_Vert.push_back(DX9VERTEX(tX + TILE_W, tY + TILE_H, 0, 1, tColor, tUV.u2, tUV.v2));
+	m_Vert.push_back(DX9VERTEX_IMAGE(tX, tY, 0, 1, tColor, tUV.u1, tUV.v1));
+	m_Vert.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY, 0, 1, tColor, tUV.u2, tUV.v1));
+	m_Vert.push_back(DX9VERTEX_IMAGE(tX, tY + TILE_H, 0, 1, tColor, tUV.u1, tUV.v2));
+	m_Vert.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY + TILE_H, 0, 1, tColor, tUV.u2, tUV.v2));
 	m_nVertCount = (int)m_Vert.size();
 
-	m_Ind.push_back(DX9INDEX(m_nVertCount - 4, m_nVertCount - 3, m_nVertCount - 1));
-	m_Ind.push_back(DX9INDEX(m_nVertCount - 4, m_nVertCount - 1, m_nVertCount - 2));
+	m_Ind.push_back(DX9INDEX3(m_nVertCount - 4, m_nVertCount - 3, m_nVertCount - 1));
+	m_Ind.push_back(DX9INDEX3(m_nVertCount - 4, m_nVertCount - 1, m_nVertCount - 2));
 	m_nIndCount = (int)m_Ind.size();
 
 	return 0;
@@ -253,10 +253,10 @@ int DX9Map::AddMapFragmentMove(int MoveID, int X, int Y) {
 		float tX = (float)(X * TILE_W);
 		float tY = (float)(Y * TILE_H);
 
-		m_VertMove.push_back(DX9VERTEX(tX, tY, 0, 1, Color, tUV.u1, tUV.v1));
-		m_VertMove.push_back(DX9VERTEX(tX + TILE_W, tY, 0, 1, Color, tUV.u2, tUV.v1));
-		m_VertMove.push_back(DX9VERTEX(tX, tY + TILE_H, 0, 1, Color, tUV.u1, tUV.v2));
-		m_VertMove.push_back(DX9VERTEX(tX + TILE_W, tY + TILE_H, 0, 1, Color, tUV.u2, tUV.v2));
+		m_VertMove.push_back(DX9VERTEX_IMAGE(tX, tY, 0, 1, Color, tUV.u1, tUV.v1));
+		m_VertMove.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY, 0, 1, Color, tUV.u2, tUV.v1));
+		m_VertMove.push_back(DX9VERTEX_IMAGE(tX, tY + TILE_H, 0, 1, Color, tUV.u1, tUV.v2));
+		m_VertMove.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY + TILE_H, 0, 1, Color, tUV.u2, tUV.v2));
 		m_nVertMoveCount = (int)m_VertMove.size();
 
 		return 0;
@@ -266,7 +266,7 @@ int DX9Map::AddMapFragmentMove(int MoveID, int X, int Y) {
 }
 
 int DX9Map::CreateVBMove() {
-	int rVertSize = sizeof(DX9VERTEX) * m_nVertMoveCount;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertMoveCount;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0,
 		D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVBMove, NULL)))
 	{
@@ -277,7 +277,7 @@ int DX9Map::CreateVBMove() {
 }
 
 int DX9Map::UpdateVBMove() {
-	int rVertSize = sizeof(DX9VERTEX) * m_nVertMoveCount;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertMoveCount;
 	VOID* pVertices;
 	if (FAILED(m_pVBMove->Lock(0, rVertSize, (void**)&pVertices, 0)))
 		return -1;
@@ -396,7 +396,7 @@ int DX9Map::Draw() {
 		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
-		m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX));
+		m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_IMAGE));
 		m_pDevice->SetFVF(D3DFVF_TEXTURE);
 		m_pDevice->SetIndices(m_pIB);
 		m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertCount, 0, m_nIndCount);
@@ -413,7 +413,7 @@ int DX9Map::Draw() {
 			m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
 			m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
-			m_pDevice->SetStreamSource(0, m_pVBMove, 0, sizeof(DX9VERTEX));
+			m_pDevice->SetStreamSource(0, m_pVBMove, 0, sizeof(DX9VERTEX_IMAGE));
 			m_pDevice->SetFVF(D3DFVF_TEXTURE);
 			m_pDevice->SetIndices(m_pIB);
 			m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertMoveCount, 0, m_nIndCount);
@@ -579,8 +579,8 @@ int DX9Map::GetTileName(std::wstring *pStr) {
 	return 0;
 }
 
-DXMAPXY DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY) {
-	DXMAPXY Result;
+D3DXVECTOR2 DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY) {
+	D3DXVECTOR2 Result;
 
 	float tX = -m_fOffsetX + ScreenX;
 	float tY = -m_fOffsetY + ScreenY;
@@ -588,8 +588,8 @@ DXMAPXY DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY) {
 	int tMapX = (int)(tX / TILE_W);
 	int tMapY = (int)(tY / TILE_H);
 
-	Result.X = tMapX;
-	Result.Y = tMapY;
+	Result.x = tMapX;
+	Result.y = tMapY;
 
 	return Result;
 }
@@ -628,10 +628,10 @@ bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir) {
 
 bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stride,
 	float *dX, float *dY) {
-	DXMAPXY tCurrXY = GetMapXYFromPosition(ScreenX, ScreenY);
+	D3DXVECTOR2 tCurrXY = GetMapXYFromPosition(ScreenX, ScreenY);
 	float NewX = ScreenX, NewY = ScreenY;
 
-	int tCurrMapID = tCurrXY.X + (tCurrXY.Y * m_nMapCols);
+	int tCurrMapID = tCurrXY.x + (tCurrXY.y * m_nMapCols);
 	bool bMovable = true;
 
 	float SplitStide = 0.0f;
@@ -656,11 +656,11 @@ bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stri
 		default:
 			break;
 		}
-		DXMAPXY tNextXY = GetMapXYFromPosition(NewX, NewY);
+		D3DXVECTOR2 tNextXY = GetMapXYFromPosition(NewX, NewY);
 
 		if (!(tNextXY == tCurrXY))
 		{
-			int tNextMapID = tNextXY.X + (tNextXY.Y * m_nMapCols);
+			int tNextMapID = tNextXY.x + (tNextXY.y * m_nMapCols);
 			bMovable = IsMovableTile(tNextMapID, Dir);
 		}
 	}
@@ -669,8 +669,4 @@ bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stri
 	*dY = NewY - ScreenY;
 
 	return bMovable;
-}
-
-float DX9Map::GetTopFromMapXY(DXMAPXY XY) {
-	return (float)(XY.Y * TILE_H);
 }
