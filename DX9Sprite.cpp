@@ -3,8 +3,6 @@
 DX9Sprite::DX9Sprite() {
 	m_nRows = 0;
 	m_nCols = 0;
-	m_nSheetWidth = 0;
-	m_nSheetHeight = 0;
 
 	m_nSprDir = 0;
 	m_nAnimCount = 0;
@@ -16,9 +14,10 @@ int DX9Sprite::SetNumRowsAndCols(int numRows, int numCols) {
 	m_nRows = numRows;
 	m_nCols = numCols;
 
-	m_nSheetWidth = m_nWidth * m_nCols;
-	m_nSheetHeight = m_nHeight * m_nRows;
-
+	m_nSprW = (int)(m_nWidth / numCols);
+	m_nSprH = (int)(m_nHeight / numRows);
+	
+	SetSize(m_nSprW, m_nSprH);
 	SetFrame(0);
 
 	return 0;

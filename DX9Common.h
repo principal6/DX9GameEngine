@@ -5,11 +5,18 @@
 #include <iostream>
 #include <Windows.h>
 #include <d3dx9.h>
+#include <cassert>
 
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "d3d9.lib")
 
 #define CINT const int
+
+enum struct DX9MAPMODE
+{
+	TileMode,
+	MoveMode,
+};
 
 enum struct DX9WINDOW_STYLE : DWORD
 {
@@ -38,13 +45,13 @@ enum struct DX9WINDOW_STYLE : DWORD
 	ChildWindow = WS_CHILDWINDOW, // WS_CHILD
 };
 
-class DX9COLOR
+class COLORRGB
 {
 public:
 	int r, g, b;
 
 public:
-	DX9COLOR(int Red, int Green, int Blue) : r(Red), g(Green), b(Blue) {};
+	COLORRGB(int Red, int Green, int Blue) : r(Red), g(Green), b(Blue) {};
 };
 
 #endif

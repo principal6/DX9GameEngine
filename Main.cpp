@@ -7,6 +7,9 @@
 int MainLoop();
 int DetectInput();
 
+const int gWndW = 800;
+const int gWndH = 600;
+wchar_t gBaseDir[255] = { 0 };
 ULONGLONG	gTimerSec = 0;
 ULONGLONG	gTimerAnim = 0;
 int			gFPS = 0;
@@ -20,37 +23,39 @@ DX9Map* gDXMap;
 float gSprX = 0.0f;
 float gSprY = 0.0f;
 
+float gSprGroundOffsetY = 0.0f;
+float gMapGroundOffsetY = 0.0f;
+
 int main() {
+	GetCurrentDirectory(255, gBaseDir);
+
 	gDXBase = new DX9Base;
-	gDXBase->Create(50, 50, 800, 600);
+	gDXBase->Create(50, 50, gWndW, gWndH);
 
 	gDXInput = new DX9Input;
 	gDXInput->Create(gDXBase->GetInstance(), gDXBase->GetHWND());
 
 	gDXImage = new DX9Image;
-	gDXImage->Create(gDXBase->GetDevice());
+	gDXImage->Create(gDXBase->GetDevice(), gBaseDir);
 	gDXImage->SetTexture(L"bg.png");
 
 	gDXSprite = new DX9Sprite;
-	gDXSprite->Create(gDXBase->GetDevice());
+	gDXSprite->Create(gDXBase->GetDevice(), gBaseDir);
 	gDXSprite->SetTexture(L"advnt_full.png");
-	gDXSprite->SetSize(32, 64);
-	gDXSprite->SetScale(2.0f, 2.0f);
 	gDXSprite->SetNumRowsAndCols(10, 10);
+	gDXSprite->SetScale(2.0f, 2.0f);
 	gDXSprite->AddAnimation(0, 0, 0);
 	gDXSprite->AddAnimation(1, 0, 0, true);
 	gDXSprite->AddAnimation(2, 1, 5);
 	gDXSprite->AddAnimation(3, 1, 5, true);
+	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
+	gSprY = gSprGroundOffsetY;
 
 	gDXMap = new DX9Map;
-	gDXMap->Create(gDXBase->GetDevice());
-	gDXMap->SetTexture(L"maptile32x32.png");
-	gDXMap->SetTileInfo(32, 32);
-	gDXMap->AddMapFragment(2, 0, 4);
-	gDXMap->AddMapFragment(2, 1, 4);
-	gDXMap->AddMapFragment(2, 2, 4);
-	gDXMap->AddMapFragment(2, 3, 4);
-	gDXMap->AddEnd();
+	gDXMap->Create(gDXBase->GetDevice(), gBaseDir);
+	gDXMap->LoadMapFromFile(L"test.jwm");
+	gMapGroundOffsetY = (float)(-gDXMap->GetHeight() + gWndH);
+	gDXMap->SetPosition(0, gMapGroundOffsetY);
 
 	// 메인 루프 실행
 	gDXBase->Run(MainLoop);
@@ -123,6 +128,8 @@ int DetectInput() {
 		gSprX -= 3.0f;
 		gDXSprite->SetAnimation(3);
 	}
+	if (gDXInput->OnKeyDown(DIK_LALT))
+		gSprY += 2.0f;
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 		gSprY -= 2.0f;
 	if (gDXInput->OnKeyDown(DIK_DOWNARROW))

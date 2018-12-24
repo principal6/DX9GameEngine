@@ -19,8 +19,8 @@ class DX9Sprite : public DX9Image {
 private:
 	int	m_nRows;
 	int	m_nCols;
-	int	m_nSheetWidth;
-	int	m_nSheetHeight;
+	int m_nSprW;
+	int m_nSprH;
 
 	int				m_nSprDir;
 	int				m_nCurrAnimID;
@@ -38,6 +38,7 @@ public:
 	int DX9Sprite::SetAnimation(int AnimID);
 	int DX9Sprite::Animate();
 	int DX9Sprite::GetSpriteDir() { return m_nSprDir; };
+	int DX9Sprite::GetSpriteH() { return (int)(m_fScaleY * m_nSprH); };
 };
 
 #endif

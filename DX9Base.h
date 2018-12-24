@@ -22,7 +22,7 @@ private:
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name,
 		CINT X, CINT Y, CINT Width, CINT Height,
-		DX9WINDOW_STYLE WindowStyle, DX9COLOR BackColor);
+		DX9WINDOW_STYLE WindowStyle, COLORRGB BackColor);
 	int DX9Base::InitD3D();
 
 public:

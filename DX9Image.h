@@ -43,6 +43,8 @@ protected:
 	std::vector<DX9INDEX>	m_Ind;
 	int						m_nIndCount;
 
+	std::wstring			m_strBaseDir;
+
 	float	m_fX;
 	float	m_fY;
 	float	m_fScaleX;
@@ -62,7 +64,7 @@ public:
 	DX9Image() {};
 	~DX9Image() {};
 
-	int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev);
+	int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir);
 	int DX9Image::Destroy();
 	int DX9Image::Draw();
 
@@ -73,6 +75,8 @@ public:
 	int DX9Image::SetPosition(float X, float Y);
 	int DX9Image::SetSize(int Width, int Height);
 	int DX9Image::SetScale(float ScaleX, float ScaleY);
+	int DX9Image::SetRange(float u1, float u2, float v1, float v2);
+	int DX9Image::SetAlpha(int Alpha);
 	int DX9Image::SetTexture(std::wstring FileName);
 
 	// Getter

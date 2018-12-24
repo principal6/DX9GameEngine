@@ -1,6 +1,6 @@
 #include "DX9Image.h"
 
-int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
+int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
 	// 멤버 변수 초기화
 	m_pDevice = pD3DDev;
 
@@ -18,6 +18,8 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev) {
 
 	m_nWidth = 10;
 	m_nHeight = 10;
+
+	m_strBaseDir = BaseDir;
 
 	// 정점 정보 대입, 버퍼 생성
 	m_nVertCount = 4;
@@ -59,9 +61,16 @@ int DX9Image::Draw() {
 	m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	m_pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-
+	
 	if (m_pTexture)
+	{
 		m_pDevice->SetTexture(0, m_pTexture);
+
+		// 텍스처 알파 + 컬러 알파★
+		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	}
 
 	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX));
 	m_pDevice->SetFVF(D3DFVF_TEXTURE);
@@ -89,6 +98,29 @@ int DX9Image::SetScale(float ScaleX, float ScaleY) {
 	m_fScaleX = ScaleX;
 	m_fScaleY = ScaleY;
 	UpdateVertData();
+	return 0;
+}
+
+int DX9Image::SetRange(float u1, float u2, float v1, float v2) {
+	if (m_Vert.size())
+	{
+		UpdateVertData(u1, v1, u2, v2);
+	}
+	return 0;
+}
+
+int DX9Image::SetAlpha(int Alpha) {
+	if (m_Vert.size())
+	{
+		Alpha = min(255, Alpha);
+		Alpha = max(0, Alpha);
+
+		for (int i = 0; i < m_Vert.size(); i++)
+		{
+			m_Vert[i].color = D3DCOLOR_ARGB(Alpha, 255, 255, 255);
+		}
+		UpdateVertData();
+	}
 	return 0;
 }
 
@@ -124,22 +156,20 @@ int DX9Image::SetTexture(std::wstring FileName) {
 	}
 
 	std::wstring NewFileName;
-	NewFileName = FileName;
-	if (FileName.find(L'\\') == -1)
-	{
-		NewFileName = L"Data\\";
-		NewFileName += FileName;
-	}
+	NewFileName = m_strBaseDir;
+	NewFileName += L"\\Data\\";
+	NewFileName += FileName;
 
 	// 텍스처 불러오기
 	D3DXIMAGE_INFO tImgInfo;
-	if (D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0,
+	if (FAILED(D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0,
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
-		&tImgInfo, NULL, &m_pTexture))
+		&tImgInfo, NULL, &m_pTexture)))
 		return -1;
 
 	m_nWidth = tImgInfo.Width;
 	m_nHeight = tImgInfo.Height;
+	
 	UpdateVertData();
 
 	return 0;
