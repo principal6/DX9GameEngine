@@ -9,7 +9,9 @@ int DetectInput();
 
 const int gWndW = 800;
 const int gWndH = 600;
+const float gStride = 4.0f;
 wchar_t gBaseDir[255] = { 0 };
+
 ULONGLONG	gTimerSec = 0;
 ULONGLONG	gTimerAnim = 0;
 int			gFPS = 0;
@@ -19,9 +21,6 @@ DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Sprite* gDXSprite;
 DX9Map* gDXMap;
-
-float gSprX = 0.0f;
-float gSprY = 0.0f;
 
 float gSprGroundOffsetY = 0.0f;
 float gMapGroundOffsetY = 0.0f;
@@ -41,19 +40,17 @@ int main() {
 
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice(), gBaseDir);
-	gDXSprite->SetTexture(L"advnt_full.png");
-	gDXSprite->SetNumRowsAndCols(10, 10);
-	gDXSprite->SetScale(2.0f, 2.0f);
+	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 2.0f);
 	gDXSprite->AddAnimation(0, 0, 0);
 	gDXSprite->AddAnimation(1, 0, 0, true);
 	gDXSprite->AddAnimation(2, 1, 5);
 	gDXSprite->AddAnimation(3, 1, 5, true);
 	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
-	gSprY = gSprGroundOffsetY;
+	gDXSprite->SetPosition(160.0f, gSprGroundOffsetY - 140.0f);
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), gBaseDir);
-	gDXMap->LoadMapFromFile(L"test.jwm");
+	gDXMap->LoadMapFromFile(L"map01.jwm");
 	gMapGroundOffsetY = (float)(-gDXMap->GetHeight() + gWndH);
 	gDXMap->SetPosition(0, gMapGroundOffsetY);
 
@@ -81,9 +78,7 @@ int MainLoop() {
 	if (GetTickCount64() >= gTimerSec + 1000)
 	{
 		gTimerSec = GetTickCount64();
-		wchar_t tempstr[20];
-		_itow_s(gFPS, tempstr, 10);
-		OutputDebugString(tempstr);
+		std::cout << gFPS << std::endl;
 		gFPS = 0;
 	}
 
@@ -91,7 +86,6 @@ int MainLoop() {
 	if (GetTickCount64() >= gTimerAnim + 50)
 	{
 		gTimerAnim = GetTickCount64();
-
 		gDXSprite->Animate();
 	}
 
@@ -103,7 +97,6 @@ int MainLoop() {
 
 		gDXMap->Draw();
 
-		gDXSprite->SetPosition(gSprX, gSprY);
 		gDXSprite->Draw();
 
 	gDXBase->EndRender();
@@ -113,27 +106,56 @@ int MainLoop() {
 	return 0;
 }
 
+int MoveSprite(DXMAPDIR Dir) {
+	float tX = gDXSprite->GetSpriteFeetX();
+	float tY = gDXSprite->GetSpriteFeetY();
+
+	DXMAPXY tMapPos = gDXMap->GetMapXYFromPosition(tX, tY);
+	
+	float dX = 0.0f;
+	float dY = 0.0f;
+
+	bool tMovable = gDXMap->IsAbleToMove(Dir, tX, tY - 1.0f, gStride, &dX, &dY);
+
+	if (tMovable == false)
+	{
+		gDXSprite->Move(dX, dY - 1.0f);
+	}
+	else
+	{
+		gDXSprite->Move(dX, dY);
+		std::cout << tMapPos.X << "/" << tMapPos.Y << std::endl;
+	}
+	return 0;
+}
+
 int DetectInput() {
 	bool bSpriteIdle = true;
 
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
 		bSpriteIdle = false;
-		gSprX += 3.0f;
+		MoveSprite(DXMAPDIR::Right);
 		gDXSprite->SetAnimation(2);
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
 		bSpriteIdle = false;
-		gSprX -= 3.0f;
+		MoveSprite(DXMAPDIR::Left);
 		gDXSprite->SetAnimation(3);
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
-		gSprY += 2.0f;
+	{
+
+	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
-		gSprY -= 2.0f;
+	{
+		MoveSprite(DXMAPDIR::Up);
+	}
 	if (gDXInput->OnKeyDown(DIK_DOWNARROW))
-		gSprY += 2.0f;
+	{
+		MoveSprite(DXMAPDIR::Down);
+	}
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();
 
@@ -148,7 +170,6 @@ int DetectInput() {
 			gDXSprite->SetAnimation(0);
 		}
 	}
-		
 
 	return 0;
 }

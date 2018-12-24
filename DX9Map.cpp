@@ -115,7 +115,6 @@ int DX9Map::CreateMapWithData() {
 
 	int tTileID = 0;
 	int tMoveID = 0;
-	int tMapID = 0;
 
 	for (int i = 0; i < m_nMapRows; i++)
 	{
@@ -150,13 +149,16 @@ int DX9Map::SetPosition(float OffsetX, float OffsetY) {
 	float tX = 0.0f;
 	float tY = 0.0f;
 
+	m_fOffsetX = OffsetX;
+	m_fOffsetY = OffsetY;
+
 	for (int i = 0; i < m_nMapRows; i++)
 	{
 		for (int j = 0; j < m_nMapCols; j++)
 		{
 			VertID0 = (j + (i * m_nMapCols)) * 4;
-			tX = (float)(j * TILE_W) + OffsetX;
-			tY = (float)(i * TILE_H) + OffsetY;
+			tX = (float)(j * TILE_W) + m_fOffsetX;
+			tY = (float)(i * TILE_H) + m_fOffsetY;
 			m_Vert[VertID0].x = tX;
 			m_Vert[VertID0].y = tY;
 			m_Vert[VertID0 + 1].x = tX + TILE_W;
@@ -575,4 +577,100 @@ int DX9Map::GetMapName(std::wstring *pStr) {
 int DX9Map::GetTileName(std::wstring *pStr) {
 	*pStr = m_strTileName;
 	return 0;
+}
+
+DXMAPXY DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY) {
+	DXMAPXY Result;
+
+	float tX = -m_fOffsetX + ScreenX;
+	float tY = -m_fOffsetY + ScreenY;
+
+	int tMapX = (int)(tX / TILE_W);
+	int tMapY = (int)(tY / TILE_H);
+
+	Result.X = tMapX;
+	Result.Y = tMapY;
+
+	return Result;
+}
+
+bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir) {
+	if ((MapID > (m_nMapCols * m_nMapRows)) || (MapID < 0))
+		return true;
+
+	int tMoveID = m_MapData[MapID].MoveID;
+	switch (Dir)
+	{
+	case DXMAPDIR::Up:
+		if ((tMoveID == 2) || (tMoveID == 7) || (tMoveID == 8) || (tMoveID == 9) ||
+			(tMoveID == 12) || (tMoveID == 13) || (tMoveID == 14) || (tMoveID == 15))
+			return false;
+		return true;
+	case DXMAPDIR::Down:
+		if ((tMoveID == 1) || (tMoveID == 5) || (tMoveID == 6) || (tMoveID == 9) ||
+			(tMoveID == 11) || (tMoveID == 12) || (tMoveID == 14) || (tMoveID == 15))
+			return false;
+		return true;
+	case DXMAPDIR::Left:
+		if ((tMoveID == 4) || (tMoveID == 5) || (tMoveID == 7) || (tMoveID == 10) ||
+			(tMoveID == 11) || (tMoveID == 12) || (tMoveID == 13) || (tMoveID == 15))
+			return false;
+		return true;
+	case DXMAPDIR::Right:
+		if ((tMoveID == 3) || (tMoveID == 6) || (tMoveID == 8) || (tMoveID == 10) ||
+			(tMoveID == 11) || (tMoveID == 13) || (tMoveID == 14) || (tMoveID == 15))
+			return false;
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stride,
+	float *dX, float *dY) {
+	DXMAPXY tCurrXY = GetMapXYFromPosition(ScreenX, ScreenY);
+	float NewX = ScreenX, NewY = ScreenY;
+
+	int tCurrMapID = tCurrXY.X + (tCurrXY.Y * m_nMapCols);
+	bool bMovable = true;
+
+	float SplitStide = 0.0f;
+	while ((bMovable) && (SplitStide < Stride))
+	{
+		SplitStide += 1.0f;
+
+		switch (Dir)
+		{
+		case DXMAPDIR::Up:
+			NewY = ScreenY - SplitStide;
+			break;
+		case DXMAPDIR::Down:
+			NewY = ScreenY + SplitStide;
+			break;
+		case DXMAPDIR::Left:
+			NewX = ScreenX - SplitStide;
+			break;
+		case DXMAPDIR::Right:
+			NewX = ScreenX + SplitStide;
+			break;
+		default:
+			break;
+		}
+		DXMAPXY tNextXY = GetMapXYFromPosition(NewX, NewY);
+
+		if (!(tNextXY == tCurrXY))
+		{
+			int tNextMapID = tNextXY.X + (tNextXY.Y * m_nMapCols);
+			bMovable = IsMovableTile(tNextMapID, Dir);
+		}
+	}
+
+	*dX = NewX - ScreenX;
+	*dY = NewY - ScreenY;
+
+	return bMovable;
+}
+
+float DX9Map::GetTopFromMapXY(DXMAPXY XY) {
+	return (float)(XY.Y * TILE_H);
 }

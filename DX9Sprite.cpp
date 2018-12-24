@@ -4,15 +4,40 @@ DX9Sprite::DX9Sprite() {
 	m_nRows = 0;
 	m_nCols = 0;
 
+	m_nSprW = 0;
+	m_nSprH = 0;
+	m_nSprScaledW = 0;
+	m_nSprScaledH = 0;
+
 	m_nSprDir = 0;
 	m_nAnimCount = 0;
 	m_nCurrAnimID = 0;
 	m_nCurrFrame = 0;
+
+	m_SprX = 0.0f;
+	m_SprY = 0.0f;
+	m_SprFeetY = 0.0f;
 }
 
-int DX9Sprite::SetNumRowsAndCols(int numRows, int numCols) {
-	m_nRows = numRows;
+int DX9Sprite::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
+	DX9Image::Create(pD3DDev, BaseDir);
+	return 0;
+}
+
+int DX9Sprite::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float Scale) {
+	DX9Image::SetTexture(L"advnt_full.png");
+	SetNumRowsAndCols(numCols, numRows);
+	DX9Image::SetScale(Scale, Scale);
+	m_nSprScaledW = (int)(m_nSprW * Scale);
+	m_nSprScaledH = (int)(m_nSprH * Scale);
+
+	SetPosition(0.0f, 0.0f);
+	return 0;
+}
+
+int DX9Sprite::SetNumRowsAndCols(int numCols, int numRows) {
 	m_nCols = numCols;
+	m_nRows = numRows;
 
 	m_nSprW = (int)(m_nWidth / numCols);
 	m_nSprH = (int)(m_nHeight / numRows);
@@ -77,5 +102,31 @@ int DX9Sprite::Animate() {
 	}
 	
 	SetFrame(m_nCurrFrame);
+	return 0;
+}
+
+int DX9Sprite::SetPosition(float X, float Y) {
+	DX9Image::SetPosition(X, Y);
+	m_SprX = X;
+	m_SprY = Y;
+	m_SprFeetX = X + m_nSprScaledW / 2;
+	m_SprFeetY = Y + m_nSprScaledH;
+	return 0;
+}
+
+int DX9Sprite::SetPositionY(float Y) {
+	DX9Image::SetPosition(m_SprX, Y);
+	m_SprY = Y;
+	m_SprFeetY = Y + m_nSprScaledH;
+	return 0;
+}
+
+int DX9Sprite::Move(float dX, float dY) {
+	m_SprX += dX;
+	m_SprY += dY;
+	m_SprFeetX += dX;
+	m_SprFeetY += dY;
+
+	DX9Image::SetPosition(m_SprX, m_SprY);
 	return 0;
 }

@@ -16,6 +16,13 @@ const int TILE_H = 32;
 
 const int MOVE_ALPHA = 100;
 
+enum class DXMAPDIR {
+	Up,
+	Down,
+	Left,
+	Right,
+};
+
 struct DXUV {
 	float u1;
 	float u2;
@@ -23,6 +30,19 @@ struct DXUV {
 	float v2;
 	DXUV() : u1(0), u2(0), v1(0), v2(0) {};
 	DXUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
+};
+
+struct DXMAPXY {
+	int X;
+	int Y;
+	DXMAPXY() : X(0), Y(0) {};
+	DXMAPXY(int _X, int _Y) : X(_X), Y(_Y) {};
+
+	bool operator ==(DXMAPXY New) {
+		if ((New.X == this->X) && (New.Y == this->Y))
+			return true;
+		return false;
+	}
 };
 
 struct DXMAPDATA {
@@ -52,6 +72,9 @@ private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVBMove;
 	std::vector<DX9VERTEX>	m_VertMove;
 	int						m_nVertMoveCount;
+
+	float m_fOffsetX;
+	float m_fOffsetY;
 
 private:
 	int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size);
@@ -97,6 +120,13 @@ public:
 	int DX9Map::GetMapRows() { return m_nMapRows; };
 	int DX9Map::GetWidth() { return (m_nMapCols * TILE_W); };
 	int DX9Map::GetHeight() { return (m_nMapRows * TILE_H); };
+	DXMAPXY DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY);
+	float DX9Map::GetTopFromMapXY(DXMAPXY XY);
+
+	// Asker
+	bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir);
+	bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stride,
+		float *dX, float *dY);
 };
 
 
