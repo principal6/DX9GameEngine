@@ -10,7 +10,7 @@ int DetectInput();
 
 const int gWndW = 800;
 const int gWndH = 600;
-const float gStride = 14.0f;
+const float gStride = 2.0f;
 wchar_t gBaseDir[255] = { 0 };
 
 ULONGLONG	gTimerSec = 0;
@@ -48,6 +48,7 @@ int main() {
 	gDXSprite->AddAnimation(3, 1, 5, true);
 	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(160.0f, gSprGroundOffsetY - 140.0f));
+	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-30, -30));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), gBaseDir);
@@ -99,7 +100,8 @@ int MainLoop() {
 		gDXMap->Draw();
 
 		gDXSprite->Draw();
-		gDXSprite->DrawBB();
+		gDXSprite->DrawBoundingBox();
+
 
 	gDXBase->EndRender();
 
@@ -114,6 +116,9 @@ int MoveSprite(D3DXVECTOR2 Velocity) {
 	
 	gDXSprite->Move(tNewVel);
 
+	std::cout << gDXSprite->GetBoundingBoxA().x << "/" << gDXSprite->GetBoundingBoxA().y << std::endl;
+	std::cout << gDXSprite->GetBoundingBoxB().x << "/" << gDXSprite->GetBoundingBoxB().y << std::endl;
+	std::cout << "-----" << std::endl;
 	//std::cout << tNewVel.x << "/" << tNewVel.y << std::endl;
 
 	return 0;

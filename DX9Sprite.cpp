@@ -21,9 +21,15 @@ DX9Sprite::DX9Sprite() {
 int DX9Sprite::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
 	DX9Image::Create(pD3DDev, BaseDir);
 
-	m_BB.Create(pD3DDev);
-	m_BB.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
-	m_BB.AddEnd();
+	m_BBLine.Create(pD3DDev);
+	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
+	m_BBLine.AddEnd();
+	return 0;
+}
+
+int DX9Sprite::Destroy() {
+	m_BBLine.Destroy();
+	DX9Image::Destroy();
 	return 0;
 }
 
@@ -47,6 +53,16 @@ int DX9Sprite::SetNumRowsAndCols(int numCols, int numRows) {
 	
 	SetSize(m_nSprW, m_nSprH);
 	SetFrame(0);
+
+	return 0;
+}
+
+int DX9Sprite::SetBoundingnBox(D3DXVECTOR2 dSize) {
+	m_BB.PosOffset.x = -dSize.x / 2;
+	m_BB.PosOffset.y = -dSize.y;
+
+	m_BB.Size.x = (float)m_nSprScaledW + dSize.x;
+	m_BB.Size.y = (float)m_nSprScaledH + dSize.y;
 
 	return 0;
 }
@@ -108,10 +124,22 @@ int DX9Sprite::Animate() {
 	return 0;
 }
 
-int DX9Sprite::DrawBB() {
-	m_BB.SetBoxPosition(m_SprPos, D3DXVECTOR2((float)m_nSprScaledW, (float)m_nSprScaledH));
-	m_BB.Draw();
+int DX9Sprite::DrawBoundingBox() {
+	m_BBLine.SetBoxPosition(m_SprPos + m_BB.PosOffset, m_BB.Size);
+	m_BBLine.Draw();
 	return 0;
+}
+
+D3DXVECTOR2 DX9Sprite::GetBoundingBoxA() {
+	D3DXVECTOR2 Result;
+	Result = m_SprPos + m_BB.PosOffset;
+	return Result;
+}
+
+D3DXVECTOR2 DX9Sprite::GetBoundingBoxB() {
+	D3DXVECTOR2 Result;
+	Result = m_SprPos + m_BB.PosOffset + m_BB.Size;
+	return Result;
 }
 
 int DX9Sprite::SetPosition(D3DXVECTOR2 Pos) {
