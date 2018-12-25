@@ -579,17 +579,59 @@ int DX9Map::GetTileName(std::wstring *pStr) {
 	return 0;
 }
 
-D3DXVECTOR2 DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY) {
+D3DXVECTOR2 DX9Map::ConvertIDtoXY(int MapID) {
+	D3DXVECTOR2 Result = D3DXVECTOR2(0, 0);
+	
+	Result.x = (FLOAT)(MapID % m_nMapCols);
+	Result.y = (FLOAT)(MapID / m_nMapCols);
+	
+	return Result;
+}
+
+int DX9Map::ConvertXYtoID(D3DXVECTOR2 MapXY) {
+	return (int)MapXY.x + ((int)MapXY.y * m_nMapCols);
+}
+
+D3DXVECTOR2 DX9Map::ConvertScrPostoXY(D3DXVECTOR2 ScreenPos) {
 	D3DXVECTOR2 Result;
 
-	float tX = -m_fOffsetX + ScreenX;
-	float tY = -m_fOffsetY + ScreenY;
+	float tX = -m_fOffsetX + ScreenPos.x;
+	float tY = -m_fOffsetY + ScreenPos.y;
 
 	int tMapX = (int)(tX / TILE_W);
 	int tMapY = (int)(tY / TILE_H);
 
-	Result.x = tMapX;
-	Result.y = tMapY;
+	Result.x = (FLOAT)tMapX;
+	Result.y = (FLOAT)tMapY;
+
+	return Result;
+}
+
+float DX9Map::GetMapTileBoundary(int MapID, DXMAPDIR Dir) {
+	float Result = 0.0f;
+
+	D3DXVECTOR2 tMapXY = ConvertIDtoXY(MapID);
+
+	float tX = m_fOffsetX + tMapXY.x * TILE_W;
+	float tY = m_fOffsetY + tMapXY.y * TILE_H;
+
+	switch (Dir)
+	{
+	case DXMAPDIR::Up:
+		Result = tY;
+		break;
+	case DXMAPDIR::Down:
+		Result = tY + TILE_H;
+		break;
+	case DXMAPDIR::Left:
+		Result = tX;
+		break;
+	case DXMAPDIR::Right:
+		Result = tX + TILE_W;
+		break;
+	default:
+		break;
+	}
 
 	return Result;
 }
@@ -626,47 +668,114 @@ bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir) {
 	}
 }
 
-bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stride,
-	float *dX, float *dY) {
-	D3DXVECTOR2 tCurrXY = GetMapXYFromPosition(ScreenX, ScreenY);
-	float NewX = ScreenX, NewY = ScreenY;
+D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) {
+	D3DXVECTOR2 NewVelocity = Velocity;
 
-	int tCurrMapID = tCurrXY.x + (tCurrXY.y * m_nMapCols);
-	bool bMovable = true;
+	D3DXVECTOR2 tMapXYSrc = ConvertScrPostoXY(SprPos);
 
-	float SplitStide = 0.0f;
-	while ((bMovable) && (SplitStide < Stride))
+	D3DXVECTOR2 SprPosTrg = SprPos;
+	D3DXVECTOR2 tMapXYTrg = D3DXVECTOR2(0, 0);
+	
+	if (Velocity.x != 0)
 	{
-		SplitStide += 1.0f;
+		// Left & Right
+		SprPosTrg.x += Velocity.x;
+		tMapXYTrg = ConvertScrPostoXY(SprPosTrg);
 
-		switch (Dir)
+		if (tMapXYSrc != tMapXYTrg)
 		{
-		case DXMAPDIR::Up:
-			NewY = ScreenY - SplitStide;
-			break;
-		case DXMAPDIR::Down:
-			NewY = ScreenY + SplitStide;
-			break;
-		case DXMAPDIR::Left:
-			NewX = ScreenX - SplitStide;
-			break;
-		case DXMAPDIR::Right:
-			NewX = ScreenX + SplitStide;
-			break;
-		default:
-			break;
-		}
-		D3DXVECTOR2 tNextXY = GetMapXYFromPosition(NewX, NewY);
+			int StartX = (int)tMapXYSrc.x;
+			int EndX = (int)tMapXYTrg.x;
+			int Y = (int)tMapXYSrc.y;
 
-		if (!(tNextXY == tCurrXY))
-		{
-			int tNextMapID = tNextXY.x + (tNextXY.y * m_nMapCols);
-			bMovable = IsMovableTile(tNextMapID, Dir);
+			float fWall = 0.0f;
+			if (Velocity.x > 0)
+			{
+				// Right
+				for (int i = StartX; i <= EndX; i++)
+				{
+					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
+					if (IsMovableTile(tMapID, DXMAPDIR::Right) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Left);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.x + Velocity.x;
+					float fDist = fWall - SprPos.x - 0.1f;
+					NewVelocity.x = fDist;
+				}
+
+			}
+			if (Velocity.x < 0)
+			{
+				// Left
+				for (int i = StartX; i >= EndX; i--)
+				{
+					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
+					if (IsMovableTile(tMapID, DXMAPDIR::Left) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Right);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.x + Velocity.x;
+					float fDist = fWall - SprPos.x;
+					NewVelocity.x = fDist;
+				}
+			}
 		}
 	}
 
-	*dX = NewX - ScreenX;
-	*dY = NewY - ScreenY;
+	if (Velocity.y != 0)
+	{
+		// Up & Down
+		SprPosTrg.y += Velocity.y;
+		tMapXYTrg = ConvertScrPostoXY(SprPosTrg);
 
-	return bMovable;
+		if (tMapXYSrc != tMapXYTrg)
+		{
+			int StartY = (int)tMapXYSrc.y;
+			int EndY = (int)tMapXYTrg.y;
+			int X = (int)tMapXYSrc.x;
+
+			float fWall = 0.0f;
+			if (Velocity.y > 0)
+			{
+				// Down
+				for (int i = StartY; i <= EndY; i++)
+				{
+					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
+					if (IsMovableTile(tMapID, DXMAPDIR::Down) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Up);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.y + Velocity.y;
+					float fDist = fWall - SprPos.y - 0.1f;
+					NewVelocity.y = fDist;
+				}
+			}
+			if (Velocity.y < 0)
+			{
+				// Up
+				for (int i = StartY; i >= EndY; i--)
+				{
+					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
+					if (IsMovableTile(tMapID, DXMAPDIR::Up) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Down);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.y + Velocity.y;
+					float fDist = fWall - SprPos.y;
+					NewVelocity.y = fDist;
+				}
+			}
+		}
+	}
+
+	return NewVelocity;
 }

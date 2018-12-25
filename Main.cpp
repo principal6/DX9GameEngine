@@ -10,7 +10,7 @@ int DetectInput();
 
 const int gWndW = 800;
 const int gWndH = 600;
-const float gStride = 4.0f;
+const float gStride = 14.0f;
 wchar_t gBaseDir[255] = { 0 };
 
 ULONGLONG	gTimerSec = 0;
@@ -108,33 +108,14 @@ int MainLoop() {
 	return 0;
 }
 
-int ChechkCollision() {
-
-
-	return 0;
-}
-
-int MoveSprite(DXMAPDIR Dir) {
-	float tX = gDXSprite->GetSpriteFeetX();
-	float tY = gDXSprite->GetSpriteFeetY();
-
-	D3DXVECTOR2 tMapPos = gDXMap->GetMapXYFromPosition(tX, tY);
+int MoveSprite(D3DXVECTOR2 Velocity) {
+	D3DXVECTOR2 tSprPos = gDXSprite->GetSpriteFeet();
+	D3DXVECTOR2 tNewVel = gDXMap->CheckSprCollision(tSprPos, Velocity);
 	
-	float dX = 0.0f;
-	float dY = 0.0f;
+	gDXSprite->Move(tNewVel);
 
-	bool tMovable = gDXMap->IsAbleToMove(Dir, tX, tY - 1.0f, gStride, &dX, &dY);
-	bool tMovable2 = gDXMap->IsAbleToMove(Dir, tX, tY - 1.0f, gStride, &dX, &dY);
+	//std::cout << tNewVel.x << "/" << tNewVel.y << std::endl;
 
-	if (tMovable == false)
-	{
-		gDXSprite->Move(dX, dY - 1.0f);
-	}
-	else
-	{
-		gDXSprite->Move(dX, dY);
-		std::cout << tMapPos.x << "/" << tMapPos.y << std::endl;
-	}
 	return 0;
 }
 
@@ -144,13 +125,13 @@ int DetectInput() {
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
 		bSpriteIdle = false;
-		MoveSprite(DXMAPDIR::Right);
+		MoveSprite(D3DXVECTOR2(gStride, 0));
 		gDXSprite->SetAnimation(2);
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
 		bSpriteIdle = false;
-		MoveSprite(DXMAPDIR::Left);
+		MoveSprite(D3DXVECTOR2(-gStride, 0));
 		gDXSprite->SetAnimation(3);
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
@@ -159,11 +140,11 @@ int DetectInput() {
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 	{
-		MoveSprite(DXMAPDIR::Up);
+		MoveSprite(D3DXVECTOR2(0, -gStride));
 	}
 	if (gDXInput->OnKeyDown(DIK_DOWNARROW))
 	{
-		MoveSprite(DXMAPDIR::Down);
+		MoveSprite(D3DXVECTOR2(0, gStride));
 	}
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();

@@ -34,8 +34,7 @@ private:
 	DX9Line			m_BB;
 
 	D3DXVECTOR2 m_SprPos;
-	float m_SprFeetX;
-	float m_SprFeetY;
+	D3DXVECTOR2 m_SprFeetPos;
 
 public:
 	DX9Sprite();
@@ -56,13 +55,11 @@ public:
 	int DX9Sprite::DrawBB();
 
 	int DX9Sprite::SetPosition(D3DXVECTOR2 Pos);
-	int DX9Sprite::SetPositionY(float Y);
-	int DX9Sprite::Move(float dX, float dY);
+	int DX9Sprite::Move(D3DXVECTOR2 dXY);
 
 	int DX9Sprite::GetSpriteDir() { return m_nSprDir; };
 	int DX9Sprite::GetSpriteH() { return (int)(m_fScaleY * m_nSprH); };
-	float DX9Sprite::GetSpriteFeetX() { return m_SprFeetX; };
-	float DX9Sprite::GetSpriteFeetY() { return m_SprFeetY; };
+	D3DXVECTOR2 DX9Sprite::GetSpriteFeet() { return m_SprFeetPos; };
 };
 
 #endif

@@ -73,6 +73,10 @@ private:
 	int DX9Map::AddEnd();
 	int DX9Map::SetMapData(std::wstring Str);
 
+	// Sprite Collision
+	float DX9Map::GetMapTileBoundary(int MapID, DXMAPDIR Dir);
+	bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir);
+
 public:
 	DX9Map();
 	~DX9Map() {};
@@ -107,12 +111,14 @@ public:
 	int DX9Map::GetMapRows() { return m_nMapRows; };
 	int DX9Map::GetWidth() { return (m_nMapCols * TILE_W); };
 	int DX9Map::GetHeight() { return (m_nMapRows * TILE_H); };
-	D3DXVECTOR2 DX9Map::GetMapXYFromPosition(float ScreenX, float ScreenY);
 
-	// Asker
-	bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir);
-	bool DX9Map::IsAbleToMove(DXMAPDIR Dir, float ScreenX, float ScreenY, float Stride,
-		float *dX, float *dY);
+	// Converter
+	D3DXVECTOR2 DX9Map::ConvertScrPostoXY(D3DXVECTOR2 ScreenPos);
+	D3DXVECTOR2 DX9Map::ConvertIDtoXY(int MapID);
+	int DX9Map::ConvertXYtoID(D3DXVECTOR2 MapXY);
+
+	// Sprite Collision
+	D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity);
 };
 
 

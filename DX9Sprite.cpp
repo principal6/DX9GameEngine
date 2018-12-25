@@ -15,7 +15,7 @@ DX9Sprite::DX9Sprite() {
 	m_nCurrFrame = 0;
 
 	m_SprPos = D3DXVECTOR2(0.0f, 0.0f);
-	m_SprFeetY = 0.0f;
+	m_SprFeetPos = D3DXVECTOR2(0.0f, 0.0f);
 }
 
 int DX9Sprite::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir) {
@@ -116,25 +116,15 @@ int DX9Sprite::DrawBB() {
 
 int DX9Sprite::SetPosition(D3DXVECTOR2 Pos) {
 	DX9Image::SetPosition(Pos.x, Pos.y);
-	m_SprPos.x = Pos.x;
-	m_SprPos.y = Pos.y;
-	m_SprFeetX = Pos.x + m_nSprScaledW / 2;
-	m_SprFeetY = Pos.y + m_nSprScaledH;
+	m_SprPos = Pos;
+	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
+	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
 	return 0;
 }
 
-int DX9Sprite::SetPositionY(float Y) {
-	DX9Image::SetPosition(m_SprPos.x, Y);
-	m_SprPos.y = Y;
-	m_SprFeetY = Y + m_nSprScaledH;
-	return 0;
-}
-
-int DX9Sprite::Move(float dX, float dY) {
-	m_SprPos.x += dX;
-	m_SprPos.y += dY;
-	m_SprFeetX += dX;
-	m_SprFeetY += dY;
+int DX9Sprite::Move(D3DXVECTOR2 dXY) {
+	m_SprPos += dXY;
+	m_SprFeetPos += dXY;
 
 	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
 	return 0;
