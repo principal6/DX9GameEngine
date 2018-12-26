@@ -16,6 +16,7 @@ const D3DXVECTOR2 gGravity = D3DXVECTOR2(0.0f, 0.3f);
 const float gStride = 4.0f;
 wchar_t gBaseDir[255] = { 0 };
 bool gbHitGround = false;
+bool gbSpriteIdle = true;
 
 ULONGLONG	gTimerSec = 0;
 ULONGLONG	gTimerAnim = 0;
@@ -46,10 +47,14 @@ int main() {
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice(), gBaseDir);
 	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 2.0f);
-	gDXSprite->AddAnimation(0, 0, 0);
+	gDXSprite->AddAnimation(0, 0, 0); // Idle
 	gDXSprite->AddAnimation(1, 0, 0, true);
-	gDXSprite->AddAnimation(2, 1, 5);
+	gDXSprite->AddAnimation(2, 1, 5); // Walk
 	gDXSprite->AddAnimation(3, 1, 5, true);
+	gDXSprite->AddAnimation(4, 27, 28); // Punch
+	gDXSprite->AddAnimation(5, 27, 28, true);
+	gDXSprite->AddAnimation(6, 24, 26); // HorzAttack
+	gDXSprite->AddAnimation(7, 24, 26, true);
 	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-34, -30));
@@ -89,7 +94,7 @@ int MainLoop() {
 	}
 
 	// 애니메이션용 타이머
-	if (GetTickCount64() >= gTimerAnim + 50)
+	if (GetTickCount64() >= gTimerAnim + 80)
 	{
 		gTimerAnim = GetTickCount64();
 		gDXSprite->Animate();
@@ -126,12 +131,25 @@ int Gravitate() {
 	if (tNewVel.y < SprVel.y)
 	{
 		if (gbHitGround)
+		{
 			tNewVel.y = 0;
-		gbHitGround = true;
+		}
+		else
+		{
+			gbHitGround = true;
+			gDXSprite->SetFrame(19);
+		}	
 	}
 	else
 	{
+		if (SprVel.y < 0)
+			gDXSprite->SetFrame(17); // 점프 중
+
+		if (SprVel.y > 0)
+			gDXSprite->SetFrame(18); // 낙하 중
+
 		gbHitGround = false;
+		//gbSpriteIdle = false;
 	}
 	
 	gDXSprite->SetVelocity(tNewVel);
@@ -142,6 +160,8 @@ int Gravitate() {
 }
 
 int Jump() {
+	//gbSpriteIdle = false;
+
 	D3DXVECTOR2 CurrSprVel = gDXSprite->GetVelocity();
 
 	if (gbHitGround == false)
@@ -169,19 +189,31 @@ int MoveSprite(D3DXVECTOR2 Velocity) {
 }
 
 int DetectInput() {
-	bool bSpriteIdle = true;
+	gbSpriteIdle = true;
 
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
-		bSpriteIdle = false;
+		gbSpriteIdle = false;
 		MoveSprite(D3DXVECTOR2(gStride, 0));
 		gDXSprite->SetAnimation(2);
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
-		bSpriteIdle = false;
+		gbSpriteIdle = false;
 		MoveSprite(D3DXVECTOR2(-gStride, 0));
 		gDXSprite->SetAnimation(3);
+	}
+	if (gDXInput->OnKeyDown(DIK_LCONTROL))
+	{
+		gbSpriteIdle = false;
+		if (gDXSprite->GetSpriteDir())
+		{
+			gDXSprite->SetAnimation(7);
+		}
+		else
+		{
+			gDXSprite->SetAnimation(6);
+		}
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
@@ -199,7 +231,7 @@ int DetectInput() {
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();
 
-	if (bSpriteIdle)
+	if (gbSpriteIdle)
 	{
 		if (gDXSprite->GetSpriteDir())
 		{

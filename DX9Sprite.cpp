@@ -81,6 +81,10 @@ int DX9Sprite::SetFrame(int FrameID) {
 	float v1 = ((float)FrameY / (float)m_nRows);
 	float v2 = ((float)(FrameY + 1) / (float)m_nRows);
 
+	// 이걸 해야 옆줄 침범하지 않음!★
+	u1 += 0.01f;
+	v1 += 0.01f;
+
 	if (m_Anims[m_nCurrAnimID].HFlip)
 	{
 		UpdateVertData(u2, v1, u1, v2);
