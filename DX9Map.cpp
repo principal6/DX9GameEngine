@@ -984,58 +984,5 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 			NewVelocity.y = fDist;
 		}
 	}
-
-	/*
-	if (Velocity.y != 0)
-	{
-		// Up & Down
-		SprPosE.y += Velocity.y;
-		tMapXYE = ConvertScrPosToXY(SprPosE);
-
-		if (tMapXYS != tMapXYE)
-		{
-			int tYS = (int)tMapXYS.y;
-			int tYE = (int)tMapXYE.y;
-			int tX = (int)tMapXYS.x;
-
-			float fWall = 0.0f;
-			if (Velocity.y > 0)
-			{
-				// Down
-				for (int i = tYS; i <= tYE; i++)
-				{
-					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)tX, (FLOAT)i));
-					if (IsMovableTile(tMapID, DXMAPDIR::Down) == false)
-						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Up);
-				}
-
-				if (fWall)
-				{
-					float fCurr = SprPos.y + Velocity.y;
-					float fDist = fWall - SprPos.y - 0.1f;
-					NewVelocity.y = fDist;
-				}
-			}
-			if (Velocity.y < 0)
-			{
-				// Up
-				for (int i = tYS; i >= tYE; i--)
-				{
-					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)tX, (FLOAT)i));
-					if (IsMovableTile(tMapID, DXMAPDIR::Up) == false)
-						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Down);
-				}
-
-				if (fWall)
-				{
-					float fCurr = SprPos.y + Velocity.y;
-					float fDist = fWall - SprPos.y;
-					NewVelocity.y = fDist;
-				}
-			}
-		}
-	}
-	*/
-
 	return NewVelocity;
 }

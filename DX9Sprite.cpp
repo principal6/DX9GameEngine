@@ -137,17 +137,6 @@ DX9BOUNDINGBOX DX9Sprite::GetBoundingBox() {
 	return Result;
 
 }
-D3DXVECTOR2 DX9Sprite::GetBoundingBoxA() {
-	D3DXVECTOR2 Result;
-	Result = m_SprPos + m_BB.PosOffset;
-	return Result;
-}
-
-D3DXVECTOR2 DX9Sprite::GetBoundingBoxB() {
-	D3DXVECTOR2 Result;
-	Result = m_SprPos + m_BB.PosOffset + m_BB.Size;
-	return Result;
-}
 
 int DX9Sprite::SetPosition(D3DXVECTOR2 Pos) {
 	DX9Image::SetPosition(Pos.x, Pos.y);
