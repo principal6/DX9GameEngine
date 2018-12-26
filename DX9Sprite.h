@@ -67,6 +67,7 @@ public:
 	int DX9Sprite::GetSpriteDir() { return m_nSprDir; };
 	int DX9Sprite::GetSpriteH() { return (int)(m_fScaleY * m_nSprH); };
 	D3DXVECTOR2 DX9Sprite::GetSpriteFeet() { return m_SprFeetPos; };
+	DX9BOUNDINGBOX DX9Sprite::GetBoundingBox();
 	D3DXVECTOR2 DX9Sprite::GetBoundingBoxA();
 	D3DXVECTOR2 DX9Sprite::GetBoundingBoxB();
 };

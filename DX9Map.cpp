@@ -579,7 +579,7 @@ int DX9Map::GetTileName(std::wstring *pStr) {
 	return 0;
 }
 
-D3DXVECTOR2 DX9Map::ConvertIDtoXY(int MapID) {
+D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID) {
 	D3DXVECTOR2 Result = D3DXVECTOR2(0, 0);
 	
 	Result.x = (FLOAT)(MapID % m_nMapCols);
@@ -588,11 +588,11 @@ D3DXVECTOR2 DX9Map::ConvertIDtoXY(int MapID) {
 	return Result;
 }
 
-int DX9Map::ConvertXYtoID(D3DXVECTOR2 MapXY) {
+int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY) {
 	return (int)MapXY.x + ((int)MapXY.y * m_nMapCols);
 }
 
-D3DXVECTOR2 DX9Map::ConvertScrPostoXY(D3DXVECTOR2 ScreenPos) {
+D3DXVECTOR2 DX9Map::ConvertScrPosToXY(D3DXVECTOR2 ScreenPos) {
 	D3DXVECTOR2 Result;
 
 	float tX = -m_fOffsetX + ScreenPos.x;
@@ -610,7 +610,7 @@ D3DXVECTOR2 DX9Map::ConvertScrPostoXY(D3DXVECTOR2 ScreenPos) {
 float DX9Map::GetMapTileBoundary(int MapID, DXMAPDIR Dir) {
 	float Result = 0.0f;
 
-	D3DXVECTOR2 tMapXY = ConvertIDtoXY(MapID);
+	D3DXVECTOR2 tMapXY = ConvertIDToXY(MapID);
 
 	float tX = m_fOffsetX + tMapXY.x * TILE_W;
 	float tY = m_fOffsetY + tMapXY.y * TILE_H;
@@ -637,7 +637,7 @@ float DX9Map::GetMapTileBoundary(int MapID, DXMAPDIR Dir) {
 }
 
 bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir) {
-	if ((MapID > (m_nMapCols * m_nMapRows)) || (MapID < 0))
+	if ((MapID >= (m_nMapCols * m_nMapRows)) || (MapID < 0))
 		return true;
 
 	int tMoveID = m_MapData[MapID].MoveID;
@@ -671,7 +671,7 @@ bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir) {
 D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) {
 	D3DXVECTOR2 NewVelocity = Velocity;
 
-	D3DXVECTOR2 tMapXYSrc = ConvertScrPostoXY(SprPos);
+	D3DXVECTOR2 tMapXYSrc = ConvertScrPosToXY(SprPos);
 
 	D3DXVECTOR2 SprPosTrg = SprPos;
 	D3DXVECTOR2 tMapXYTrg = D3DXVECTOR2(0, 0);
@@ -680,7 +680,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 	{
 		// Left & Right
 		SprPosTrg.x += Velocity.x;
-		tMapXYTrg = ConvertScrPostoXY(SprPosTrg);
+		tMapXYTrg = ConvertScrPosToXY(SprPosTrg);
 
 		if (tMapXYSrc != tMapXYTrg)
 		{
@@ -694,7 +694,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 				// Right
 				for (int i = StartX; i <= EndX; i++)
 				{
-					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
 					if (IsMovableTile(tMapID, DXMAPDIR::Right) == false)
 						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Left);
 				}
@@ -712,7 +712,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 				// Left
 				for (int i = StartX; i >= EndX; i--)
 				{
-					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)Y));
 					if (IsMovableTile(tMapID, DXMAPDIR::Left) == false)
 						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Right);
 				}
@@ -731,7 +731,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 	{
 		// Up & Down
 		SprPosTrg.y += Velocity.y;
-		tMapXYTrg = ConvertScrPostoXY(SprPosTrg);
+		tMapXYTrg = ConvertScrPosToXY(SprPosTrg);
 
 		if (tMapXYSrc != tMapXYTrg)
 		{
@@ -745,7 +745,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 				// Down
 				for (int i = StartY; i <= EndY; i++)
 				{
-					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
 					if (IsMovableTile(tMapID, DXMAPDIR::Down) == false)
 						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Up);
 				}
@@ -762,7 +762,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 				// Up
 				for (int i = StartY; i >= EndY; i--)
 				{
-					int tMapID = ConvertXYtoID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)X, (FLOAT)i));
 					if (IsMovableTile(tMapID, DXMAPDIR::Up) == false)
 						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Down);
 				}
@@ -776,6 +776,266 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 			}
 		}
 	}
+
+	return NewVelocity;
+}
+
+D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity) {
+	D3DXVECTOR2 NewVelocity = Velocity;
+
+	D3DXVECTOR2 tSprPosS;
+	D3DXVECTOR2 tSprPosE1;
+	D3DXVECTOR2 tSprPosE2;
+	D3DXVECTOR2 tMapXYS;
+	D3DXVECTOR2 tMapXYE1;
+	D3DXVECTOR2 tMapXYE2;
+
+	if (Velocity.x > 0)
+	{
+		// Go Right
+		tSprPosS = BB.PosOffset;
+		tSprPosS.x += BB.Size.x; // ¦¤ (Right Up)
+		tSprPosE1 = tSprPosS;
+		tSprPosE1.x += Velocity.x;
+		tSprPosE2 = tSprPosE1;
+		tSprPosE2.y += BB.Size.y;
+
+		tMapXYS = ConvertScrPosToXY(tSprPosS);
+		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
+		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+
+		int tXS = (int)tMapXYS.x;
+		int tXE = (int)tMapXYE1.x;
+		int tYS = (int)tMapXYS.y;
+		int tYE = (int)tMapXYE2.y;
+
+		float fWall = 0.0f;
+		float fWallCmp = 0.0f;
+
+		for (int i = tXS; i <= tXE; i++)
+		{
+			for (int j = tYS; j <= tYE; j++)
+			{
+				int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)j));
+				if (IsMovableTile(tMapID, DXMAPDIR::Right) == false)
+				{
+					fWallCmp = GetMapTileBoundary(tMapID, DXMAPDIR::Left);
+					if (fWall == 0)
+					{
+						fWall = fWallCmp;
+					}
+					else if (fWall && fWallCmp)
+					{
+						fWall = min(fWall, fWallCmp);
+					}
+				}
+			}
+		}
+
+		if (fWall)
+		{
+			float fCurr = tSprPosS.x + Velocity.x;
+			float fDist = fWall - tSprPosS.x - 0.1f;
+			NewVelocity.x = fDist;
+		}
+	}
+	else if (Velocity.x < 0)
+	{
+		// Go Left
+		tSprPosS = BB.PosOffset; // ¦£ (Left Up)
+		tSprPosE1 = tSprPosS;
+		tSprPosE1.x += Velocity.x;
+		tSprPosE2 = tSprPosE1;
+		tSprPosE2.y += BB.Size.y;
+
+		tMapXYS = ConvertScrPosToXY(tSprPosS);
+		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
+		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+
+		int tXS = (int)tMapXYS.x;
+		int tXE = (int)tMapXYE1.x;
+		int tYS = (int)tMapXYS.y;
+		int tYE = (int)tMapXYE2.y;
+
+		float fWall = 0.0f;
+		float fWallCmp = 0.0f;
+
+		for (int i = tXS; i >= tXE; i--)
+		{
+			for (int j = tYS; j <= tYE; j++)
+			{
+				int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)j));
+				if (IsMovableTile(tMapID, DXMAPDIR::Left) == false)
+				{
+					fWallCmp = GetMapTileBoundary(tMapID, DXMAPDIR::Right);
+					if (fWall == 0)
+					{
+						fWall = fWallCmp;
+					}
+					else if (fWall && fWallCmp)
+					{
+						fWall = max(fWall, fWallCmp);
+					}
+				}
+			}
+		}
+
+		if (fWall)
+		{
+			float fCurr = tSprPosS.x + Velocity.x;
+			float fDist = fWall - tSprPosS.x;
+			NewVelocity.x = fDist;
+		}
+	}
+	else if (Velocity.y > 0)
+	{
+		// Go Down
+		tSprPosS = BB.PosOffset;
+		tSprPosS.y += BB.Size.y; // ¦¦ (Left Down)
+		tSprPosE1 = tSprPosS;
+		tSprPosE1.y += Velocity.y;
+		tSprPosE2 = tSprPosE1;
+		tSprPosE2.x += BB.Size.x;
+
+		tMapXYS = ConvertScrPosToXY(tSprPosS);
+		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
+		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+
+		int tXS = (int)tMapXYS.x;
+		int tXE = (int)tMapXYE2.x;
+		int tYS = (int)tMapXYS.y;
+		int tYE = (int)tMapXYE2.y;
+
+		float fWall = 0.0f;
+		float fWallCmp = 0.0f;
+
+		for (int i = tXS; i <= tXE; i++)
+		{
+			for (int j = tYS; j <= tYE; j++)
+			{
+				int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)j));
+				if (IsMovableTile(tMapID, DXMAPDIR::Down) == false)
+				{
+					fWallCmp = GetMapTileBoundary(tMapID, DXMAPDIR::Up);
+					if (fWall == 0)
+					{
+						fWall = fWallCmp;
+					}
+					else if (fWall && fWallCmp)
+					{
+						fWall = min(fWall, fWallCmp);
+					}
+				}
+			}
+		}
+
+		if (fWall)
+		{
+			float fCurr = tSprPosS.y + Velocity.y;
+			float fDist = fWall - tSprPosS.y - 0.1f;
+			NewVelocity.y = fDist;
+		}
+	}
+	else if (Velocity.y < 0)
+	{
+		// Go Up
+		tSprPosS = BB.PosOffset; // ¦£ (Left Up)
+		tSprPosE1 = tSprPosS;
+		tSprPosE1.y += Velocity.y;
+		tSprPosE2 = tSprPosE1;
+		tSprPosE2.x += BB.Size.x;
+
+		tMapXYS = ConvertScrPosToXY(tSprPosS);
+		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
+		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+
+		int tXS = (int)tMapXYS.x;
+		int tXE = (int)tMapXYE2.x;
+		int tYS = (int)tMapXYS.y;
+		int tYE = (int)tMapXYE2.y;
+
+		float fWall = 0.0f;
+		float fWallCmp = 0.0f;
+
+		for (int i = tXS; i <= tXE; i++)
+		{
+			for (int j = tYS; j >= tYE; j--)
+			{
+				int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)i, (FLOAT)j));
+				if (IsMovableTile(tMapID, DXMAPDIR::Up) == false)
+				{
+					fWallCmp = GetMapTileBoundary(tMapID, DXMAPDIR::Down);
+					if (fWall == 0)
+					{
+						fWall = fWallCmp;
+					}
+					else if (fWall && fWallCmp)
+					{
+						fWall = max(fWall, fWallCmp);
+					}
+				}
+			}
+		}
+
+		if (fWall)
+		{
+			float fCurr = tSprPosS.y + Velocity.y;
+			float fDist = fWall - tSprPosS.y;
+			NewVelocity.y = fDist;
+		}
+	}
+
+	/*
+	if (Velocity.y != 0)
+	{
+		// Up & Down
+		SprPosE.y += Velocity.y;
+		tMapXYE = ConvertScrPosToXY(SprPosE);
+
+		if (tMapXYS != tMapXYE)
+		{
+			int tYS = (int)tMapXYS.y;
+			int tYE = (int)tMapXYE.y;
+			int tX = (int)tMapXYS.x;
+
+			float fWall = 0.0f;
+			if (Velocity.y > 0)
+			{
+				// Down
+				for (int i = tYS; i <= tYE; i++)
+				{
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)tX, (FLOAT)i));
+					if (IsMovableTile(tMapID, DXMAPDIR::Down) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Up);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.y + Velocity.y;
+					float fDist = fWall - SprPos.y - 0.1f;
+					NewVelocity.y = fDist;
+				}
+			}
+			if (Velocity.y < 0)
+			{
+				// Up
+				for (int i = tYS; i >= tYE; i--)
+				{
+					int tMapID = ConvertXYToID(D3DXVECTOR2((FLOAT)tX, (FLOAT)i));
+					if (IsMovableTile(tMapID, DXMAPDIR::Up) == false)
+						fWall = GetMapTileBoundary(tMapID, DXMAPDIR::Down);
+				}
+
+				if (fWall)
+				{
+					float fCurr = SprPos.y + Velocity.y;
+					float fDist = fWall - SprPos.y;
+					NewVelocity.y = fDist;
+				}
+			}
+		}
+	}
+	*/
 
 	return NewVelocity;
 }

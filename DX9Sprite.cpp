@@ -130,6 +130,13 @@ int DX9Sprite::DrawBoundingBox() {
 	return 0;
 }
 
+DX9BOUNDINGBOX DX9Sprite::GetBoundingBox() {
+	DX9BOUNDINGBOX Result;
+	Result.PosOffset = m_SprPos + m_BB.PosOffset;
+	Result.Size = m_BB.Size;
+	return Result;
+
+}
 D3DXVECTOR2 DX9Sprite::GetBoundingBoxA() {
 	D3DXVECTOR2 Result;
 	Result = m_SprPos + m_BB.PosOffset;

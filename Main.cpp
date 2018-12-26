@@ -10,7 +10,7 @@ int DetectInput();
 
 const int gWndW = 800;
 const int gWndH = 600;
-const float gStride = 2.0f;
+const float gStride = 4.0f;
 wchar_t gBaseDir[255] = { 0 };
 
 ULONGLONG	gTimerSec = 0;
@@ -47,7 +47,7 @@ int main() {
 	gDXSprite->AddAnimation(2, 1, 5);
 	gDXSprite->AddAnimation(3, 1, 5, true);
 	gSprGroundOffsetY = (float)(gWndH - gDXSprite->GetSpriteH() - TILE_H);
-	gDXSprite->SetPosition(D3DXVECTOR2(160.0f, gSprGroundOffsetY - 140.0f));
+	gDXSprite->SetPosition(D3DXVECTOR2(380.0f, gSprGroundOffsetY - 230.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-30, -30));
 
 	gDXMap = new DX9Map;
@@ -80,7 +80,7 @@ int MainLoop() {
 	if (GetTickCount64() >= gTimerSec + 1000)
 	{
 		gTimerSec = GetTickCount64();
-		std::cout << gFPS << std::endl;
+		//std::cout << gFPS << std::endl;
 		gFPS = 0;
 	}
 
@@ -111,15 +111,64 @@ int MainLoop() {
 }
 
 int MoveSprite(D3DXVECTOR2 Velocity) {
-	D3DXVECTOR2 tSprPos = gDXSprite->GetSpriteFeet();
-	D3DXVECTOR2 tNewVel = gDXMap->CheckSprCollision(tSprPos, Velocity);
-	
+
+	/*
+	D3DXVECTOR2 tSprBBA = gDXSprite->GetBoundingBoxA();
+	D3DXVECTOR2 tSprBBB = gDXSprite->GetBoundingBoxB();
+
+	D3DXVECTOR2 tSprPosA = D3DXVECTOR2(0, 0);
+	D3DXVECTOR2 tSprPosB = D3DXVECTOR2(0, 0);
+
+	if (Velocity.x > 0)
+	{
+		// Go Right
+		tSprPosA = D3DXVECTOR2(tSprBBB.x, tSprBBA.y);
+		tSprPosB = D3DXVECTOR2(tSprBBB.x, tSprBBB.y);
+	}
+	else if (Velocity.x < 0)
+	{
+		// Go Left
+		tSprPosA = D3DXVECTOR2(tSprBBA.x, tSprBBA.y);
+		tSprPosB = D3DXVECTOR2(tSprBBA.x, tSprBBB.y);
+	}
+	else if (Velocity.y > 0)
+	{
+		// Go Down
+		tSprPosA = D3DXVECTOR2(tSprBBA.x, tSprBBB.y);
+		tSprPosB = D3DXVECTOR2(tSprBBB.x, tSprBBB.y);
+	}
+	else if (Velocity.y < 0)
+	{
+		// Go Up
+		tSprPosA = D3DXVECTOR2(tSprBBA.x, tSprBBA.y);
+		tSprPosB = D3DXVECTOR2(tSprBBB.x, tSprBBA.y);
+	}
+
+	D3DXVECTOR2 tNewVelA = gDXMap->CheckSprCollision(tSprPosA, Velocity);
+	D3DXVECTOR2 tNewVelB = gDXMap->CheckSprCollision(tSprPosB, Velocity);
+
+	if ((tNewVelA == Velocity) && (tNewVelB == Velocity))
+	{
+		gDXSprite->Move(tNewVelA);
+	}
+	else if (tNewVelA != Velocity)
+	{
+		gDXSprite->Move(tNewVelA);
+	}
+	else if (tNewVelB != Velocity)
+	{
+		gDXSprite->Move(tNewVelB);
+	}
+	*/
+
+	DX9BOUNDINGBOX tSprBB = gDXSprite->GetBoundingBox();
+	D3DXVECTOR2 tNewVel = gDXMap->CheckSprCollisionWithBB(tSprBB, Velocity);
 	gDXSprite->Move(tNewVel);
 
-	std::cout << gDXSprite->GetBoundingBoxA().x << "/" << gDXSprite->GetBoundingBoxA().y << std::endl;
-	std::cout << gDXSprite->GetBoundingBoxB().x << "/" << gDXSprite->GetBoundingBoxB().y << std::endl;
-	std::cout << "-----" << std::endl;
-	//std::cout << tNewVel.x << "/" << tNewVel.y << std::endl;
+	//std::cout << "NewVelA" << tNewVelA.x << "/" << tNewVelA.y << std::endl;
+	//std::cout << "NewVelB" << tNewVelB.x << "/" << tNewVelB.y << std::endl;
+	//std::cout << "-----" << std::endl;
+	std::cout << tNewVel.x << "/" << tNewVel.y << std::endl;
 
 	return 0;
 }
