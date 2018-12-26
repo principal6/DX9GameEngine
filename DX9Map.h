@@ -114,12 +114,13 @@ public:
 
 	// Converter
 	D3DXVECTOR2 DX9Map::ConvertScrPosToXY(D3DXVECTOR2 ScreenPos);
+	D3DXVECTOR2 DX9Map::ConvertScrPosToXYRoundUp(D3DXVECTOR2 ScreenPos);
 	D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID);
 	int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY);
 
 	// Sprite Collision
 	D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity);
-	D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity);
+	D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity);
 };
 
 

@@ -598,8 +598,29 @@ D3DXVECTOR2 DX9Map::ConvertScrPosToXY(D3DXVECTOR2 ScreenPos) {
 	float tX = -m_fOffsetX + ScreenPos.x;
 	float tY = -m_fOffsetY + ScreenPos.y;
 
+	int tYR = (int)tX % TILE_W;
 	int tMapX = (int)(tX / TILE_W);
 	int tMapY = (int)(tY / TILE_H);
+	
+	Result.x = (FLOAT)tMapX;
+	Result.y = (FLOAT)tMapY;
+
+	return Result;
+}
+
+D3DXVECTOR2 DX9Map::ConvertScrPosToXYRoundUp(D3DXVECTOR2 ScreenPos) {
+	D3DXVECTOR2 Result;
+
+	float tX = -m_fOffsetX + ScreenPos.x;
+	float tY = -m_fOffsetY + ScreenPos.y;
+
+	int tYR = (int)tX % TILE_W;
+	int tMapX = (int)(tX / TILE_W);
+	int tMapY = (int)(tY / TILE_H);
+
+	// Y값은 올림 계산!★ (조금이라도 밑으로 내려가면 다음 줄로 인식해야 충돌 편함..)
+	if (tYR)
+		tMapY++;
 
 	Result.x = (FLOAT)tMapX;
 	Result.y = (FLOAT)tMapY;
@@ -780,34 +801,30 @@ D3DXVECTOR2 DX9Map::CheckSprCollision(D3DXVECTOR2 SprPos, D3DXVECTOR2 Velocity) 
 	return NewVelocity;
 }
 
-D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity) {
+D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity) {
 	D3DXVECTOR2 NewVelocity = Velocity;
 
 	D3DXVECTOR2 tSprPosS;
-	D3DXVECTOR2 tSprPosE1;
-	D3DXVECTOR2 tSprPosE2;
+	D3DXVECTOR2 tSprPosE;
 	D3DXVECTOR2 tMapXYS;
-	D3DXVECTOR2 tMapXYE1;
-	D3DXVECTOR2 tMapXYE2;
+	D3DXVECTOR2 tMapXYE;
 
 	if (Velocity.x > 0)
 	{
 		// Go Right
 		tSprPosS = BB.PosOffset;
 		tSprPosS.x += BB.Size.x; // ┐ (Right Up)
-		tSprPosE1 = tSprPosS;
-		tSprPosE1.x += Velocity.x;
-		tSprPosE2 = tSprPosE1;
-		tSprPosE2.y += BB.Size.y;
+		tSprPosE = tSprPosS;
+		tSprPosE.x += Velocity.x;
+		tSprPosE.y += BB.Size.y;
 
 		tMapXYS = ConvertScrPosToXY(tSprPosS);
-		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
-		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+		tMapXYE = ConvertScrPosToXY(tSprPosE);
 
 		int tXS = (int)tMapXYS.x;
-		int tXE = (int)tMapXYE1.x;
 		int tYS = (int)tMapXYS.y;
-		int tYE = (int)tMapXYE2.y;
+		int tXE = (int)tMapXYE.x;
+		int tYE = (int)tMapXYE.y;
 
 		float fWall = 0.0f;
 		float fWallCmp = 0.0f;
@@ -835,7 +852,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 		if (fWall)
 		{
 			float fCurr = tSprPosS.x + Velocity.x;
-			float fDist = fWall - tSprPosS.x - 0.1f;
+			float fDist = fWall - tSprPosS.x; // - 0.1f;
 			NewVelocity.x = fDist;
 		}
 	}
@@ -843,19 +860,17 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 	{
 		// Go Left
 		tSprPosS = BB.PosOffset; // ┌ (Left Up)
-		tSprPosE1 = tSprPosS;
-		tSprPosE1.x += Velocity.x;
-		tSprPosE2 = tSprPosE1;
-		tSprPosE2.y += BB.Size.y;
+		tSprPosE = tSprPosS;
+		tSprPosE.x += Velocity.x;
+		tSprPosE.y += BB.Size.y;
 
 		tMapXYS = ConvertScrPosToXY(tSprPosS);
-		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
-		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+		tMapXYE = ConvertScrPosToXY(tSprPosE);
 
 		int tXS = (int)tMapXYS.x;
-		int tXE = (int)tMapXYE1.x;
 		int tYS = (int)tMapXYS.y;
-		int tYE = (int)tMapXYE2.y;
+		int tXE = (int)tMapXYE.x;
+		int tYE = (int)tMapXYE.y;
 
 		float fWall = 0.0f;
 		float fWallCmp = 0.0f;
@@ -892,22 +907,23 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 		// Go Down
 		tSprPosS = BB.PosOffset;
 		tSprPosS.y += BB.Size.y; // └ (Left Down)
-		tSprPosE1 = tSprPosS;
-		tSprPosE1.y += Velocity.y;
-		tSprPosE2 = tSprPosE1;
-		tSprPosE2.x += BB.Size.x;
+		tSprPosE = tSprPosS;
+		tSprPosE.y += Velocity.y;
+		tSprPosE.x += BB.Size.x;
 
-		tMapXYS = ConvertScrPosToXY(tSprPosS);
-		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
-		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+		tMapXYS = ConvertScrPosToXYRoundUp(tSprPosS);
+		tMapXYE = ConvertScrPosToXYRoundUp(tSprPosE);
 
 		int tXS = (int)tMapXYS.x;
-		int tXE = (int)tMapXYE2.x;
 		int tYS = (int)tMapXYS.y;
-		int tYE = (int)tMapXYE2.y;
+		int tXE = (int)tMapXYE.x;
+		int tYE = (int)tMapXYE.y;
 
 		float fWall = 0.0f;
 		float fWallCmp = 0.0f;
+
+		int deb1, deb2;
+		bool deb3;
 
 		for (int i = tXS; i <= tXE; i++)
 		{
@@ -925,34 +941,38 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 					{
 						fWall = min(fWall, fWallCmp);
 					}
+					deb1 = i;
+					deb2 = j;
+
+					deb3 = IsMovableTile(tMapID, DXMAPDIR::Down);
 				}
 			}
-		}
 
-		if (fWall)
-		{
-			float fCurr = tSprPosS.y + Velocity.y;
-			float fDist = fWall - tSprPosS.y - 0.1f;
-			NewVelocity.y = fDist;
+			if (fWall)
+			{
+				float fCurr = tSprPosS.y + Velocity.y;
+				float fDist = fWall - tSprPosS.y - 0.1f;
+				if (fDist)
+					int dd = 0;
+				NewVelocity.y = min(NewVelocity.y, fDist);
+			}
 		}
 	}
 	else if (Velocity.y < 0)
 	{
 		// Go Up
 		tSprPosS = BB.PosOffset; // ┌ (Left Up)
-		tSprPosE1 = tSprPosS;
-		tSprPosE1.y += Velocity.y;
-		tSprPosE2 = tSprPosE1;
-		tSprPosE2.x += BB.Size.x;
+		tSprPosE = tSprPosS;
+		tSprPosE.y += Velocity.y;
+		tSprPosE.x += BB.Size.x;
 
 		tMapXYS = ConvertScrPosToXY(tSprPosS);
-		tMapXYE1 = ConvertScrPosToXY(tSprPosE1);
-		tMapXYE2 = ConvertScrPosToXY(tSprPosE2);
+		tMapXYE = ConvertScrPosToXY(tSprPosE);
 
 		int tXS = (int)tMapXYS.x;
-		int tXE = (int)tMapXYE2.x;
 		int tYS = (int)tMapXYS.y;
-		int tYE = (int)tMapXYE2.y;
+		int tXE = (int)tMapXYE.x;
+		int tYE = (int)tMapXYE.y;
 
 		float fWall = 0.0f;
 		float fWallCmp = 0.0f;
@@ -981,7 +1001,7 @@ D3DXVECTOR2 DX9Map::CheckSprCollisionWithBB(DX9BOUNDINGBOX BB, D3DXVECTOR2 Veloc
 		{
 			float fCurr = tSprPosS.y + Velocity.y;
 			float fDist = fWall - tSprPosS.y;
-			NewVelocity.y = fDist;
+			NewVelocity.y = max(NewVelocity.y, fDist);
 		}
 	}
 	return NewVelocity;

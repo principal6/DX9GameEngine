@@ -9,7 +9,7 @@ DX9Sprite::DX9Sprite() {
 	m_nSprScaledW = 0;
 	m_nSprScaledH = 0;
 
-	m_nSprDir = 0;
+	m_nAnimSprDir = 0;
 	m_nAnimCount = 0;
 	m_nCurrAnimID = 0;
 	m_nCurrFrame = 0;
@@ -106,7 +106,7 @@ int DX9Sprite::SetAnimation(int AnimID) {
 	{
 		m_nCurrAnimID = AnimID;
 		m_nCurrFrame = m_Anims[AnimID].FrameS;
-		m_nSprDir = m_Anims[AnimID].HFlip;
+		m_nAnimSprDir = m_Anims[AnimID].HFlip;
 	}
 	return 0;
 }
@@ -146,7 +146,39 @@ int DX9Sprite::SetPosition(D3DXVECTOR2 Pos) {
 	return 0;
 }
 
-int DX9Sprite::Move(D3DXVECTOR2 dXY) {
+int DX9Sprite::Accelerate(D3DXVECTOR2 Accel) {
+	m_Velocity += Accel;
+	return 0;
+}
+
+int DX9Sprite::AddVelocity(D3DXVECTOR2 Vel) {
+	m_Velocity += Vel;
+	return 0;
+}
+
+int DX9Sprite::SetVelocity(D3DXVECTOR2 Vel) {
+	m_Velocity = Vel;
+	return 0;
+}
+
+int DX9Sprite::SetVelocityY(float Vel) {
+	m_Velocity.y = Vel;
+	return 0;
+}
+
+D3DXVECTOR2 DX9Sprite::GetVelocity() {
+	return m_Velocity;
+}
+
+int DX9Sprite::MoveWithVelocity() {
+	m_SprPos += m_Velocity;
+	m_SprFeetPos += m_Velocity;
+
+	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
+	return 0;
+}
+
+int DX9Sprite::MoveOnce(D3DXVECTOR2 dXY) {
 	m_SprPos += dXY;
 	m_SprFeetPos += dXY;
 
