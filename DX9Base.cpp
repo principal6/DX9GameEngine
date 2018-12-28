@@ -55,10 +55,16 @@ int DX9Base::CreateOnWindow(HWND hWnd)
 int DX9Base::Destroy()
 {
 	if (m_pD3DDevice != nullptr)
+	{
 		m_pD3DDevice->Release();
+		m_pD3DDevice = nullptr;
+	}	
 
 	if (m_pD3D != nullptr)
+	{
 		m_pD3D->Release();
+		m_pD3D = nullptr;
+	}
 
 	return 0;
 }

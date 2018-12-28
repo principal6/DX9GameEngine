@@ -18,6 +18,56 @@
 
 const float UV_OFFSET = 0.005f;
 
+enum class DX9EFFECTTYPE
+{
+	Still,
+	FlyRight,
+	FlyDown,
+	FlyUp,
+};
+
+class DX9EFFECTDATA
+{
+private:
+	DX9EFFECTDATA* pNext;
+	D3DXVECTOR2 Position;
+	D3DXVECTOR2 SpawnOffset;
+
+public:
+	DX9EFFECTDATA(): pNext(nullptr), Position(D3DXVECTOR2(0, 0)),SpawnOffset(D3DXVECTOR2(0, 0)) {};
+	DX9EFFECTDATA(D3DXVECTOR2 _Position, D3DXVECTOR2 _SpawnOffset) : pNext(nullptr), Position(_Position), SpawnOffset(_SpawnOffset) {};
+	void SetNext(DX9EFFECTDATA* Next) { pNext = Next; };
+	DX9EFFECTDATA* GetNext() { return pNext; };
+};
+
+enum class DX9MAPDIR
+{
+	Up,
+	Down,
+	Left,
+	Right,
+};
+
+struct DX9UV
+{
+	float u1;
+	float u2;
+	float v1;
+	float v2;
+
+	DX9UV() : u1(0), u2(0), v1(0), v2(0) {};
+	DX9UV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
+};
+
+struct DX9MAPDATA
+{
+	int TileID;
+	int MoveID;
+
+	DX9MAPDATA() : TileID(0), MoveID(0) {};
+	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
+};
+
 enum class DX9ANIMID
 {
 	Idle = 0,
@@ -26,7 +76,7 @@ enum class DX9ANIMID
 	Attack2,
 	Attack3,
 
-	Effect = 0,
+	Effect,
 };
 
 enum class DX9MAPMODE

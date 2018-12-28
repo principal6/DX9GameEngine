@@ -38,14 +38,23 @@ int DX9Image::Destroy()
 	m_Vert.clear();
 	m_Ind.clear();
 
-	if (m_pTexture != nullptr)
+	if (m_pTexture)
+	{
 		m_pTexture->Release();
-
-	if (m_pIB != nullptr)
+		m_pTexture = nullptr;
+	}
+		
+	if (m_pIB)
+	{
 		m_pIB->Release();
-
-	if (m_pVB != nullptr)
+		m_pIB = nullptr;
+	}
+		
+	if (m_pVB)
+	{
 		m_pVB->Release();
+		m_pVB = nullptr;
+	}
 
 	return 0;
 }

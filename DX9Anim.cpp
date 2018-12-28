@@ -12,7 +12,7 @@ DX9Anim::DX9Anim()
 
 	m_nAnimDir = DX9ANIMDIR::Right;
 	m_nCurrAnimID = DX9ANIMID::Idle;
-	m_nCurrFrame = 0;
+	m_nCurrFrameID = 0;
 	m_nAnimCount = 0;
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
@@ -127,11 +127,11 @@ int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet,
 	if ((m_nCurrAnimID != AnimID) || (bForcedSet))
 	{
 		m_nCurrAnimID = AnimID;
-		m_nCurrFrame = m_Anims[(int)AnimID].FrameS;
+		m_nCurrFrameID = m_Anims[(int)AnimID].FrameS;
 		m_bRepeating = bRepeating;
 		m_bBeingAnimated = !bCanInterrupt;
 
-		SetFrame(m_nCurrFrame);
+		SetFrame(m_nCurrFrameID);
 	}
 
 	return 0;
@@ -139,16 +139,16 @@ int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet,
 
 int DX9Anim::Animate()
 {	
-	if (m_nCurrFrame < m_Anims[(int)m_nCurrAnimID].FrameE) {
-		m_nCurrFrame++;
+	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE) {
+		m_nCurrFrameID++;
 	}
 	else {
-		m_nCurrFrame = m_Anims[(int)m_nCurrAnimID].FrameS;
+		m_nCurrFrameID = m_Anims[(int)m_nCurrAnimID].FrameS;
 		if (!m_bRepeating)
 			m_bBeingAnimated = false;
 	}
 	
-	SetFrame(m_nCurrFrame);
+	SetFrame(m_nCurrFrameID);
 
 	return 0;
 }

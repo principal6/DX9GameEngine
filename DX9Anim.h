@@ -22,7 +22,7 @@ private:
 	// Animation
 	DX9ANIMDIR m_nAnimDir;
 	DX9ANIMID m_nCurrAnimID;
-	int m_nCurrFrame;
+	int m_nCurrFrameID;
 	DX9ANIMDATA m_Anims[MAX_ANIM_COUNT];
 	int m_nAnimCount;
 	bool m_bBeingAnimated;

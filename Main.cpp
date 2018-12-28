@@ -1,11 +1,15 @@
 #include "DX9Base.h"
 #include "DX9Input.h"
 #include "DX9Image.h"
-#include "DX9Line.h"
-#include "DX9Anim.h"
 #include "DX9Sprite.h"
 #include "DX9Monster.h"
+#include "DX9Effect.h"
 #include "DX9Map.h"
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define new new( _CLIENT_BLOCK, __FILE__, __LINE__)
+#endif
 
 // 함수 헤더
 int MainLoop();
@@ -18,8 +22,8 @@ const int WINDOW_X = 50;
 const int WINDOW_Y = 50;
 const int WINDOW_W = 800;
 const int WINDOW_H = 600;
-const D3DXVECTOR2 kGravity = D3DXVECTOR2(0.0f, 0.5f);
-const D3DXVECTOR2 kJumpPow = D3DXVECTOR2(0.0f, -12.0f);
+const D3DXVECTOR2 kGravity = D3DXVECTOR2(0.0f, 0.6f);
+const D3DXVECTOR2 kJumpPow = D3DXVECTOR2(0.0f, -15.0f);
 const float kStride = 5.0f;
 
 // 변수
@@ -39,11 +43,13 @@ DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Sprite* gDXSprite;
 DX9Monster* gDXMonster;
-DX9Anim* gDXEffect;
+DX9Effect* gDXEffect;
 DX9Map* gDXMap;
 
 int main()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	wchar_t wszBaseDir[255] = { 0 };
 	GetCurrentDirectoryW(255, wszBaseDir);
 
@@ -68,17 +74,18 @@ int main()
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 
-	gDXEffect = new DX9Anim;
-	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXEffect->MakeSprite(L"particlefx_14.png", 8, 8);
-	gDXEffect->AddAnimation(DX9ANIMID::Effect, 0, 63);
-
 	gDXMonster = new DX9Monster;
 	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXMonster->MakeSprite(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetSpriteScaledH() - TILE_H)));
-	
+
+	gDXEffect = new DX9Effect;
+	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
+	gDXEffect->MakeSprite(L"particlefx_14.png", 8, 8);
+	gDXEffect->AddAnimation(DX9ANIMID::Effect, 0, 63);
+	gDXEffect->SetBaseSpawnOffset(D3DXVECTOR2(80.0f, 0.0f));
+
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXMap->LoadMapFromFile(L"map01.jwm");
@@ -92,16 +99,16 @@ int main()
 	
 	// 종료 전 객체 파괴
 	gDXMap->Destroy();
-	gDXMonster->Destroy();
 	gDXEffect->Destroy();
+	gDXMonster->Destroy();
 	gDXSprite->Destroy();
 	gDXImage->Destroy();
 	gDXInput->Destroy();
 	gDXBase->Destroy();
 
 	delete gDXMap;
-	delete gDXMonster;
 	delete gDXEffect;
+	delete gDXMonster;
 	delete gDXSprite;
 	delete gDXImage;
 	delete gDXInput;
@@ -244,21 +251,7 @@ int DetectInput()
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
-		D3DXVECTOR2 tPos = gDXSprite->GetCenterPosition();
-		switch (gDXSprite->GetAnimDir())
-		{
-		case DX9ANIMDIR::Left:
-			tPos.x -= 80.0f;
-			break;
-		case DX9ANIMDIR::Right:
-			tPos.x += 80.0f;
-			break;
-		default:
-			break;
-		}
-
-		gDXEffect->SetPositionCentered(tPos);
-		gDXEffect->SetAnimation(DX9ANIMID::Effect, false, true);
+		gDXEffect->Spawn(gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
 		gbEffect = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))

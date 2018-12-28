@@ -18,12 +18,18 @@ int DX9Line::Destroy()
 	m_Vert.clear();
 	m_Ind.clear();
 
-	if (m_pIB != nullptr)
+	if (m_pIB)
+	{
 		m_pIB->Release();
-
-	if (m_pVB != nullptr)
+		m_pIB = nullptr;
+	}
+		
+	if (m_pVB)
+	{
 		m_pVB->Release();
-
+		m_pVB = nullptr;
+	}
+		
 	return 0;
 }
 

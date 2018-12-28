@@ -33,6 +33,17 @@ int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 
 int DX9Map::Destroy()
 {
+	if (m_pTextureMove)
+	{
+		m_pTextureMove->Release();
+		m_pTextureMove = nullptr;
+	}
+	if (m_pVBMove)
+	{
+		m_pVBMove->Release();
+		m_pVBMove = nullptr;
+	}
+
 	return DX9Image::Destroy();
 }
 

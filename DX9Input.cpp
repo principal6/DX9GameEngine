@@ -80,15 +80,18 @@ bool DX9Input::Destroy()
 	{
 		m_DIDevMouse->Unacquire();
 		m_DIDevMouse->Release();
+		m_DIDevMouse = nullptr;
 	}
 	if (m_DIDevKeyboard)
 	{
 		m_DIDevKeyboard->Unacquire();
 		m_DIDevKeyboard->Release();
+		m_DIDevKeyboard = nullptr;
 	}
 	if (m_DI8)
 	{
 		m_DI8->Release();
+		m_DI8 = nullptr;
 	}
 	
 	return true;
