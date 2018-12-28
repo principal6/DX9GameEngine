@@ -21,7 +21,7 @@ private:
 
 	// Animation
 	DX9ANIMDIR m_nAnimDir;
-	int m_nCurrAnimID;
+	DX9ANIMID m_nCurrAnimID;
 	int m_nCurrFrame;
 	DX9ANIMDATA m_Anims[MAX_ANIM_COUNT];
 	int m_nAnimCount;
@@ -54,8 +54,8 @@ public:
 
 	// Animator
 	int DX9Anim::SetFrame(int FrameID);
-	int DX9Anim::AddAnimation(int AnimID, int StartFrame, int EndFrame, bool HFlip = false);
-	int DX9Anim::SetAnimation(int AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
+	int DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);
+	int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
 	int DX9Anim::Animate();
 	bool DX9Anim::IsBeingAnimated() { return m_bBeingAnimated; };
 	DX9ANIMDIR DX9Anim::GetAnimDir() { return m_nAnimDir; };

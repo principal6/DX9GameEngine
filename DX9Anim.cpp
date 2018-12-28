@@ -11,7 +11,7 @@ DX9Anim::DX9Anim()
 	m_nSprScaledH = 0;
 
 	m_nAnimDir = DX9ANIMDIR::Right;
-	m_nCurrAnimID = 0;
+	m_nCurrAnimID = DX9ANIMID::Idle;
 	m_nCurrFrame = 0;
 	m_nAnimCount = 0;
 	m_bBeingAnimated = false;
@@ -48,6 +48,7 @@ int DX9Anim::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float 
 	m_nSprScaledH = (int)(m_nSprH * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
+	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
 	return 0;
 }
 
@@ -95,7 +96,7 @@ int DX9Anim::SetFrame(int FrameID)
 	u1 += 0.01f;
 	v1 += 0.01f;
 
-	if (m_Anims[m_nCurrAnimID].HFlip)
+	if (m_Anims[(int)m_nCurrAnimID].HFlip)
 	{
 		UpdateVertData(u2, v1, u1, v2);
 	}
@@ -107,26 +108,26 @@ int DX9Anim::SetFrame(int FrameID)
 	return 0;
 }
 
-int DX9Anim::AddAnimation(int AnimID, int StartFrame, int EndFrame, bool HFlip)
+int DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
 {
-	m_Anims[AnimID].FrameS = StartFrame;
-	m_Anims[AnimID].FrameE = EndFrame;
-	m_Anims[AnimID].HFlip = HFlip;
+	m_Anims[(int)AnimID].FrameS = StartFrame;
+	m_Anims[(int)AnimID].FrameE = EndFrame;
+	m_Anims[(int)AnimID].HFlip = HFlip;
 
 	return 0;
 }
 
-int DX9Anim::SetAnimation(int AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
+int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
 {
 	if ((m_nCurrAnimID != AnimID) || (bForcedSet))
 	{
 		m_nCurrAnimID = AnimID;
-		m_nCurrFrame = m_Anims[AnimID].FrameS;
+		m_nCurrFrame = m_Anims[(int)AnimID].FrameS;
 		
-		if (m_Anims[AnimID].HFlip)
-			m_nAnimDir = DX9ANIMDIR::Right;
-		else
+		if (m_Anims[(int)AnimID].HFlip)
 			m_nAnimDir = DX9ANIMDIR::Left;
+		else
+			m_nAnimDir = DX9ANIMDIR::Right;
 
 		m_bRepeating = bRepeating;
 		m_bBeingAnimated = !bCanInterrupt;
@@ -136,11 +137,11 @@ int DX9Anim::SetAnimation(int AnimID, bool bCanInterrupt, bool bForcedSet, bool 
 
 int DX9Anim::Animate()
 {	
-	if (m_nCurrFrame < m_Anims[m_nCurrAnimID].FrameE) {
+	if (m_nCurrFrame < m_Anims[(int)m_nCurrAnimID].FrameE) {
 		m_nCurrFrame++;
 	}
 	else {
-		m_nCurrFrame = m_Anims[m_nCurrAnimID].FrameS;
+		m_nCurrFrame = m_Anims[(int)m_nCurrAnimID].FrameS;
 		if (!m_bRepeating)
 			m_bBeingAnimated = false;
 	}

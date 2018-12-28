@@ -33,13 +33,13 @@ ULONGLONG gTimerAnim = 0;
 int gFPS = 0;
 
 // Å¬·¡½º
-DX9Base*	gDXBase;
-DX9Input*	gDXInput;
-DX9Image*	gDXImage;
-DX9Sprite*	gDXSprite;
-DX9Sprite*	gDXEnemy;
-DX9Anim*	gDXEffect;
-DX9Map*		gDXMap;
+DX9Base* gDXBase;
+DX9Input* gDXInput;
+DX9Image* gDXImage;
+DX9Sprite* gDXSprite;
+DX9Sprite* gDXEnemy;
+DX9Anim* gDXEffect;
+DX9Map* gDXMap;
 
 int main()
 {
@@ -58,30 +58,29 @@ int main()
 
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 2.0f);
-	gDXSprite->AddAnimation(0, 0, 0); // Idle
-	gDXSprite->AddAnimation(1, 0, 0, true);
-	gDXSprite->AddAnimation(2, 1, 5); // Walk
-	gDXSprite->AddAnimation(3, 1, 5, true);
-	gDXSprite->AddAnimation(4, 27, 28); // Punch
-	gDXSprite->AddAnimation(5, 27, 28, true);
-	gDXSprite->AddAnimation(6, 24, 26); // HorzAttack
-	gDXSprite->AddAnimation(7, 24, 26, true);
+	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 1.5f);
+	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
+	gDXSprite->AddAnimation(DX9ANIMID::Idle_Flip, 0, 0, true);
+	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
+	gDXSprite->AddAnimation(DX9ANIMID::Walk_Flip, 1, 5, true);
+	gDXSprite->AddAnimation(DX9ANIMID::Attack1, 27, 28); // Punch
+	gDXSprite->AddAnimation(DX9ANIMID::Attack1_Flip, 27, 28, true);
+	gDXSprite->AddAnimation(DX9ANIMID::Attack2, 24, 26); // HorzAttack
+	gDXSprite->AddAnimation(DX9ANIMID::Attack2_Flip, 24, 26, true);
 	gSprGroundOffsetY = (float)(WINDOW_H - gDXSprite->GetSpriteScaledH() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
-	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-34, -30));
+	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 
 	gDXEffect = new DX9Anim;
 	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXEffect->MakeSprite(L"particlefx_14.png", 8, 8);
-	gDXEffect->AddAnimation(0, 0, 63);
+	gDXEffect->AddAnimation(DX9ANIMID::Effect, 0, 63);
 
 	gDXEnemy = new DX9Sprite;
 	gDXEnemy->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXEnemy->MakeSprite(L"mage-1-85x94.png", 4, 2);
-	gDXEnemy->AddAnimation(0, 0, 7);
+	gDXEnemy->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXEnemy->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXEnemy->GetSpriteScaledH() - TILE_H)));
-	gDXEnemy->SetBoundingnBox(D3DXVECTOR2(-34, -30));
 	
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir);
@@ -149,9 +148,10 @@ int MainLoop()
 		gDXMap->Draw();
 
 		gDXEnemy->Draw();
+		gDXEnemy->DrawBoundingBox();
 
 		gDXSprite->Draw();
-		//gDXSprite->DrawBoundingBox();
+		gDXSprite->DrawBoundingBox();
 
 		if (gbEffect)
 			gDXEffect->Draw();
@@ -223,30 +223,30 @@ int DetectInput()
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
 		MoveSprite(D3DXVECTOR2(kStride, 0));
-		gDXSprite->SetAnimation(2, true);
+		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
 		MoveSprite(D3DXVECTOR2(-kStride, 0));
-		gDXSprite->SetAnimation(3, true);
+		gDXSprite->SetAnimation(DX9ANIMID::Walk_Flip, true);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LCONTROL))
 	{
 		if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Right)
 		{
-			gDXSprite->SetAnimation(7);
+			gDXSprite->SetAnimation(DX9ANIMID::Attack1);
 		}
 		else if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Left)
 		{
-			gDXSprite->SetAnimation(6);
+			gDXSprite->SetAnimation(DX9ANIMID::Attack1_Flip);
 		}
 	}
 	if (gDXInput->OnKeyDown(DIK_LSHIFT))
 	{
 		gDXEffect->SetPosition(gDXSprite->GetPosition());
-		gDXEffect->SetAnimation(0, false, true);
+		gDXEffect->SetAnimation(DX9ANIMID::Effect, false, true);
 		gbEffect = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
@@ -264,11 +264,11 @@ int DetectInput()
 	{
 		if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Right)
 		{
-			gDXSprite->SetAnimation(1);
+			gDXSprite->SetAnimation(DX9ANIMID::Idle);
 		}
 		else if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Left)
 		{
-			gDXSprite->SetAnimation(0);
+			gDXSprite->SetAnimation(DX9ANIMID::Idle_Flip);
 		}
 	}
 

@@ -16,6 +16,64 @@
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define D3DFVF_LINE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
+enum class DX9ANIMID
+{
+	Idle = 0,
+	Walk,
+	Attack1,
+	Attack2,
+	Attack3,
+
+	Idle_Flip,
+	Walk_Flip,
+	Attack1_Flip,
+	Attack2_Flip,
+	Attack3_Flip,
+
+	Effect = 0,
+};
+
+enum class DX9MAPMODE
+{
+	TileMode,
+	MoveMode,
+};
+
+enum class DX9WINDOW_STYLE : DWORD
+{
+	Overlapped = WS_OVERLAPPED,
+	Popup = WS_POPUP,
+	Child = WS_CHILD,
+	Minimize = WS_MINIMIZE,
+	Visible = WS_VISIBLE,
+	DIsabled = WS_DISABLED,
+	ClipSiblings = WS_CLIPSIBLINGS,
+	ClipChildren = WS_CLIPCHILDREN,
+	Maximize = WS_MAXIMIZE,
+	Caption = WS_CAPTION, // WS_BORDER | WS_DLGFRAME
+	Border = WS_BORDER,
+	DlgFrame = WS_DLGFRAME,
+	VScroll = WS_VSCROLL,
+	HScroll = WS_HSCROLL,
+	SysMenu = WS_SYSMENU,
+	ThickFrame = WS_THICKFRAME,
+	Group = WS_GROUP,
+	TabStop = WS_TABSTOP,
+	MinimizeBox = WS_MINIMIZEBOX,
+	MaximizeBox = WS_MAXIMIZEBOX,
+	OverlappedWindow = WS_OVERLAPPEDWINDOW, // WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
+	PopupWindow = WS_POPUPWINDOW, // WS_POPUP | WS_BORDER | WS_SYSMENU
+	ChildWindow = WS_CHILDWINDOW, // WS_CHILD
+};
+
+enum class DX9ANIMDIR
+{
+	Left,
+	Right,
+	//Up,
+	//Down,
+};
+
 struct DX9VERTEX_LINE
 {
 	FLOAT x, y, z, rhw;
@@ -54,39 +112,6 @@ struct DX9INDEX2
 	WORD	_0, _1;
 };
 
-enum struct DX9MAPMODE
-{
-	TileMode,
-	MoveMode,
-};
-
-enum struct DX9WINDOW_STYLE : DWORD
-{
-	Overlapped = WS_OVERLAPPED,
-	Popup = WS_POPUP,
-	Child = WS_CHILD,
-	Minimize = WS_MINIMIZE,
-	Visible = WS_VISIBLE,
-	DIsabled = WS_DISABLED,
-	ClipSiblings = WS_CLIPSIBLINGS,
-	ClipChildren = WS_CLIPCHILDREN,
-	Maximize = WS_MAXIMIZE,
-	Caption = WS_CAPTION, // WS_BORDER | WS_DLGFRAME
-	Border = WS_BORDER,
-	DlgFrame = WS_DLGFRAME,
-	VScroll = WS_VSCROLL,
-	HScroll = WS_HSCROLL,
-	SysMenu = WS_SYSMENU,
-	ThickFrame = WS_THICKFRAME,
-	Group = WS_GROUP,
-	TabStop = WS_TABSTOP,
-	MinimizeBox = WS_MINIMIZEBOX,
-	MaximizeBox = WS_MAXIMIZEBOX,
-	OverlappedWindow = WS_OVERLAPPEDWINDOW, // WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
-	PopupWindow = WS_POPUPWINDOW, // WS_POPUP | WS_BORDER | WS_SYSMENU
-	ChildWindow = WS_CHILDWINDOW, // WS_CHILD
-};
-
 struct DX9ANIMDATA
 {
 	int FrameS;
@@ -96,14 +121,6 @@ struct DX9ANIMDATA
 	DX9ANIMDATA() : FrameS(0), FrameE(0), HFlip(false) {};
 	DX9ANIMDATA(int _FrameS, int _FrameE, bool _HFlip) :
 		FrameS(_FrameS), FrameE(_FrameE), HFlip(_HFlip) {};
-};
-
-enum class DX9ANIMDIR
-{
-	Left,
-	Right,
-	//Up,
-	//Down,
 };
 
 struct DX9BOUNDINGBOX
