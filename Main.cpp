@@ -60,13 +60,9 @@ int main()
 	gDXSprite->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
-	gDXSprite->AddAnimation(DX9ANIMID::Idle_Flip, 0, 0, true);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
-	gDXSprite->AddAnimation(DX9ANIMID::Walk_Flip, 1, 5, true);
 	gDXSprite->AddAnimation(DX9ANIMID::Attack1, 27, 28); // Punch
-	gDXSprite->AddAnimation(DX9ANIMID::Attack1_Flip, 27, 28, true);
 	gDXSprite->AddAnimation(DX9ANIMID::Attack2, 24, 26); // HorzAttack
-	gDXSprite->AddAnimation(DX9ANIMID::Attack2_Flip, 24, 26, true);
 	gSprGroundOffsetY = (float)(WINDOW_H - gDXSprite->GetSpriteScaledH() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
@@ -168,7 +164,7 @@ int Gravitate()
 	gDXSprite->Accelerate(kGravity);
 	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
 	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), tCurrSprVel);
-	
+
 	if (tNewVel.y < tCurrSprVel.y)
 	{
 		if (gbHitGround)
@@ -178,7 +174,7 @@ int Gravitate()
 		else
 		{
 			gbHitGround = true;
-			gDXSprite->SetFrame(19);
+			gDXSprite->SetFrame(19); // ÂøÁö
 		}	
 	}
 	else
@@ -213,6 +209,10 @@ int MoveSprite(D3DXVECTOR2 Velocity)
 {
 	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), Velocity);
 	gDXSprite->MoveConst(tNewVel);
+	std::cout << gDXSprite->GetBoundingBox().PosOffset.x << " / "
+		<< gDXSprite->GetBoundingBox().PosOffset.x + gDXSprite->GetBoundingBox().Size.x
+		<< std::endl;
+
 	return 0;
 }
 
@@ -224,26 +224,21 @@ int DetectInput()
 	{
 		MoveSprite(D3DXVECTOR2(kStride, 0));
 		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
+		gDXSprite->SetAnimDir(DX9ANIMDIR::Right);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
 		MoveSprite(D3DXVECTOR2(-kStride, 0));
-		gDXSprite->SetAnimation(DX9ANIMID::Walk_Flip, true);
+		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
+		gDXSprite->SetAnimDir(DX9ANIMDIR::Left);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LCONTROL))
 	{
-		if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Right)
-		{
-			gDXSprite->SetAnimation(DX9ANIMID::Attack1);
-		}
-		else if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Left)
-		{
-			gDXSprite->SetAnimation(DX9ANIMID::Attack1_Flip);
-		}
+		gDXSprite->SetAnimation(DX9ANIMID::Attack1);
 	}
-	if (gDXInput->OnKeyDown(DIK_LSHIFT))
+	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
 		gDXEffect->SetPosition(gDXSprite->GetPosition());
 		gDXEffect->SetAnimation(DX9ANIMID::Effect, false, true);
@@ -262,14 +257,7 @@ int DetectInput()
 
 	if ((!gbWalking) && (!gDXSprite->IsBeingAnimated()))
 	{
-		if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Right)
-		{
-			gDXSprite->SetAnimation(DX9ANIMID::Idle);
-		}
-		else if (gDXSprite->GetAnimDir() == DX9ANIMDIR::Left)
-		{
-			gDXSprite->SetAnimation(DX9ANIMID::Idle_Flip);
-		}
+		gDXSprite->SetAnimation(DX9ANIMID::Idle);
 	}
 
 	return 0;

@@ -29,6 +29,7 @@ int DX9Anim::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 	m_BBLine.Create(pD3DDev);
 	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
 	m_BBLine.AddEnd();
+
 	return 0;
 }
 
@@ -36,6 +37,7 @@ int DX9Anim::Destroy()
 {
 	m_BBLine.Destroy();
 	DX9Image::Destroy();
+
 	return 0;
 }
 
@@ -49,6 +51,7 @@ int DX9Anim::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float 
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
+
 	return 0;
 }
 
@@ -92,17 +95,20 @@ int DX9Anim::SetFrame(int FrameID)
 	float v1 = ((float)FrameY / (float)m_nRows);
 	float v2 = ((float)(FrameY + 1) / (float)m_nRows);
 
-	// 이걸 해야 옆줄 침범하지 않음!★
-	u1 += 0.01f;
-	v1 += 0.01f;
+	// 이걸 해야 주변 텍스처를 침범하지 않음!★
+	u1 += UV_OFFSET;
+	v1 += UV_OFFSET;
 
-	if (m_Anims[(int)m_nCurrAnimID].HFlip)
+	switch (m_nAnimDir)
 	{
+	case DX9ANIMDIR::Left:
 		UpdateVertData(u2, v1, u1, v2);
-	}
-	else
-	{
+		break;
+	case DX9ANIMDIR::Right:
 		UpdateVertData(u1, v1, u2, v2);
+		break;
+	default:
+		break;
 	}
 	
 	return 0;
@@ -112,7 +118,6 @@ int DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool H
 {
 	m_Anims[(int)AnimID].FrameS = StartFrame;
 	m_Anims[(int)AnimID].FrameE = EndFrame;
-	m_Anims[(int)AnimID].HFlip = HFlip;
 
 	return 0;
 }
@@ -123,15 +128,10 @@ int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet,
 	{
 		m_nCurrAnimID = AnimID;
 		m_nCurrFrame = m_Anims[(int)AnimID].FrameS;
-		
-		if (m_Anims[(int)AnimID].HFlip)
-			m_nAnimDir = DX9ANIMDIR::Left;
-		else
-			m_nAnimDir = DX9ANIMDIR::Right;
-
 		m_bRepeating = bRepeating;
 		m_bBeingAnimated = !bCanInterrupt;
 	}
+
 	return 0;
 }
 
@@ -147,6 +147,14 @@ int DX9Anim::Animate()
 	}
 	
 	SetFrame(m_nCurrFrame);
+
+	return 0;
+}
+
+int DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
+{
+	m_nAnimDir = Direction;
+
 	return 0;
 }
 
@@ -154,6 +162,7 @@ int DX9Anim::DrawBoundingBox()
 {
 	m_BBLine.SetBoxPosition(m_SprPos + m_BB.PosOffset, m_BB.Size);
 	m_BBLine.Draw();
+
 	return 0;
 }
 
@@ -162,6 +171,7 @@ DX9BOUNDINGBOX DX9Anim::GetBoundingBox()
 	DX9BOUNDINGBOX Result;
 	Result.PosOffset = m_SprPos + m_BB.PosOffset;
 	Result.Size = m_BB.Size;
+
 	return Result;
 }
 
@@ -171,24 +181,28 @@ int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 	m_SprPos = Pos;
 	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
 	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
+
 	return 0;
 }
 
 int DX9Anim::Accelerate(D3DXVECTOR2 Accel)
 {
 	m_Velocity += Accel;
+
 	return 0;
 }
 
 int DX9Anim::AddVelocity(D3DXVECTOR2 Vel)
 {
 	m_Velocity += Vel;
+
 	return 0;
 }
 
 int DX9Anim::SetVelocity(D3DXVECTOR2 Vel)
 {
 	m_Velocity = Vel;
+
 	return 0;
 }
 
@@ -198,6 +212,7 @@ int DX9Anim::MoveWithVelocity()
 	m_SprFeetPos += m_Velocity;
 
 	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
+
 	return 0;
 }
 
@@ -207,5 +222,6 @@ int DX9Anim::MoveConst(D3DXVECTOR2 dXY)
 	m_SprFeetPos += dXY;
 
 	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
+
 	return 0;
 }

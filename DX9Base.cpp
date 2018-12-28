@@ -4,6 +4,10 @@ LRESULT CALLBACK WndProcBase(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lPar
 {
 	switch (Message)
 	{
+	case WM_SYSCOMMAND:
+		if (wParam == SC_KEYMENU && (lParam >> 16) <= 0) // Disable Alt key
+			return 0;
+		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -100,6 +104,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 int DX9Base::SetBGColor(D3DCOLOR color)
 {
 	m_BGColor = color;
+
 	return 0;
 }
 
@@ -130,6 +135,7 @@ int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel)
 			pMainLoop();
 		}
 	}
+
 	return (int)m_MSG.wParam;
 }
 

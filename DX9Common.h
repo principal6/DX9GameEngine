@@ -16,6 +16,8 @@
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define D3DFVF_LINE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
+const float UV_OFFSET = 0.005f;
+
 enum class DX9ANIMID
 {
 	Idle = 0,
@@ -23,12 +25,6 @@ enum class DX9ANIMID
 	Attack1,
 	Attack2,
 	Attack3,
-
-	Idle_Flip,
-	Walk_Flip,
-	Attack1_Flip,
-	Attack2_Flip,
-	Attack3_Flip,
 
 	Effect = 0,
 };
@@ -70,8 +66,6 @@ enum class DX9ANIMDIR
 {
 	Left,
 	Right,
-	//Up,
-	//Down,
 };
 
 struct DX9VERTEX_LINE
@@ -116,11 +110,9 @@ struct DX9ANIMDATA
 {
 	int FrameS;
 	int FrameE;
-	bool HFlip;
 
-	DX9ANIMDATA() : FrameS(0), FrameE(0), HFlip(false) {};
-	DX9ANIMDATA(int _FrameS, int _FrameE, bool _HFlip) :
-		FrameS(_FrameS), FrameE(_FrameE), HFlip(_HFlip) {};
+	DX9ANIMDATA() : FrameS(0), FrameE(0) {};
+	DX9ANIMDATA(int _FrameS, int _FrameE) : FrameS(_FrameS), FrameE(_FrameE) {};
 };
 
 struct DX9BOUNDINGBOX

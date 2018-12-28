@@ -222,6 +222,10 @@ int DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 {
 	DX9UV tUV = ConvertIDtoUV(TileID, m_nTileSheetWidth, m_nTileSheetHeight);
 	
+	// 이걸 해야 주변 텍스처를 침범하지 않음!★
+	tUV.u1 += UV_OFFSET;
+	tUV.v1 += UV_OFFSET;
+
 	DWORD tColor;
 	if (TileID == -1)
 	{
@@ -876,7 +880,7 @@ D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(DX9BOUNDINGBOX BB, D3DXVECTOR2 Vel
 		if (fWall)
 		{
 			float fCurr = tSprPosS.x + Velocity.x;
-			float fDist = fWall - tSprPosS.x; // - 0.1f;
+			float fDist = fWall - tSprPosS.x - 0.1f;
 			NewVelocity.x = fDist;
 		}
 	}
@@ -976,8 +980,6 @@ D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(DX9BOUNDINGBOX BB, D3DXVECTOR2 Vel
 			{
 				float fCurr = tSprPosS.y + Velocity.y;
 				float fDist = fWall - tSprPosS.y - 0.1f;
-				if (fDist)
-					int dd = 0;
 				NewVelocity.y = min(NewVelocity.y, fDist);
 			}
 		}

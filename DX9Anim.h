@@ -58,6 +58,7 @@ public:
 	int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
 	int DX9Anim::Animate();
 	bool DX9Anim::IsBeingAnimated() { return m_bBeingAnimated; };
+	int DX9Anim::SetAnimDir(DX9ANIMDIR Direction);
 	DX9ANIMDIR DX9Anim::GetAnimDir() { return m_nAnimDir; };
 
 	// Graphics
