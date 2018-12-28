@@ -11,18 +11,22 @@ LRESULT CALLBACK WndProcBase(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lPar
 	return(DefWindowProc(hWnd, Message, wParam, lParam));
 }
 
-DX9Base::DX9Base(){
-	// 멤버 변수 초기화
-	m_pD3D = NULL;
-	m_pD3DDevice = NULL;
+DX9Base::DX9Base()
+{
+	m_hInstance = nullptr;
+	m_hWnd = nullptr;
+
+	m_pD3D = nullptr;
+	m_pD3DDevice = nullptr;
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height){
+int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
+{
 	COLORRGB rBGColor = COLORRGB(255, 0, 255);
 
 	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor)
-		== NULL)
+		== nullptr)
 		return -1;
 
 	if (InitD3D() == -1)
@@ -31,11 +35,12 @@ int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height){
 	return 0;
 }
 
-int DX9Base::CreateOnWindow(HWND hWnd) {
+int DX9Base::CreateOnWindow(HWND hWnd)
+{
 	COLORRGB rBGColor = COLORRGB(255, 0, 255);
 
 	m_hWnd = hWnd;
-	m_hInstance = GetModuleHandle(NULL);
+	m_hInstance = GetModuleHandle(nullptr);
 
 	if (InitD3D() == -1)
 		return -1;
@@ -43,33 +48,34 @@ int DX9Base::CreateOnWindow(HWND hWnd) {
 	return 0;
 }
 
-int DX9Base::Destroy() {
-	if (m_pD3DDevice != NULL)
+int DX9Base::Destroy()
+{
+	if (m_pD3DDevice != nullptr)
 		m_pD3DDevice->Release();
 
-	if (m_pD3D != NULL)
+	if (m_pD3D != nullptr)
 		m_pD3D->Release();
 
 	return 0;
 }
 
-HWND DX9Base::CreateWND(const wchar_t* Name,
-	CINT X, CINT Y, CINT Width, CINT Height,
-	DX9WINDOW_STYLE WindowStyle, COLORRGB BackColor) {
+HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
+	DX9WINDOW_STYLE WindowStyle, COLORRGB BackColor)
+{
 	// 멤버 변수에 인스턴스 핸들 대입
-	m_hInstance = GetModuleHandle(NULL);
+	m_hInstance = GetModuleHandle(nullptr);
 
 	// 윈도우 클래스 등록
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
 	r_WndClass.cbWndExtra = 0;
 	r_WndClass.hbrBackground = CreateSolidBrush(RGB(BackColor.r, BackColor.g, BackColor.b));
-	r_WndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	r_WndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	r_WndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	r_WndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
 	r_WndClass.hInstance = m_hInstance;
 	r_WndClass.lpfnWndProc = WndProcBase;
 	r_WndClass.lpszClassName = Name;
-	r_WndClass.lpszMenuName = NULL;
+	r_WndClass.lpszMenuName = nullptr;
 	r_WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&r_WndClass);
 
@@ -81,7 +87,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name,
 	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle,
 		rWndRect.left, rWndRect.top,
 		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top,
-		NULL, (HMENU)NULL, m_hInstance, NULL);
+		nullptr, (HMENU)nullptr, m_hInstance, nullptr);
 
 	// 윈도우 표시
 	ShowWindow(m_hWnd, SW_SHOW);
@@ -91,16 +97,17 @@ HWND DX9Base::CreateWND(const wchar_t* Name,
 	return m_hWnd;
 }
 
-int DX9Base::SetBGColor(D3DCOLOR color) {
+int DX9Base::SetBGColor(D3DCOLOR color)
+{
 	m_BGColor = color;
 	return 0;
 }
 
-int DX9Base::Run(int(*pMainLoop)()) {
-
+int DX9Base::Run(int(*pMainLoop)())
+{
 	while (m_MSG.message != WM_QUIT)
 	{
-		if (PeekMessage(&m_MSG, NULL, 0U, 0U, PM_REMOVE))
+		if (PeekMessage(&m_MSG, nullptr, 0U, 0U, PM_REMOVE))
 		{
 			TranslateMessage(&m_MSG);
 			DispatchMessage(&m_MSG);
@@ -114,7 +121,8 @@ int DX9Base::Run(int(*pMainLoop)()) {
 	return 0;
 }
 
-int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel) {
+int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel)
+{
 	while (GetMessage(&m_MSG, 0, 0, 0)) {
 		if (!TranslateAccelerator(m_hWnd, hAccel, &m_MSG)) {
 			TranslateMessage(&m_MSG);
@@ -125,14 +133,16 @@ int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel) {
 	return (int)m_MSG.wParam;
 }
 
-int DX9Base::Halt(){
+int DX9Base::Halt()
+{
 	DestroyWindow(m_hWnd);
 
 	return 0;
 }
 
-int DX9Base::InitD3D() {
-	if (NULL == (m_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
+int DX9Base::InitD3D()
+{
+	if (nullptr == (m_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return -1;
 
 	D3DPRESENT_PARAMETERS D3DPP;
@@ -150,8 +160,8 @@ int DX9Base::InitD3D() {
 	return 0;
 }
 
-int DX9Base::Resize(HWND hWnd) {
-
+int DX9Base::Resize(HWND hWnd)
+{
 	if (!m_pD3DDevice)
 		return -1;
 
@@ -167,8 +177,9 @@ int DX9Base::Resize(HWND hWnd) {
 	return 0;
 }
 
-int DX9Base::BeginRender() {
-	m_pD3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, m_BGColor, 1.0f, 0);
+int DX9Base::BeginRender()
+{
+	m_pD3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, m_BGColor, 1.0f, 0);
 
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
 		return 0;
@@ -176,9 +187,10 @@ int DX9Base::BeginRender() {
 	return -1;
 }
 
-int DX9Base::EndRender() {
+int DX9Base::EndRender()
+{
 	m_pD3DDevice->EndScene();
-	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
 
 	return 0;
 }

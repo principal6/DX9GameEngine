@@ -1,47 +1,49 @@
 #pragma once
 
-#ifndef DX9MAP_H
-#define DX9MAP_H
+#ifndef _DX9MAP_H_
+#define _DX9MAP_H_
 
 #include <fstream>
 #include "DX9Image.h"
 
 const int MAX_LINE_LEN = 1024;
-
 const int MAX_TILEID_LEN = 3;
 const int MAX_MOVEID_LEN = 2;
-
 const int TILE_W = 32;
 const int TILE_H = 32;
-
 const int MOVE_ALPHA = 100;
 
-enum class DXMAPDIR {
+enum class DX9MAPDIR
+{
 	Up,
 	Down,
 	Left,
 	Right,
 };
 
-struct DXUV {
+struct DX9UV
+{
 	float u1;
 	float u2;
 	float v1;
 	float v2;
-	DXUV() : u1(0), u2(0), v1(0), v2(0) {};
-	DXUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
+	DX9UV() : u1(0), u2(0), v1(0), v2(0) {};
+	DX9UV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
 };
 
-struct DXMAPDATA {
+struct DX9MAPDATA
+{
 	int TileID;
 	int MoveID;
-	DXMAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
+	DX9MAPDATA() : TileID(0), MoveID(0) {};
+	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
 };
 
-class DX9Map : protected DX9Image {
+class DX9Map : protected DX9Image
+{
 private:
-	bool		m_bMapCreated;
-	DX9MAPMODE	m_CurrMapMode;
+	bool m_bMapCreated;
+	DX9MAPMODE m_CurrMapMode;
 
 	int m_nMapCols;
 	int m_nMapRows;
@@ -49,23 +51,23 @@ private:
 	int	m_nTileSheetHeight;
 	int	m_nMoveSheetWidth;
 	int	m_nMoveSheetHeight;
-	std::wstring m_strMapName;
-	std::wstring m_strTileName;
-	std::wstring m_strLoadedMapTiles;
-	std::vector<DXMAPDATA> m_MapData;
+	std::wstring m_MapName;
+	std::wstring m_TileName;
+	std::wstring m_MapDataInString;
+	std::vector<DX9MAPDATA> m_MapData;
 
 	bool m_bMoveTextureLoaded;
-	LPDIRECT3DTEXTURE9		m_pTextureMove;
+	LPDIRECT3DTEXTURE9 m_pTextureMove;
 	LPDIRECT3DVERTEXBUFFER9 m_pVBMove;
-	std::vector<DX9VERTEX_IMAGE>	m_VertMove;
-	int						m_nVertMoveCount;
+	std::vector<DX9VERTEX_IMAGE> m_VertMove;
+	int m_nVertMoveCount;
 
 	float m_fOffsetX;
 	float m_fOffsetY;
 
 private:
 	int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size);
-	DXUV DX9Map::ConvertIDtoUV(int ID, int SheetW, int SheetH);
+	DX9UV DX9Map::ConvertIDtoUV(int ID, int SheetW, int SheetH);
 	int DX9Map::CreateVBMove();
 	int DX9Map::UpdateVBMove();
 	int DX9Map::AddMapFragmentTile(int TileID, int X, int Y);
@@ -74,8 +76,8 @@ private:
 	int DX9Map::SetMapData(std::wstring Str);
 
 	// Sprite Collision
-	float DX9Map::GetMapTileBoundary(int MapID, DXMAPDIR Dir);
-	bool DX9Map::IsMovableTile(int MapID, DXMAPDIR Dir);
+	float DX9Map::GetMapTileBoundary(int MapID, DX9MAPDIR Dir);
+	bool DX9Map::IsMovableTile(int MapID, DX9MAPDIR Dir);
 
 public:
 	DX9Map();

@@ -1,25 +1,29 @@
 #pragma once
 
-#ifndef DX9LINE_H
-#define DX9LINE_H
+#ifndef _DX9LINE_H_
+#define _DX9LINE_H_
 
 #include "DX9Common.h"
 #include <vector>
 
-class DX9Line {
+class DX9Line
+{
+// 현재 클래스에서 참조만 한 변수들
 private:
-	LPDIRECT3DDEVICE9       m_pDevice;
+	LPDIRECT3DDEVICE9 m_pDevice;
+
+// 현재 클래스 내에서 선언한 변수들
+private:
 	LPDIRECT3DVERTEXBUFFER9 m_pVB;
-	LPDIRECT3DINDEXBUFFER9	m_pIB;
+	LPDIRECT3DINDEXBUFFER9 m_pIB;
 
-	std::vector<DX9VERTEX_LINE>	m_Vert;
-	int							m_nVertCount;
-	std::vector<DX9VERTEX_LINE>	m_VertBU;
+	std::vector<DX9VERTEX_LINE> m_Vert;
+	int m_nVertCount;
+	std::vector<DX9VERTEX_LINE> m_VertBackup;
 
-	std::vector<DX9INDEX2>	m_Ind;
-	int						m_nIndCount;
+	std::vector<DX9INDEX2> m_Ind;
+	int m_nIndCount;
 
-	// 상속 클래스에서 접근할 함수들
 protected:
 	int DX9Line::CreateVB();
 	int DX9Line::CreateIB();

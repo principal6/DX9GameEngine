@@ -2,21 +2,20 @@
 
 DX9Input::DX9Input()
 {
-	// 모든 멤버 변수 초기화
-	m_diObj = 0;
-	m_diKeyboard = 0;
-	m_diMouse = 0;
+	m_hInstance = nullptr;
+	m_hWnd = nullptr;
+
+	m_DI8 = nullptr;
+	m_DIDevKeyboard = nullptr;
+	m_DIDevMouse = nullptr;
+
+	memset(&m_BufferKeyState, 0, sizeof(m_BufferKeyState));
 	memset(&m_KeyDown, false, sizeof(m_KeyDown));
 	memset(&m_KeyUp, false, sizeof(m_KeyUp));
+
 	m_MouseX = 0;
 	m_MouseY = 0;
-	m_hWnd = NULL;
-	m_hInstance = NULL;
-}
-
-DX9Input::~DX9Input()
-{
-
+	
 }
 
 bool DX9Input::Create(HINSTANCE hInstance, HWND hWnd)
@@ -28,15 +27,13 @@ bool DX9Input::Create(HINSTANCE hInstance, HWND hWnd)
 	memset(m_MouseBtnUp, false, sizeof(m_MouseBtnUp));
 	memset(m_MouseBtnIdle, true, sizeof(m_MouseBtnIdle));
 
-	// DirectInput8 생성
-	if(FAILED(DirectInput8Create(m_hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void **) &m_diObj, NULL)))
+	if(FAILED(DirectInput8Create(m_hInstance, DIRECTINPUT_VERSION,
+		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
 		return false;
 
-	// 마우스 장치 생성
 	if (FAILED(CreateMouseDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
 		return false;
 
-	// 키보드 장치 생성
 	if (FAILED(CreateKeyboardDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
 		return false;
 
@@ -45,16 +42,16 @@ bool DX9Input::Create(HINSTANCE hInstance, HWND hWnd)
 
 bool DX9Input::CreateMouseDevice(DWORD dwFlags)
 {
-	if(FAILED(m_diObj->CreateDevice(GUID_SysMouse, &m_diMouse, NULL)))
+	if(FAILED(m_DI8->CreateDevice(GUID_SysMouse, &m_DIDevMouse, nullptr)))
 		return false;
 
-	if(FAILED(m_diMouse->SetDataFormat(&c_dfDIMouse2)))
+	if(FAILED(m_DIDevMouse->SetDataFormat(&c_dfDIMouse2)))
 		return false;
 
-	if(FAILED(m_diMouse->SetCooperativeLevel(m_hWnd, dwFlags)))
+	if(FAILED(m_DIDevMouse->SetCooperativeLevel(m_hWnd, dwFlags)))
 		return false;
 
-	if(FAILED(m_diMouse->Acquire()))
+	if(FAILED(m_DIDevMouse->Acquire()))
 		return false;
 
 	return true;
@@ -62,16 +59,16 @@ bool DX9Input::CreateMouseDevice(DWORD dwFlags)
 
 bool DX9Input::CreateKeyboardDevice(DWORD dwFlags)
 {
-	if(FAILED(m_diObj->CreateDevice(GUID_SysKeyboard, &m_diKeyboard, NULL)))
+	if(FAILED(m_DI8->CreateDevice(GUID_SysKeyboard, &m_DIDevKeyboard, nullptr)))
 		return false;
 
-	if(FAILED(m_diKeyboard->SetDataFormat(&c_dfDIKeyboard)))
+	if(FAILED(m_DIDevKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 		return false;
 
-	if(FAILED(m_diKeyboard->SetCooperativeLevel(m_hWnd, dwFlags)))
+	if(FAILED(m_DIDevKeyboard->SetCooperativeLevel(m_hWnd, dwFlags)))
 		return false;
 
-	if(FAILED(m_diKeyboard->Acquire()))
+	if(FAILED(m_DIDevKeyboard->Acquire()))
 		return false;
 	
 	return true;
@@ -79,20 +76,19 @@ bool DX9Input::CreateKeyboardDevice(DWORD dwFlags)
 
 bool DX9Input::Destroy()
 {
-	if (m_diMouse)
+	if (m_DIDevMouse)
 	{
-		m_diMouse->Unacquire();
-		m_diMouse->Release();
+		m_DIDevMouse->Unacquire();
+		m_DIDevMouse->Release();
 	}
-
-	if (m_diKeyboard)
+	if (m_DIDevKeyboard)
 	{
-		m_diKeyboard->Unacquire();
-		m_diKeyboard->Release();
+		m_DIDevKeyboard->Unacquire();
+		m_DIDevKeyboard->Release();
 	}
-	if (m_diObj)
+	if (m_DI8)
 	{
-		m_diObj->Release();
+		m_DI8->Release();
 	}
 	
 	return true;
@@ -101,11 +97,11 @@ bool DX9Input::Destroy()
 bool DX9Input::OnKeyDown(DWORD DIK_KeyCode)
 {
 	HRESULT hr;
-
-	if(FAILED(hr = m_diKeyboard->GetDeviceState(sizeof(m_BufferKeyState),(LPVOID) &m_BufferKeyState)))
+	if(FAILED(hr = m_DIDevKeyboard->GetDeviceState(sizeof(m_BufferKeyState),
+		(LPVOID)&m_BufferKeyState)))
 	{
 		if(hr == DIERR_INPUTLOST)
-			m_diKeyboard->Acquire();
+			m_DIDevKeyboard->Acquire();
 	}
 
 	if (m_BufferKeyState[DIK_KeyCode] & 0x80)	// 키가 눌리면 true를 반환
@@ -135,23 +131,23 @@ bool DX9Input::OnKeyUp(DWORD DIK_KeyCode)
 	return m_KeyUp[DIK_KeyCode];
 }
 
-DIMOUSESTATE2 DX9Input::OnMouseMove(void)
+DIMOUSESTATE2 DX9Input::OnMouseMove()
 {
-	DIMOUSESTATE2 p;
+	DIMOUSESTATE2 Result;
 	HRESULT hr;
 	
 	memset(&m_MouseState, 0, sizeof(m_MouseState));
-	if(FAILED(hr = m_diMouse->GetDeviceState(sizeof(m_MouseState),(LPVOID) &m_MouseState)))
+	if(FAILED(hr = m_DIDevMouse->GetDeviceState(sizeof(m_MouseState),(LPVOID) &m_MouseState)))
 	{
 		if(hr == DIERR_INPUTLOST)
-			m_diMouse->Acquire();
+			m_DIDevMouse->Acquire();
 	}
 
-	p.lX = m_MouseState.lX;
-	p.lY = m_MouseState.lY;
-	p.lZ = m_MouseState.lZ;
+	Result.lX = m_MouseState.lX;
+	Result.lY = m_MouseState.lY;
+	Result.lZ = m_MouseState.lZ;
 
-	return p;
+	return Result;
 }
 
 bool DX9Input::CheckMouseButton(int button)

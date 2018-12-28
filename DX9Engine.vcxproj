@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DX9Anim.h" />
     <ClInclude Include="DX9Common.h" />
     <ClInclude Include="DX9Base.h" />
     <ClInclude Include="DX9Image.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="DX9Sprite.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DX9Anim.cpp" />
     <ClCompile Include="DX9Base.cpp" />
     <ClCompile Include="DX9Image.cpp" />
     <ClCompile Include="DX9Input.cpp" />
