@@ -11,10 +11,8 @@ DX9Image::DX9Image()
 	m_nVertCount = 0;
 	m_nIndCount = 0;
 
-	m_fX = 0.0f;
-	m_fY = 0.0f;
-	m_fScaleX = 1.0f;
-	m_fScaleY = 1.0f;
+	m_Pos = D3DXVECTOR2(0.0f, 0.0f);
+	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 
 	m_nWidth = 10;
 	m_nHeight = 10;
@@ -76,10 +74,9 @@ int DX9Image::Draw()
 	return 0;
 }
 
-int DX9Image::SetPosition(float X, float Y)
+int DX9Image::SetPosition(D3DXVECTOR2 Pos)
 {
-	m_fX = X;
-	m_fY = Y;
+	m_Pos = Pos;
 	UpdateVertData();
 	return 0;
 }
@@ -92,10 +89,9 @@ int DX9Image::SetSize(int Width, int Height)
 	return 0;
 }
 
-int DX9Image::SetScale(float ScaleX, float ScaleY)
+int DX9Image::SetScale(D3DXVECTOR2 Scale)
 {
-	m_fScaleX = ScaleX;
-	m_fScaleY = ScaleY;
+	m_Scale = Scale;
 	UpdateVertData();
 	return 0;
 }
@@ -183,10 +179,10 @@ int DX9Image::SetTexture(std::wstring FileName)
 
 int DX9Image::CreateVB()
 {
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX, m_fY, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX + m_nWidth, m_fY, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_fX + m_nWidth, m_fY + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
 	m_nVertCount = (int)m_Vert.size();
 
 	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertCount;
@@ -241,14 +237,14 @@ int DX9Image::UpdateVertData()
 	if (m_Vert.size() < 4)
 		return -1;
 
-	m_Vert[0].x = m_fX;
-	m_Vert[0].y = m_fY;
-	m_Vert[1].x = m_fX + m_nWidth * m_fScaleX;
-	m_Vert[1].y = m_fY;
-	m_Vert[2].x = m_fX;
-	m_Vert[2].y = m_fY + m_nHeight * m_fScaleY;
-	m_Vert[3].x = m_fX + m_nWidth * m_fScaleX;
-	m_Vert[3].y = m_fY + m_nHeight * m_fScaleY;
+	m_Vert[0].x = m_Pos.x;
+	m_Vert[0].y = m_Pos.y;
+	m_Vert[1].x = m_Pos.x + m_nWidth * m_Scale.x;
+	m_Vert[1].y = m_Pos.y;
+	m_Vert[2].x = m_Pos.x;
+	m_Vert[2].y = m_Pos.y + m_nHeight * m_Scale.y;
+	m_Vert[3].x = m_Pos.x + m_nWidth * m_Scale.x;
+	m_Vert[3].y = m_Pos.y + m_nHeight * m_Scale.y;
 
 	UpdateVB();
 	return 0;

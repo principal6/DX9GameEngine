@@ -45,7 +45,7 @@ int DX9Anim::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float 
 {
 	DX9Image::SetTexture(TextureFN);
 	SetNumRowsAndCols(numCols, numRows);
-	DX9Image::SetScale(Scale, Scale);
+	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
 	m_nSprScaledW = (int)(m_nSprW * Scale);
 	m_nSprScaledH = (int)(m_nSprH * Scale);
 
@@ -130,6 +130,8 @@ int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet,
 		m_nCurrFrame = m_Anims[(int)AnimID].FrameS;
 		m_bRepeating = bRepeating;
 		m_bBeingAnimated = !bCanInterrupt;
+
+		SetFrame(m_nCurrFrame);
 	}
 
 	return 0;
@@ -177,12 +179,31 @@ DX9BOUNDINGBOX DX9Anim::GetBoundingBox()
 
 int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
-	DX9Image::SetPosition(Pos.x, Pos.y);
+	DX9Image::SetPosition(Pos);
 	m_SprPos = Pos;
 	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
 	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
 
 	return 0;
+}
+
+int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
+{
+	D3DXVECTOR2 NewPos = D3DXVECTOR2(Pos.x - (m_nSprScaledW / 2), Pos.y - (m_nSprScaledH / 2));
+	DX9Image::SetPosition(NewPos);
+	m_SprPos = NewPos;
+	m_SprFeetPos.x = NewPos.x + m_nSprScaledW / 2;
+	m_SprFeetPos.y = NewPos.y + m_nSprScaledH;
+
+	return 0;
+}
+
+D3DXVECTOR2 DX9Anim::GetCenterPosition() {
+	D3DXVECTOR2 Result = m_SprPos;
+	Result.x += m_nSprScaledW / 2;
+	Result.y += m_nSprScaledH / 2;
+	
+	return Result;
 }
 
 int DX9Anim::Accelerate(D3DXVECTOR2 Accel)
@@ -211,7 +232,7 @@ int DX9Anim::MoveWithVelocity()
 	m_SprPos += m_Velocity;
 	m_SprFeetPos += m_Velocity;
 
-	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
+	DX9Image::SetPosition(m_SprPos);
 
 	return 0;
 }
@@ -221,7 +242,7 @@ int DX9Anim::MoveConst(D3DXVECTOR2 dXY)
 	m_SprPos += dXY;
 	m_SprFeetPos += dXY;
 
-	DX9Image::SetPosition(m_SprPos.x, m_SprPos.y);
+	DX9Image::SetPosition(m_SprPos);
 
 	return 0;
 }

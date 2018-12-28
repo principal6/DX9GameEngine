@@ -26,10 +26,8 @@ protected:
 
 	std::wstring m_strBaseDir;
 
-	float m_fX;
-	float m_fY;
-	float m_fScaleX;
-	float m_fScaleY;
+	D3DXVECTOR2 m_Pos;
+	D3DXVECTOR2 m_Scale;
 	int m_nWidth;
 	int m_nHeight;
 
@@ -52,9 +50,9 @@ public:
 	int DX9Image::FlipHorizontal();
 	int DX9Image::FlipVertical();
 
-	int DX9Image::SetPosition(float X, float Y);
+	int DX9Image::SetPosition(D3DXVECTOR2 Pos);
 	int DX9Image::SetSize(int Width, int Height);
-	int DX9Image::SetScale(float ScaleX, float ScaleY);
+	int DX9Image::SetScale(D3DXVECTOR2 Scale);
 	int DX9Image::SetRange(float u1, float u2, float v1, float v2);
 	int DX9Image::SetAlpha(int Alpha);
 	int DX9Image::SetTexture(std::wstring FileName);

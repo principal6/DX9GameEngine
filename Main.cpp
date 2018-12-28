@@ -4,6 +4,7 @@
 #include "DX9Line.h"
 #include "DX9Anim.h"
 #include "DX9Sprite.h"
+#include "DX9Monster.h"
 #include "DX9Map.h"
 
 // 함수 헤더
@@ -37,7 +38,7 @@ DX9Base* gDXBase;
 DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Sprite* gDXSprite;
-DX9Sprite* gDXEnemy;
+DX9Monster* gDXMonster;
 DX9Anim* gDXEffect;
 DX9Map* gDXMap;
 
@@ -72,11 +73,11 @@ int main()
 	gDXEffect->MakeSprite(L"particlefx_14.png", 8, 8);
 	gDXEffect->AddAnimation(DX9ANIMID::Effect, 0, 63);
 
-	gDXEnemy = new DX9Sprite;
-	gDXEnemy->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXEnemy->MakeSprite(L"mage-1-85x94.png", 4, 2);
-	gDXEnemy->AddAnimation(DX9ANIMID::Idle, 0, 7);
-	gDXEnemy->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXEnemy->GetSpriteScaledH() - TILE_H)));
+	gDXMonster = new DX9Monster;
+	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir);
+	gDXMonster->MakeSprite(L"mage-1-85x94.png", 4, 2);
+	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
+	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetSpriteScaledH() - TILE_H)));
 	
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir);
@@ -91,7 +92,7 @@ int main()
 	
 	// 종료 전 객체 파괴
 	gDXMap->Destroy();
-	gDXEnemy->Destroy();
+	gDXMonster->Destroy();
 	gDXEffect->Destroy();
 	gDXSprite->Destroy();
 	gDXImage->Destroy();
@@ -99,7 +100,7 @@ int main()
 	gDXBase->Destroy();
 
 	delete gDXMap;
-	delete gDXEnemy;
+	delete gDXMonster;
 	delete gDXEffect;
 	delete gDXSprite;
 	delete gDXImage;
@@ -124,7 +125,7 @@ int MainLoop()
 	if (GetTickCount64() >= gTimerAnim + 80)
 	{
 		gTimerAnim = GetTickCount64();
-		gDXEnemy->Animate();
+		gDXMonster->Animate();
 		gDXSprite->Animate();
 	}
 
@@ -143,14 +144,17 @@ int MainLoop()
 
 		gDXMap->Draw();
 
-		gDXEnemy->Draw();
-		gDXEnemy->DrawBoundingBox();
+		gDXMonster->Draw();
+		gDXMonster->DrawBoundingBox();
 
 		gDXSprite->Draw();
 		gDXSprite->DrawBoundingBox();
 
 		if (gbEffect)
+		{
 			gDXEffect->Draw();
+			gDXEffect->DrawBoundingBox();
+		}
 
 	gDXBase->EndRender();
 
@@ -240,7 +244,20 @@ int DetectInput()
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
-		gDXEffect->SetPosition(gDXSprite->GetPosition());
+		D3DXVECTOR2 tPos = gDXSprite->GetCenterPosition();
+		switch (gDXSprite->GetAnimDir())
+		{
+		case DX9ANIMDIR::Left:
+			tPos.x -= 80.0f;
+			break;
+		case DX9ANIMDIR::Right:
+			tPos.x += 80.0f;
+			break;
+		default:
+			break;
+		}
+
+		gDXEffect->SetPositionCentered(tPos);
 		gDXEffect->SetAnimation(DX9ANIMID::Effect, false, true);
 		gbEffect = true;
 	}
