@@ -70,7 +70,7 @@ int main()
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
 	gDXSprite->AddAnimation(DX9ANIMID::Attack1, 27, 28); // Punch
 	gDXSprite->AddAnimation(DX9ANIMID::Attack2, 24, 26); // HorzAttack
-	gSprGroundOffsetY = (float)(WINDOW_H - gDXSprite->GetSpriteScaledH() - TILE_H);
+	gSprGroundOffsetY = (float)(WINDOW_H - gDXSprite->GetScaledSprHeight() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 
@@ -78,13 +78,12 @@ int main()
 	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXMonster->MakeSprite(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
-	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetSpriteScaledH() - TILE_H)));
+	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetScaledSprHeight() - TILE_H)));
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXEffect->MakeSprite(L"particlefx_14.png", 8, 8);
-	gDXEffect->AddAnimation(DX9ANIMID::Effect, 0, 63);
-	gDXEffect->SetBaseSpawnOffset(D3DXVECTOR2(80.0f, 0.0f));
+	gDXEffect->SetTextureAtlas(L"Test.png", 4, 4);
+	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 15, D3DXVECTOR2(80.0f, 0.0f));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir);
@@ -134,11 +133,8 @@ int MainLoop()
 		gTimerAnim = GetTickCount64();
 		gDXMonster->Animate();
 		gDXSprite->Animate();
+		gDXEffect->Update();
 	}
-
-	gDXEffect->Animate();
-	if (!gDXEffect->IsBeingAnimated())
-		gbEffect = false;
 
 	DetectInput();
 	Gravitate();
@@ -157,11 +153,8 @@ int MainLoop()
 		gDXSprite->Draw();
 		gDXSprite->DrawBoundingBox();
 
-		if (gbEffect)
-		{
-			gDXEffect->Draw();
-			gDXEffect->DrawBoundingBox();
-		}
+		gDXEffect->Draw();
+		//gDXEffect->DrawBoundingBox();
 
 	gDXBase->EndRender();
 
@@ -251,8 +244,7 @@ int DetectInput()
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
-		gDXEffect->Spawn(gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
-		gbEffect = true;
+		gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 	{

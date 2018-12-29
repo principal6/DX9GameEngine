@@ -189,21 +189,12 @@ int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 
 int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
-	D3DXVECTOR2 NewPos = D3DXVECTOR2(Pos.x - (m_nSprScaledW / 2), Pos.y - (m_nSprScaledH / 2));
-	DX9Image::SetPosition(NewPos);
-	m_SprPos = NewPos;
-	m_SprFeetPos.x = NewPos.x + m_nSprScaledW / 2;
-	m_SprFeetPos.y = NewPos.y + m_nSprScaledH;
+	DX9Image::SetPositionCentered(Pos);
+	m_SprPos = Pos;
+	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
+	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
 
 	return 0;
-}
-
-D3DXVECTOR2 DX9Anim::GetCenterPosition() {
-	D3DXVECTOR2 Result = m_SprPos;
-	Result.x += m_nSprScaledW / 2;
-	Result.y += m_nSprScaledH / 2;
-	
-	return Result;
 }
 
 int DX9Anim::Accelerate(D3DXVECTOR2 Accel)
@@ -232,7 +223,7 @@ int DX9Anim::MoveWithVelocity()
 	m_SprPos += m_Velocity;
 	m_SprFeetPos += m_Velocity;
 
-	DX9Image::SetPosition(m_SprPos);
+	SetPosition(m_SprPos);
 
 	return 0;
 }
@@ -242,7 +233,7 @@ int DX9Anim::MoveConst(D3DXVECTOR2 dXY)
 	m_SprPos += dXY;
 	m_SprFeetPos += dXY;
 
-	DX9Image::SetPosition(m_SprPos);
+	SetPosition(m_SprPos);
 
 	return 0;
 }

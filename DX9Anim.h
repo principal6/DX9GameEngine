@@ -68,10 +68,10 @@ public:
 	// Position
 	int DX9Anim::SetPosition(D3DXVECTOR2 Pos);
 	int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos);
-	D3DXVECTOR2 DX9Anim::GetPosition() { return m_SprPos; };
-	D3DXVECTOR2 DX9Anim::GetCenterPosition();
+	int DX9Anim::GetScaledSprWidth() { return m_nSprScaledW; };
+	int DX9Anim::GetScaledSprHeight() { return m_nSprScaledH; };
+	D3DXVECTOR2 DX9Anim::GetCenterPosition() { return DX9Image::GetCenterPosition(); };
 	D3DXVECTOR2 DX9Anim::GetSpriteFeetPos() { return m_SprFeetPos; };
-	int DX9Anim::GetSpriteScaledH() { return m_nSprScaledH; };
 	int DX9Anim::MoveWithVelocity();
 	int DX9Anim::MoveConst(D3DXVECTOR2 dXY);
 	int DX9Anim::Accelerate(D3DXVECTOR2 Accel);

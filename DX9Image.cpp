@@ -8,8 +8,8 @@ DX9Image::DX9Image()
 	m_pIB = nullptr;
 	m_pTexture = nullptr;
 
-	m_nVertCount = 0;
-	m_nIndCount = 0;
+	m_VertCount = 0;
+	m_IndCount = 0;
 
 	m_Pos = D3DXVECTOR2(0.0f, 0.0f);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
@@ -23,7 +23,7 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 	m_pDevice = pD3DDev;
 	m_Vert.clear();
 	m_Ind.clear();
-	m_strBaseDir = BaseDir;
+	m_BaseDir = BaseDir;
 
 	CreateVB();
 	CreateIB();
@@ -78,7 +78,7 @@ int DX9Image::Draw()
 	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_IMAGE));
 	m_pDevice->SetFVF(D3DFVF_TEXTURE);
 	m_pDevice->SetIndices(m_pIB);
-	m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertCount, 0, m_nIndCount);
+	m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_VertCount, 0, m_IndCount);
 
 	return 0;
 }
@@ -90,10 +90,20 @@ int DX9Image::SetPosition(D3DXVECTOR2 Pos)
 	return 0;
 }
 
+int DX9Image::SetPositionCentered(D3DXVECTOR2 Pos)
+{
+	m_Pos = D3DXVECTOR2(Pos.x - (m_nScaledW / 2), Pos.y - (m_nScaledH / 2));
+	m_Pos = Pos;
+	UpdateVertData();
+	return 0;
+}
+
 int DX9Image::SetSize(int Width, int Height)
 {
 	m_nWidth = Width;
 	m_nHeight = Height;
+	m_nScaledW = m_nWidth * m_Scale.x;
+	m_nScaledH = m_nHeight * m_Scale.y;
 	UpdateVertData();
 	return 0;
 }
@@ -101,6 +111,8 @@ int DX9Image::SetSize(int Width, int Height)
 int DX9Image::SetScale(D3DXVECTOR2 Scale)
 {
 	m_Scale = Scale;
+	m_nScaledW = m_nWidth * m_Scale.x;
+	m_nScaledH = m_nHeight * m_Scale.y;
 	UpdateVertData();
 	return 0;
 }
@@ -167,15 +179,14 @@ int DX9Image::SetTexture(std::wstring FileName)
 	}
 
 	std::wstring NewFileName;
-	NewFileName = m_strBaseDir;
+	NewFileName = m_BaseDir;
 	NewFileName += L"\\Data\\";
 	NewFileName += FileName;
 
 	// 텍스처 불러오기
 	D3DXIMAGE_INFO tImgInfo;
-	if (FAILED(D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0,
-		D3DFMT_UNKNOWN, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0,
-		&tImgInfo, nullptr, &m_pTexture)))
+	if (FAILED(D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
+		D3DX_DEFAULT, D3DX_DEFAULT, 0, &tImgInfo, nullptr, &m_pTexture)))
 		return -1;
 
 	m_nWidth = tImgInfo.Width;
@@ -192,11 +203,10 @@ int DX9Image::CreateVB()
 	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
 	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
 	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
-	m_nVertCount = (int)m_Vert.size();
+	m_VertCount = (int)m_Vert.size();
 
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertCount;
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0,
-		D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
+	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 	{
 		return -1;
 	}
@@ -208,11 +218,10 @@ int DX9Image::CreateIB()
 {
 	m_Ind.push_back(DX9INDEX3(0, 1, 3));
 	m_Ind.push_back(DX9INDEX3(0, 3, 2));
-	m_nIndCount = (int)m_Ind.size();
+	m_IndCount = (int)m_Ind.size();
 
-	int rIndSize = sizeof(DX9INDEX3) * m_nIndCount;
-	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16,
-		D3DPOOL_MANAGED, &m_pIB, nullptr)))
+	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
+	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 	{
 		return -1;
 	}
@@ -231,12 +240,29 @@ int DX9Image::CreateIB()
 
 int DX9Image::UpdateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_nVertCount;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
 	VOID* pVertices;
 	if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
+	{
 		return -1;
+	}
 	memcpy(pVertices, &m_Vert[0], rVertSize);
 	m_pVB->Unlock();
+
+	return 0;
+}
+
+int DX9Image::UpdateIB()
+{
+	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
+	VOID* pIndices;
+	if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+	{
+		return -1;
+	}
+
+	memcpy(pIndices, &m_Ind[0], rIndSize);
+	m_pIB->Unlock();
 
 	return 0;
 }
@@ -281,4 +307,13 @@ bool DX9Image::IsTextureLoaded()
 	if (m_pTexture)
 		return true;
 	return false;
+}
+
+D3DXVECTOR2 DX9Image::GetCenterPosition()
+{
+	D3DXVECTOR2 Result = m_Pos;
+	Result.x += m_nScaledW / 2;
+	Result.y += m_nScaledH / 2;
+
+	return Result;
 }

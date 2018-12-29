@@ -18,7 +18,7 @@
 
 const float UV_OFFSET = 0.005f;
 
-enum class DX9EFFECTTYPE
+enum class DX9EFF_TYPE
 {
 	Still,
 	FlyRight,
@@ -26,18 +26,50 @@ enum class DX9EFFECTTYPE
 	FlyUp,
 };
 
-class DX9EFFECTDATA
+class DX9EFF_TYPE_DATA
 {
 private:
-	DX9EFFECTDATA* pNext;
-	D3DXVECTOR2 Position;
-	D3DXVECTOR2 SpawnOffset;
+	DX9EFF_TYPE m_Type;
+	int m_StartFrame;
+	int m_EndFrame;
+	D3DXVECTOR2 m_SpawnOffset;
+	int m_RepeatCount;
 
 public:
-	DX9EFFECTDATA(): pNext(nullptr), Position(D3DXVECTOR2(0, 0)),SpawnOffset(D3DXVECTOR2(0, 0)) {};
-	DX9EFFECTDATA(D3DXVECTOR2 _Position, D3DXVECTOR2 _SpawnOffset) : pNext(nullptr), Position(_Position), SpawnOffset(_SpawnOffset) {};
-	void SetNext(DX9EFFECTDATA* Next) { pNext = Next; };
-	DX9EFFECTDATA* GetNext() { return pNext; };
+	DX9EFF_TYPE_DATA() : m_StartFrame(0), m_EndFrame(0), m_RepeatCount(1) {};
+	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset, int RepeatCount = 1) :
+		m_Type(Type), m_StartFrame(StartFrame), m_EndFrame(EndFrame), m_SpawnOffset(SpawnOffset), m_RepeatCount(RepeatCount) {};
+
+	D3DXVECTOR2 GetSpawnOffset() { return m_SpawnOffset; };
+	int GetStartFrame() { return m_StartFrame; };
+	int GetEndFrame() { return m_EndFrame; };
+};
+
+class DX9EFF_INST_DATA
+{
+private:
+	DX9EFF_INST_DATA* m_pNext;
+	DX9EFF_TYPE m_Type;
+	int m_TypeDataID;
+	D3DXVECTOR2 m_Pos;
+	int m_CurrFrame;
+	int m_RepeatCount;
+
+public:
+	DX9EFF_INST_DATA(): m_pNext(nullptr), m_Pos(D3DXVECTOR2(0, 0)) {};
+	DX9EFF_INST_DATA(int TypeDataID, D3DXVECTOR2 Position, int CurrFrame) :
+		m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Pos(Position), m_CurrFrame(CurrFrame) {};
+	
+	// Setter
+	void SetNext(DX9EFF_INST_DATA* Next) { m_pNext = Next; };
+	void SetCurrFrame(int FrameID) { m_CurrFrame = FrameID; };
+
+	// Getter
+	DX9EFF_INST_DATA* GetNext() { return m_pNext; };
+	DX9EFF_TYPE GetType() { return m_Type; };
+	D3DXVECTOR2 GetPos() { return m_Pos; };
+	int GetCurrFrame() { return m_CurrFrame; };
+	int GetTypeDataID() { return m_TypeDataID; };
 };
 
 enum class DX9MAPDIR
@@ -134,10 +166,10 @@ struct DX9VERTEX_IMAGE
 	DWORD color;
 	FLOAT u, v;
 
-	DX9VERTEX_IMAGE() : x(0), y(0), z(0), rhw(1), color(0xffffffff), u(0), v(0) {};
-	DX9VERTEX_IMAGE(float _x, float _y, float _z, float _rhw,
-		DWORD _color, float _u, float _v) : x(_x), y(_y), z(_z), rhw(_rhw),
-		color(_color), u(_u), v(_v) {};
+	DX9VERTEX_IMAGE() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
+	DX9VERTEX_IMAGE(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
+	DX9VERTEX_IMAGE(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
+		x(_x), y(_y), z(_z), rhw(_rhw), color(_color), u(_u), v(_v) {};
 };
 
 struct DX9INDEX3

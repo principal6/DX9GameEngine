@@ -26,7 +26,7 @@ int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 	m_pDevice = pD3DDev;
 	m_Vert.clear();
 	m_Ind.clear();
-	m_strBaseDir = BaseDir;
+	m_BaseDir = BaseDir;
 
 	return 0;
 }
@@ -76,7 +76,7 @@ int DX9Map::SetMoveTexture(std::wstring FileName)
 	}
 
 	std::wstring NewFileName;
-	NewFileName = m_strBaseDir;
+	NewFileName = m_BaseDir;
 	NewFileName += L"\\Data\\";
 	NewFileName += FileName;
 
@@ -254,11 +254,11 @@ int DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 	m_Vert.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY, 0, 1, tColor, tUV.u2, tUV.v1));
 	m_Vert.push_back(DX9VERTEX_IMAGE(tX, tY + TILE_H, 0, 1, tColor, tUV.u1, tUV.v2));
 	m_Vert.push_back(DX9VERTEX_IMAGE(tX + TILE_W, tY + TILE_H, 0, 1, tColor, tUV.u2, tUV.v2));
-	m_nVertCount = (int)m_Vert.size();
+	m_VertCount = (int)m_Vert.size();
 
-	m_Ind.push_back(DX9INDEX3(m_nVertCount - 4, m_nVertCount - 3, m_nVertCount - 1));
-	m_Ind.push_back(DX9INDEX3(m_nVertCount - 4, m_nVertCount - 1, m_nVertCount - 2));
-	m_nIndCount = (int)m_Ind.size();
+	m_Ind.push_back(DX9INDEX3(m_VertCount - 4, m_VertCount - 3, m_VertCount - 1));
+	m_Ind.push_back(DX9INDEX3(m_VertCount - 4, m_VertCount - 1, m_VertCount - 2));
+	m_IndCount = (int)m_Ind.size();
 
 	return 0;
 }
@@ -425,7 +425,7 @@ int DX9Map::Draw()
 		m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_IMAGE));
 		m_pDevice->SetFVF(D3DFVF_TEXTURE);
 		m_pDevice->SetIndices(m_pIB);
-		m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertCount, 0, m_nIndCount);
+		m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_VertCount, 0, m_IndCount);
 	}
 
 	if (m_CurrMapMode == DX9MAPMODE::MoveMode)
@@ -442,7 +442,7 @@ int DX9Map::Draw()
 			m_pDevice->SetStreamSource(0, m_pVBMove, 0, sizeof(DX9VERTEX_IMAGE));
 			m_pDevice->SetFVF(D3DFVF_TEXTURE);
 			m_pDevice->SetIndices(m_pIB);
-			m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertMoveCount, 0, m_nIndCount);
+			m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, m_nVertMoveCount, 0, m_IndCount);
 		}
 	}
 
@@ -532,7 +532,7 @@ int DX9Map::GetMapData(std::wstring *pStr)
 int DX9Map::LoadMapFromFile(std::wstring FileName)
 {
 	std::wstring NewFileName;
-	NewFileName = m_strBaseDir;
+	NewFileName = m_BaseDir;
 	NewFileName += L"\\Data\\";
 	NewFileName += FileName;
 
