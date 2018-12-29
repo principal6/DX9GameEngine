@@ -27,7 +27,7 @@ DX9Base::DX9Base()
 
 int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
 {
-	COLORRGB rBGColor = COLORRGB(255, 0, 255);
+	COLOR_RGB rBGColor = COLOR_RGB(255, 0, 255);
 
 	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor)
 		== nullptr)
@@ -41,7 +41,7 @@ int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
 
 int DX9Base::CreateOnWindow(HWND hWnd)
 {
-	COLORRGB rBGColor = COLORRGB(255, 0, 255);
+	COLOR_RGB rBGColor = COLOR_RGB(255, 0, 255);
 
 	m_hWnd = hWnd;
 	m_hInstance = GetModuleHandle(nullptr);
@@ -70,7 +70,7 @@ int DX9Base::Destroy()
 }
 
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-	DX9WINDOW_STYLE WindowStyle, COLORRGB BackColor)
+	DX9WINDOW_STYLE WindowStyle, COLOR_RGB BackColor)
 {
 	// 멤버 변수에 인스턴스 핸들 대입
 	m_hInstance = GetModuleHandle(nullptr);

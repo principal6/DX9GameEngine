@@ -21,7 +21,7 @@ private:
 
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-		DX9WINDOW_STYLE WindowStyle, COLORRGB BackColor);
+		DX9WINDOW_STYLE WindowStyle, COLOR_RGB BackColor);
 	int DX9Base::InitD3D();
 	friend LRESULT CALLBACK WndProcBase(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 

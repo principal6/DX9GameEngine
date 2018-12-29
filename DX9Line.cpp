@@ -136,7 +136,7 @@ int DX9Line::CreateVBMax()
 		m_pVB->Release();
 		m_pVB = nullptr;
 	}
-	int rVertSize = sizeof(DX9VERTEX_LINE) * MAX_VB_COUNT;
+	int rVertSize = sizeof(DX9VERTEX_LINE) * MAX_UNIT_COUNT * 8;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 		return -1;
 
@@ -150,7 +150,7 @@ int DX9Line::CreateIBMax()
 		m_pIB->Release();
 		m_pIB = nullptr;
 	}
-	int rIndSize = sizeof(DX9INDEX2) * MAX_VB_COUNT / 2;
+	int rIndSize = sizeof(DX9INDEX2) * MAX_UNIT_COUNT * 4;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 		return -1;
 

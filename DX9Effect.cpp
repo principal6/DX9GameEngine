@@ -27,7 +27,7 @@ int DX9Effect::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 
 int DX9Effect::CreateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * MAX_VB_COUNT;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * MAX_UNIT_COUNT * 4;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 	{
 		return -1;
@@ -38,7 +38,7 @@ int DX9Effect::CreateVB()
 
 int DX9Effect::CreateIB()
 {
-	int rIndSize = sizeof(DX9INDEX3) * (MAX_VB_COUNT / 2);
+	int rIndSize = sizeof(DX9INDEX3) * MAX_UNIT_COUNT * 2;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 	{
 		return -1;
@@ -87,7 +87,7 @@ int DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3D
 
 int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
-	if (m_InstanceCount >= MAX_VB_COUNT)
+	if (m_InstanceCount >= MAX_UNIT_COUNT)
 		return -1;
 
 	m_InstanceCount++;
@@ -143,7 +143,10 @@ int DX9Effect::Update()
 	int iterator_n = 0;
 
 	if (iterator == nullptr)
+	{
+		m_InstanceCount = iterator_n;
 		return -1;
+	}
 
 	while (iterator)
 	{
@@ -177,6 +180,7 @@ int DX9Effect::Update()
 			}
 			else
 			{
+				// Life circle ends here
 				m_pFisrtInstance = iterator->GetNext();
 				delete iterator;
 				iterator = m_pFisrtInstance;
@@ -210,6 +214,9 @@ int DX9Effect::Update()
 
 	DX9Image::UpdateVB();
 	DX9Image::UpdateIB();
+
+	m_InstanceCount = iterator_n;
+
 	return 0;
 }
 

@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <d3dx9.h>
 #include <cassert>
+//#include <vector>
 
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "d3d9.lib")
@@ -16,7 +17,7 @@
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define D3DFVF_LINE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
-const int MAX_VB_COUNT = 100;
+const int MAX_UNIT_COUNT = 100;
 const float UV_OFFSET = 0.005f;
 
 struct DX9VERTEX_LINE
@@ -77,20 +78,12 @@ struct DX9BOUNDINGBOX
 		PosOffset(_POSOFFSET), Size(_SIZE) {};
 };
 
-struct COLORRGB
+struct COLOR_RGB
 {
 	int r, g, b;
 
-	COLORRGB() : r(0), g(0), b(0) {};
-	COLORRGB(int Red, int Green, int Blue) : r(Red), g(Green), b(Blue) {};
-};
-
-enum class DX9EFF_TYPE
-{
-	Still,
-	FlyRight,
-	FlyDown,
-	FlyUp,
+	COLOR_RGB() : r(0), g(0), b(0) {};
+	COLOR_RGB(int Red, int Green, int Blue) : r(Red), g(Green), b(Blue) {};
 };
 
 struct DX9UV
@@ -111,6 +104,15 @@ struct DX9MAPDATA
 
 	DX9MAPDATA() : TileID(0), MoveID(0) {};
 	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
+};
+
+//***** DX9Effect *****
+enum class DX9EFF_TYPE
+{
+	Still,
+	FlyRight,
+	FlyDown,
+	FlyUp,
 };
 
 class DX9EFF_TYPE_DATA
@@ -170,6 +172,15 @@ public:
 	int GetCurrFrame() { return m_CurrFrame; };
 	int GetTypeDataID() { return m_TypeDataID; };
 	int GetDamage() { return m_Damage; };
+};
+//**********
+
+enum class DX9FONT_ID
+{
+	Title,
+	Subtitle,
+	Text,
+	Debug,
 };
 
 enum class DX9MAPDIR

@@ -5,6 +5,7 @@
 #include "DX9Monster.h"
 #include "DX9Effect.h"
 #include "DX9Map.h"
+#include "DX9Font.h"
 #include <crtdbg.h>
 
 #ifdef _DEBUG
@@ -32,7 +33,7 @@ float gSprGroundOffsetY = 0.0f;
 float gMapGroundOffsetY = 0.0f;
 bool gbHitGround = false;
 bool gbWalking = false;
-bool gbEffect = false;
+bool gbDrawBB = false;
 ULONGLONG gTimerStart = 0;
 ULONGLONG gTimerSec = 0;
 ULONGLONG gTimerAnim = 0;
@@ -47,6 +48,7 @@ DX9Sprite* gDXSprite;
 DX9Monster* gDXMonster;
 DX9Effect* gDXEffect;
 DX9Map* gDXMap;
+DX9Font* gDXFont;
 
 int main()
 {
@@ -94,12 +96,17 @@ int main()
 	gMapGroundOffsetY = (float)(-gDXMap->GetHeight() + WINDOW_H);
 	gDXMap->SetPosition(0, gMapGroundOffsetY);
 
+	gDXFont = new DX9Font;
+	gDXFont->Create(gDXBase->GetDevice(), WINDOW_W, WINDOW_H);
+	gDXFont->MakeFont(DX9FONT_ID::Debug, L"굴림", 14, true);
+
 	gTimerStart = GetTickCount64();
 
 	// 메인 루프 실행
 	gDXBase->Run(MainLoop);
 	
 	// 종료 전 객체 파괴
+	gDXFont->Destroy();
 	gDXMap->Destroy();
 	gDXEffect->Destroy();
 	gDXMonster->Destroy();
@@ -108,6 +115,7 @@ int main()
 	gDXInput->Destroy();
 	gDXBase->Destroy();
 
+	delete gDXFont;
 	delete gDXMap;
 	delete gDXEffect;
 	delete gDXMonster;
@@ -158,15 +166,24 @@ int MainLoop()
 		gDXMap->Draw();
 
 		gDXMonster->Draw();
-		gDXMonster->DrawBoundingBox();
 
 		gDXSprite->Draw();
-		gDXSprite->DrawBoundingBox();
-
+		
 		gDXEffect->CheckCollisionWithMonsters(gDXMonster);
 		gDXEffect->Update();
 		gDXEffect->Draw();
-		gDXEffect->DrawBoundingBox();
+		
+		if (gbDrawBB)
+		{
+			gDXMonster->DrawBoundingBox();
+			gDXSprite->DrawBoundingBox();
+			gDXEffect->DrawBoundingBox();
+		}
+
+		gDXFont->SelectFont(DX9FONT_ID::Debug);
+		gDXFont->SetFontColor(D3DCOLOR_ARGB(255, 0, 255, 120));
+		gDXFont->Draw(0, 5, L"화살표 키: 이동, 점프 / Ctrl: 물리 공격 / Alt: 마법 공격");
+		gDXFont->Draw(0, 25, L"B: 바운딩 박스 토글");
 
 	gDXBase->EndRender();
 
@@ -272,6 +289,14 @@ int DetectInput()
 	}
 	if (gDXInput->OnKeyDown(DIK_ESCAPE))
 		gDXBase->Halt();
+	if (gDXInput->OnKeyDown(DIK_B))
+	{
+		if (gKeyPressCount == 0)
+		{
+			gKeyPressCount++;
+			gbDrawBB = !gbDrawBB;
+		}
+	}
 
 	if ((!gbWalking) && (!gDXSprite->IsBeingAnimated()))
 	{
