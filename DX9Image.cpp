@@ -28,13 +28,58 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 	CreateVB();
 	CreateIB();
 
+	m_BBLine.Create(pD3DDev);
+	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
+	m_BBLine.AddEnd();
+
+	return 0;
+}
+
+int DX9Image::CreateVB()
+{
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+	m_VertCount = (int)m_Vert.size();
+
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
+	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
+	{
+		return -1;
+	}
+
+	return 0;
+}
+
+int DX9Image::CreateIB()
+{
+	m_Ind.push_back(DX9INDEX3(0, 1, 3));
+	m_Ind.push_back(DX9INDEX3(0, 3, 2));
+	m_IndCount = (int)m_Ind.size();
+
+	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
+	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
+	{
+		return -1;
+	}
+
+	VOID* pIndices;
+	if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+	{
+		return -1;
+	}
+
+	memcpy(pIndices, &m_Ind[0], rIndSize);
+	m_pIB->Unlock();
+
 	return 0;
 }
 
 int DX9Image::Destroy()
 {
 	m_pDevice = nullptr; // DX9Base에서 생성했으므로 여기서는 참조 해제만 한다!
-	
+
 	m_Vert.clear();
 	m_Ind.clear();
 
@@ -83,6 +128,14 @@ int DX9Image::Draw()
 	return 0;
 }
 
+int DX9Image::DrawBoundingBox()
+{
+	m_BBLine.SetBoxPosition(m_Pos + m_BB.PosOffset, m_BB.Size);
+	m_BBLine.Draw();
+
+	return 0;
+}
+
 int DX9Image::SetPosition(D3DXVECTOR2 Pos)
 {
 	m_Pos = Pos;
@@ -102,8 +155,8 @@ int DX9Image::SetSize(int Width, int Height)
 {
 	m_nWidth = Width;
 	m_nHeight = Height;
-	m_nScaledW = m_nWidth * m_Scale.x;
-	m_nScaledH = m_nHeight * m_Scale.y;
+	m_nScaledW = (int)(m_nWidth * m_Scale.x);
+	m_nScaledH = (int)(m_nHeight * m_Scale.y);
 	UpdateVertData();
 	return 0;
 }
@@ -111,8 +164,8 @@ int DX9Image::SetSize(int Width, int Height)
 int DX9Image::SetScale(D3DXVECTOR2 Scale)
 {
 	m_Scale = Scale;
-	m_nScaledW = m_nWidth * m_Scale.x;
-	m_nScaledH = m_nHeight * m_Scale.y;
+	m_nScaledW = (int)(m_nWidth * m_Scale.x);
+	m_nScaledH = (int)(m_nHeight * m_Scale.y);
 	UpdateVertData();
 	return 0;
 }
@@ -197,74 +250,53 @@ int DX9Image::SetTexture(std::wstring FileName)
 	return 0;
 }
 
-int DX9Image::CreateVB()
+int DX9Image::SetBoundingnBox(D3DXVECTOR2 Size)
 {
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
-	m_VertCount = (int)m_Vert.size();
+	m_BB.PosOffset.x = -Size.x / 2;
+	m_BB.PosOffset.y = -Size.y;
 
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
-	{
-		return -1;
-	}
-
-	return 0;
-}
-
-int DX9Image::CreateIB()
-{
-	m_Ind.push_back(DX9INDEX3(0, 1, 3));
-	m_Ind.push_back(DX9INDEX3(0, 3, 2));
-	m_IndCount = (int)m_Ind.size();
-
-	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
-	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
-	{
-		return -1;
-	}
-
-	VOID* pIndices;
-	if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
-	{
-		return -1;
-	}
-	
-	memcpy(pIndices, &m_Ind[0], rIndSize);
-	m_pIB->Unlock();
+	m_BB.Size.x = (float)m_nScaledW + Size.x;
+	m_BB.Size.y = (float)m_nScaledH + Size.y;
 
 	return 0;
 }
 
 int DX9Image::UpdateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
-	VOID* pVertices;
-	if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
+	if (m_Vert.size() > 0)
 	{
-		return -1;
-	}
-	memcpy(pVertices, &m_Vert[0], rVertSize);
-	m_pVB->Unlock();
+		int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
+		VOID* pVertices;
+		if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
+		{
+			return -1;
+		}
+		memcpy(pVertices, &m_Vert[0], rVertSize);
+		m_pVB->Unlock();
 
-	return 0;
+		return 0;
+	}
+
+	return -1;
 }
 
 int DX9Image::UpdateIB()
 {
-	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
-	VOID* pIndices;
-	if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+	if (m_Ind.size() > 0)
 	{
-		return -1;
+		int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
+		VOID* pIndices;
+		if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+		{
+			return -1;
+		}
+		memcpy(pIndices, &m_Ind[0], rIndSize);
+		m_pIB->Unlock();
+
+		return 0;
 	}
-
-	memcpy(pIndices, &m_Ind[0], rIndSize);
-	m_pIB->Unlock();
-
-	return 0;
+	
+	return -1;
 }
 
 int DX9Image::UpdateVertData()
@@ -314,6 +346,15 @@ D3DXVECTOR2 DX9Image::GetCenterPosition()
 	D3DXVECTOR2 Result = m_Pos;
 	Result.x += m_nScaledW / 2;
 	Result.y += m_nScaledH / 2;
+
+	return Result;
+}
+
+DX9BOUNDINGBOX DX9Image::GetBoundingBox()
+{
+	DX9BOUNDINGBOX Result;
+	Result.PosOffset = m_Pos + m_BB.PosOffset;
+	Result.Size = m_BB.Size;
 
 	return Result;
 }

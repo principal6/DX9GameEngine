@@ -5,10 +5,8 @@ DX9Anim::DX9Anim()
 	m_nRows = 0;
 	m_nCols = 0;
 
-	m_nSprW = 0;
-	m_nSprH = 0;
-	m_nSprScaledW = 0;
-	m_nSprScaledH = 0;
+	m_nUnitW = 0;
+	m_nUnitH = 0;
 
 	m_nAnimDir = DX9ANIMDIR::Right;
 	m_nCurrAnimID = DX9ANIMID::Idle;
@@ -17,37 +15,17 @@ DX9Anim::DX9Anim()
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_SprPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_SprFeetPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_Velocity = D3DXVECTOR2(0.0f, 0.0f);
 }
 
-int DX9Anim::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
-{
-	DX9Image::Create(pD3DDev, BaseDir);
-
-	m_BBLine.Create(pD3DDev);
-	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
-	m_BBLine.AddEnd();
-
-	return 0;
-}
-
-int DX9Anim::Destroy()
-{
-	m_BBLine.Destroy();
-	DX9Image::Destroy();
-
-	return 0;
-}
-
-int DX9Anim::MakeSprite(std::wstring TextureFN, int numCols, int numRows, float Scale)
+int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
 {
 	DX9Image::SetTexture(TextureFN);
 	SetNumRowsAndCols(numCols, numRows);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
-	m_nSprScaledW = (int)(m_nSprW * Scale);
-	m_nSprScaledH = (int)(m_nSprH * Scale);
+	m_nScaledW = (int)(m_nUnitW * Scale);
+	m_nScaledH = (int)(m_nUnitH * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
@@ -60,22 +38,11 @@ int DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 	m_nCols = numCols;
 	m_nRows = numRows;
 
-	m_nSprW = (int)(m_nWidth / numCols);
-	m_nSprH = (int)(m_nHeight / numRows);
+	m_nUnitW = (int)(m_nWidth / numCols);
+	m_nUnitH = (int)(m_nHeight / numRows);
 	
-	SetSize(m_nSprW, m_nSprH);
+	SetSize(m_nUnitW, m_nUnitH);
 	SetFrame(0);
-
-	return 0;
-}
-
-int DX9Anim::SetBoundingnBox(D3DXVECTOR2 Size)
-{
-	m_BB.PosOffset.x = -Size.x / 2;
-	m_BB.PosOffset.y = -Size.y;
-
-	m_BB.Size.x = (float)m_nSprScaledW + Size.x;
-	m_BB.Size.y = (float)m_nSprScaledH + Size.y;
 
 	return 0;
 }
@@ -160,29 +127,12 @@ int DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
 	return 0;
 }
 
-int DX9Anim::DrawBoundingBox()
-{
-	m_BBLine.SetBoxPosition(m_SprPos + m_BB.PosOffset, m_BB.Size);
-	m_BBLine.Draw();
-
-	return 0;
-}
-
-DX9BOUNDINGBOX DX9Anim::GetBoundingBox()
-{
-	DX9BOUNDINGBOX Result;
-	Result.PosOffset = m_SprPos + m_BB.PosOffset;
-	Result.Size = m_BB.Size;
-
-	return Result;
-}
-
 int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
-	m_SprPos = Pos;
-	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
-	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
+	m_Pos = Pos;
+	m_SprFeetPos.x = Pos.x + m_nScaledW / 2;
+	m_SprFeetPos.y = Pos.y + m_nScaledH;
 
 	return 0;
 }
@@ -190,9 +140,9 @@ int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
-	m_SprPos = Pos;
-	m_SprFeetPos.x = Pos.x + m_nSprScaledW / 2;
-	m_SprFeetPos.y = Pos.y + m_nSprScaledH;
+	m_Pos = Pos;
+	m_SprFeetPos.x = Pos.x + m_nScaledW / 2;
+	m_SprFeetPos.y = Pos.y + m_nScaledH;
 
 	return 0;
 }
@@ -220,20 +170,20 @@ int DX9Anim::SetVelocity(D3DXVECTOR2 Vel)
 
 int DX9Anim::MoveWithVelocity()
 {
-	m_SprPos += m_Velocity;
+	m_Pos += m_Velocity;
 	m_SprFeetPos += m_Velocity;
 
-	SetPosition(m_SprPos);
+	SetPosition(m_Pos);
 
 	return 0;
 }
 
 int DX9Anim::MoveConst(D3DXVECTOR2 dXY)
 {
-	m_SprPos += dXY;
+	m_Pos += dXY;
 	m_SprFeetPos += dXY;
 
-	SetPosition(m_SprPos);
+	SetPosition(m_Pos);
 
 	return 0;
 }

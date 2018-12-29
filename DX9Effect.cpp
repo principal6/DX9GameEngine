@@ -20,12 +20,14 @@ int DX9Effect::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 	CreateVB();
 	CreateIB();
 
+	m_BBLine.CreateMax(pD3DDev);
+
 	return 0;
 }
 
 int DX9Effect::CreateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_IMAGE) * MAX_EFFECT_COUNT;
+	int rVertSize = sizeof(DX9VERTEX_IMAGE) * MAX_VB_COUNT;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 	{
 		return -1;
@@ -36,7 +38,7 @@ int DX9Effect::CreateVB()
 
 int DX9Effect::CreateIB()
 {
-	int rIndSize = sizeof(DX9INDEX3) * (MAX_EFFECT_COUNT / 2);
+	int rIndSize = sizeof(DX9INDEX3) * (MAX_VB_COUNT / 2);
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 	{
 		return -1;
@@ -75,16 +77,17 @@ int DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
 	return 0;
 }
 
-int DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset, int RepeatCount)
+int DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
+	D3DXVECTOR2 BBSize, int RepeatCount)
 {
-	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, StartFrame, EndFrame, SpawnOffset, RepeatCount));
+	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, StartFrame, EndFrame, SpawnOffset, BBSize, RepeatCount));
 	m_TypeCount = (int)m_TypeData.size();
 	return 0;
 }
 
 int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir)
 {
-	if (m_InstanceCount >= MAX_EFFECT_COUNT)
+	if (m_InstanceCount >= MAX_VB_COUNT)
 		return -1;
 
 	m_InstanceCount++;
@@ -103,14 +106,22 @@ int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir)
 	NewPos.x -= (m_UnitW / 2);
 	NewPos.y -= (m_UnitH / 2);
 
+
+	D3DXVECTOR2 tBBSize = m_TypeData[EffectID].GetBoundingBoxSize();
+	DX9BOUNDINGBOX tBB;
+	tBB.PosOffset.x = (float)(-tBBSize.x) / 2.0f;
+	tBB.PosOffset.y = (float)(-tBBSize.y) / 2.0f;
+	tBB.Size.x = m_UnitW + tBBSize.x;
+	tBB.Size.y = m_UnitH + tBBSize.y;
+
 	if (m_pFisrtInstance == nullptr)
 	{
-		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0);
+		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB);
 		m_pLastInstance = m_pFisrtInstance;
 	}
 	else
 	{
-		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0));
+		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
 	
@@ -123,6 +134,7 @@ int DX9Effect::Update()
 	m_Ind.clear();
 	m_VertCount = 0;
 	m_IndCount = 0;
+	m_BBLine.Clear();
 
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
 	int iterator_n = 0;
@@ -138,6 +150,7 @@ int DX9Effect::Update()
 
 		int tStartFrame = m_TypeData[tTypeDataID].GetStartFrame();
 		int tEndFrame = m_TypeData[tTypeDataID].GetEndFrame();
+		D3DXVECTOR2 tBBSize = m_TypeData[tTypeDataID].GetBoundingBoxSize();
 
 		int tCurrFrame = iterator->GetCurrFrame();
 
@@ -150,26 +163,34 @@ int DX9Effect::Update()
 		tCurrFrame++;
 		if (tCurrFrame > tEndFrame)
 		{
-			tCurrFrame = tStartFrame;
+			m_pFisrtInstance = iterator->GetNext();
+			delete iterator;
+			iterator = m_pFisrtInstance;
 		}
-		iterator->SetCurrFrame(tCurrFrame);
+		else
+		{
+			iterator->SetCurrFrame(tCurrFrame);
 
-		m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x, tPos.y, u1, v1));
-		m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x + m_UnitW, tPos.y, u2, v1));
-		m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x, tPos.y + m_UnitH, u1, v2));
-		m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x + m_UnitW, tPos.y + m_UnitH, u2, v2));
-		m_VertCount = (int)m_Vert.size();
+			m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x, tPos.y, u1, v1));
+			m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x + m_UnitW, tPos.y, u2, v1));
+			m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x, tPos.y + m_UnitH, u1, v2));
+			m_Vert.push_back(DX9VERTEX_IMAGE(tPos.x + m_UnitW, tPos.y + m_UnitH, u2, v2));
+			m_VertCount = (int)m_Vert.size();
 
-		m_Ind.push_back(DX9INDEX3((m_IndCount * 2), (m_IndCount * 2) + 1, (m_IndCount * 2) + 3));
-		m_Ind.push_back(DX9INDEX3((m_IndCount * 2), (m_IndCount * 2) + 3, (m_IndCount * 2) + 2));
-		m_IndCount = (int)m_Ind.size();
-		
-		iterator = iterator->GetNext();
-		iterator_n++;
+			m_Ind.push_back(DX9INDEX3((m_IndCount * 2), (m_IndCount * 2) + 1, (m_IndCount * 2) + 3));
+			m_Ind.push_back(DX9INDEX3((m_IndCount * 2), (m_IndCount * 2) + 3, (m_IndCount * 2) + 2));
+			m_IndCount = (int)m_Ind.size();
+			
+			DX9BOUNDINGBOX tBB = iterator->GetBoundingBox();
+			m_BBLine.AddBox(tPos + tBB.PosOffset, tBB.Size, 0xFFFFFFFF);
 
-		if (iterator)
-			int dd = 0;
+			iterator = iterator->GetNext();
+			iterator_n++;
+		}
 	}
+
+	m_BBLine.UpdateVB();
+	m_BBLine.UpdateIB();
 
 	DX9Image::UpdateVB();
 	DX9Image::UpdateIB();
@@ -181,6 +202,16 @@ int DX9Effect::Draw()
 	if (m_pFisrtInstance)
 	{
 		return DX9Image::Draw();
+	}
+
+	return -1;
+}
+
+int DX9Effect::DrawBoundingBox()
+{
+	if (m_pFisrtInstance)
+	{
+		return m_BBLine.Draw();
 	}
 
 	return -1;

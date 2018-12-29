@@ -4,6 +4,7 @@
 #define _DX9IMAGE_H_
 
 #include "DX9Common.h"
+#include "DX9Line.h"
 #include <vector>
 
 class DX9Image
@@ -33,6 +34,10 @@ protected:
 	int m_nScaledW;
 	int m_nScaledH;
 
+	// Collision
+	DX9BOUNDINGBOX m_BB;
+	DX9Line m_BBLine;
+
 // 상속 클래스에서 접근할 함수들
 protected:
 	int DX9Image::CreateVB();
@@ -50,6 +55,7 @@ public:
 	int DX9Image::Destroy();
 
 	int DX9Image::Draw();
+	int DX9Image::DrawBoundingBox();
 	int DX9Image::FlipHorizontal();
 	int DX9Image::FlipVertical();
 
@@ -60,6 +66,7 @@ public:
 	int DX9Image::SetRange(float u1, float u2, float v1, float v2);
 	int DX9Image::SetAlpha(int Alpha);
 	int DX9Image::SetTexture(std::wstring FileName);
+	int DX9Image::SetBoundingnBox(D3DXVECTOR2 Size);
 
 	D3DXVECTOR2 DX9Image::GetPosition() { return m_Pos; };
 	D3DXVECTOR2 DX9Image::GetCenterPosition();
@@ -67,6 +74,7 @@ public:
 	int DX9Image::GetHeight() { return m_nHeight; };
 	int DX9Image::GetScaledWidth() { return m_nScaledW; };
 	int DX9Image::GetScaledHeight() { return m_nScaledH; };
+	DX9BOUNDINGBOX DX9Image::GetBoundingBox();
 
 	bool DX9Image::IsTextureLoaded();
 };

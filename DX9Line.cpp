@@ -11,6 +11,15 @@ int DX9Line::Create(LPDIRECT3DDEVICE9 pD3DDev)
 	return 0;
 }
 
+int DX9Line::CreateMax(LPDIRECT3DDEVICE9 pD3DDev)
+{
+	Create(pD3DDev);
+	CreateVBMax();
+	CreateIBMax();
+
+	return 0;
+}
+
 int DX9Line::Destroy()
 {
 	m_pDevice = nullptr; // DX9Base에서 생성했으므로 여기서는 참조 해제만 한다!
@@ -33,16 +42,26 @@ int DX9Line::Destroy()
 	return 0;
 }
 
+int DX9Line::Clear()
+{
+	m_Vert.clear();
+	m_Ind.clear();
+	m_VertCount = 0;
+	m_IndCount = 0;
+
+	return 0;
+}
+
 int DX9Line::AddLine(D3DXVECTOR2 StartPos, D3DXVECTOR2 Length, DWORD Color)
 {
 	// 정점 정보 대입, 버퍼 생성
-	m_Vert.push_back(DX9VERTEX_LINE(StartPos.x, StartPos.y, 0.0f, 1.0f, Color));
-	m_Vert.push_back(DX9VERTEX_LINE(StartPos.x + Length.x, StartPos.y + Length.y, 0.0f, 1.0f, Color));
-	m_nVertCount = (int)m_Vert.size();
+	m_Vert.push_back(DX9VERTEX_LINE(StartPos.x, StartPos.y, Color));
+	m_Vert.push_back(DX9VERTEX_LINE(StartPos.x + Length.x, StartPos.y + Length.y, Color));
+	m_VertCount = (int)m_Vert.size();
 
 	// 색인 정보 대입, 버퍼 생성
-	m_Ind.push_back(DX9INDEX2(m_nIndCount * 2, m_nIndCount * 2 + 1));
-	m_nIndCount = (int)m_Ind.size();
+	m_Ind.push_back(DX9INDEX2(m_IndCount * 2, m_IndCount * 2 + 1));
+	m_IndCount = (int)m_Ind.size();
 	return 0;
 }
 
@@ -60,6 +79,7 @@ int DX9Line::AddEnd()
 	CreateVB();
 	CreateIB();
 	UpdateVB();
+	UpdateIB();
 
 	m_VertBackup = m_Vert;
 	return 0;
@@ -67,7 +87,7 @@ int DX9Line::AddEnd()
 
 int DX9Line::SetPositionOffset(D3DXVECTOR2 Offset)
 {
-	for (int i = 0; i < m_nVertCount; i++)
+	for (int i = 0; i < m_VertCount; i++)
 	{
 		m_Vert[i].x = m_VertBackup[i].x + Offset.x;
 		m_Vert[i].y = m_VertBackup[i].y + Offset.y;
@@ -110,45 +130,87 @@ int DX9Line::Draw()
 	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_LINE));
 	m_pDevice->SetFVF(D3DFVF_LINE);
 	m_pDevice->SetIndices(m_pIB);
-	m_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, m_nVertCount, 0, m_nIndCount);
+	m_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, m_VertCount, 0, m_IndCount);
 
 	return 0;
 }
 
 int DX9Line::CreateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_LINE) * m_nVertCount;
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0,
-		D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
-	{
+	int rVertSize = sizeof(DX9VERTEX_LINE) * m_VertCount;
+	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 		return -1;
-	}
 
 	return 0;
 }
 
 int DX9Line::CreateIB()
 {
-	int rIndSize = sizeof(DX9INDEX2) * m_nIndCount;
+	int rIndSize = sizeof(DX9INDEX2) * m_IndCount;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 		return -1;
-	VOID* pIndices;
-	if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+
+	return 0;
+}
+
+int DX9Line::CreateVBMax()
+{
+	if (m_pVB)
+	{
+		m_pVB->Release();
+		m_pVB = nullptr;
+	}
+	int rVertSize = sizeof(DX9VERTEX_LINE) * MAX_VB_COUNT;
+	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 		return -1;
-	memcpy(pIndices, &m_Ind[0], rIndSize);
-	m_pIB->Unlock();
+
+	return 0;
+}
+
+int DX9Line::CreateIBMax()
+{
+	if (m_pIB)
+	{
+		m_pIB->Release();
+		m_pIB = nullptr;
+	}
+	int rIndSize = sizeof(DX9INDEX2) * MAX_VB_COUNT / 2;
+	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
+		return -1;
 
 	return 0;
 }
 
 int DX9Line::UpdateVB()
 {
-	int rVertSize = sizeof(DX9VERTEX_LINE) * m_nVertCount;
-	VOID* pVertices;
-	if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
-		return -1;
-	memcpy(pVertices, &m_Vert[0], rVertSize);
-	m_pVB->Unlock();
+	if (m_Vert.size() > 0)
+	{
+		int rVertSize = sizeof(DX9VERTEX_LINE) * m_VertCount;
+		VOID* pVertices;
+		if (FAILED(m_pVB->Lock(0, rVertSize, (void**)&pVertices, 0)))
+			return -1;
+		memcpy(pVertices, &m_Vert[0], rVertSize);
+		m_pVB->Unlock();
 
-	return 0;
+		return 0;
+	}
+	
+	return -1;
+}
+
+int DX9Line::UpdateIB()
+{
+	if (m_Ind.size() > 0)
+	{
+		int rIndSize = sizeof(DX9INDEX2) * m_IndCount;
+		VOID* pIndices;
+		if (FAILED(m_pIB->Lock(0, rIndSize, (void **)&pIndices, 0)))
+			return -1;
+		memcpy(pIndices, &m_Ind[0], rIndSize);
+		m_pIB->Unlock();
+
+		return 0;
+	}
+
+	return -1;
 }

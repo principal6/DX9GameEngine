@@ -25,6 +25,7 @@ const int WINDOW_H = 600;
 const D3DXVECTOR2 kGravity = D3DXVECTOR2(0.0f, 0.6f);
 const D3DXVECTOR2 kJumpPow = D3DXVECTOR2(0.0f, -15.0f);
 const float kStride = 5.0f;
+const int KEY_PRESS_INTERVAL = 20;
 
 // 변수
 float gSprGroundOffsetY = 0.0f;
@@ -36,6 +37,7 @@ ULONGLONG gTimerStart = 0;
 ULONGLONG gTimerSec = 0;
 ULONGLONG gTimerAnim = 0;
 int gFPS = 0;
+int gKeyPressCount = 0;
 
 // 클래스
 DX9Base* gDXBase;
@@ -65,7 +67,7 @@ int main()
 
 	gDXSprite = new DX9Sprite;
 	gDXSprite->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXSprite->MakeSprite(L"advnt_full.png", 10, 10, 1.5f);
+	gDXSprite->MakeUnit(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
 	gDXSprite->AddAnimation(DX9ANIMID::Attack1, 27, 28); // Punch
@@ -73,17 +75,17 @@ int main()
 	gSprGroundOffsetY = (float)(WINDOW_H - gDXSprite->GetScaledSprHeight() - TILE_H);
 	gDXSprite->SetPosition(D3DXVECTOR2(400.0f, gSprGroundOffsetY - 32.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
-
+	
 	gDXMonster = new DX9Monster;
 	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXMonster->MakeSprite(L"mage-1-85x94.png", 4, 2);
+	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetScaledSprHeight() - TILE_H)));
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
-	gDXEffect->SetTextureAtlas(L"Test.png", 4, 4);
-	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 15, D3DXVECTOR2(80.0f, 0.0f));
+	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
+	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 63, D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0, 0));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir);
@@ -133,9 +135,16 @@ int MainLoop()
 		gTimerAnim = GetTickCount64();
 		gDXMonster->Animate();
 		gDXSprite->Animate();
-		gDXEffect->Update();
 	}
 
+	if (gKeyPressCount > 0)
+	{
+		gKeyPressCount++;
+
+		if (gKeyPressCount > KEY_PRESS_INTERVAL)
+			gKeyPressCount = 0;
+	}
+	
 	DetectInput();
 	Gravitate();
 
@@ -153,8 +162,9 @@ int MainLoop()
 		gDXSprite->Draw();
 		gDXSprite->DrawBoundingBox();
 
+		gDXEffect->Update();
 		gDXEffect->Draw();
-		//gDXEffect->DrawBoundingBox();
+		gDXEffect->DrawBoundingBox();
 
 	gDXBase->EndRender();
 
@@ -244,7 +254,11 @@ int DetectInput()
 	}
 	if (gDXInput->OnKeyDown(DIK_LALT))
 	{
-		gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
+		if (gKeyPressCount == 0)
+		{
+			gKeyPressCount++;
+			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
+		}
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 	{
