@@ -8,12 +8,7 @@
 class DX9Sprite : public DX9Anim
 {
 private:
-	D3DXVECTOR2 m_GlobalPosInverse;
 	D3DXVECTOR2 m_Velocity;
-
-private:
-	int DX9Sprite::CalculateGlobalPositionInverse();
-	int DX9Sprite::CalculateGlobalPosition();
 
 public:
 	DX9Sprite();

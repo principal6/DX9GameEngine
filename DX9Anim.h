@@ -30,6 +30,7 @@ protected:
 	float m_WindowHalfW;
 	float m_WindowHalfH;
 	D3DXVECTOR2 m_GlobalPos;
+	D3DXVECTOR2 m_GlobalPosInverse;
 
 private:
 	int DX9Anim::SetNumRowsAndCols(int numCols, int numRows);
@@ -37,6 +38,8 @@ private:
 protected:
 	int DX9Anim::SetPosition(D3DXVECTOR2 Pos);
 	int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos);
+	int DX9Anim::CalculateGlobalPositionInverse();
+	int DX9Anim::CalculateGlobalPosition();
 
 public:
 	DX9Anim();

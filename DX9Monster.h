@@ -16,6 +16,7 @@ private:
 	DX9Image *m_HPBar;
 
 private:
+	int DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
 	int DX9Monster::CalculateHP();
 
 public:
@@ -26,7 +27,9 @@ public:
 	int DX9Monster::Destroy();
 	
 	int DX9Monster::SetMaxHP(int HPMax);
-	int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Pos);
+	int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position);
+	int DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY);
+	D3DXVECTOR2 DX9Monster::GetGlobalPosition() { return m_GlobalPos; };
 
 	int DX9Monster::Damage(int Damage);
 

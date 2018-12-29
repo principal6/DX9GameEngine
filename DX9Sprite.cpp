@@ -6,22 +6,6 @@ DX9Sprite::DX9Sprite()
 	m_Velocity = D3DXVECTOR2(0.0f, 0.0f);
 }
 
-int DX9Sprite::CalculateGlobalPositionInverse()
-{
-	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_WindowH - m_ScaledH - m_GlobalPos.y;
-
-	return 0;
-}
-
-int DX9Sprite::CalculateGlobalPosition()
-{
-	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_WindowH - m_ScaledH - m_GlobalPosInverse.y;
-
-	return 0;
-}
-
 int DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)
 {
 	m_GlobalPos = Position;

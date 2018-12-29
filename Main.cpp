@@ -79,18 +79,18 @@ int main()
 	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir, WINDOW_W, WINDOW_H);
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
-	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, (float)(WINDOW_H - gDXMonster->GetScaledSprHeight() - TILE_H)));
+	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 32.0f));
 	gDXMonster->SetMaxHP(200);
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
 	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
-	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 63, D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0, 0));
+	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 63, D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir, WINDOW_H);
 	gDXMap->LoadMapFromFile(L"map01.jwm");
-	gDXMap->SetGlobalPosition(0, 0);
+	gDXMap->SetGlobalPosition(D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXFont = new DX9Font;
 	gDXFont->Create(gDXBase->GetDevice(), WINDOW_W, WINDOW_H);
@@ -161,9 +161,10 @@ int MainLoop()
 		gDXImage->Draw();
 
 		D3DXVECTOR2 tOffset = gDXSprite->GetOffsetForMapMove();
-		gDXMap->SetGlobalPosition(-tOffset.x, -tOffset.y);
+		gDXMap->SetGlobalPosition(-tOffset);
 		gDXMap->Draw();
 
+		gDXMonster->UpdateGlobalPosition(gDXMap->GetMapOffset(), gDXMap->GetMapOffsetZeroY());
 		gDXMonster->Draw();
 
 		gDXSprite->Draw();

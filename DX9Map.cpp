@@ -18,8 +18,7 @@ DX9Map::DX9Map()
 	m_pVBMove = nullptr;
 	m_nVertMoveCount = 0;
 
-	m_fOffsetX = 0.0f;
-	m_fOffsetY = 0.0f;
+	m_Offset = D3DXVECTOR2(0.0f, 0.0f);
 }
 
 int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowHeight)
@@ -158,31 +157,30 @@ int DX9Map::CreateMapWithData()
 	return 0;
 }
 
-int DX9Map::SetGlobalPosition(float OffsetX, float OffsetY)
+int DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset)
 {
 	float MapH = (float)(m_MapRows * TILE_H);
-	float NewOffsetY = m_WindowH - MapH + OffsetY;
+	float NewOffsetY = m_WindowH - MapH + Offset.y;
 
-	SetPosition(OffsetX, NewOffsetY);
+	SetPosition(D3DXVECTOR2(Offset.x, NewOffsetY));
 	return 0;
 }
 
-int DX9Map::SetPosition(float OffsetX, float OffsetY)
+int DX9Map::SetPosition(D3DXVECTOR2 Offset)
 {
 	int VertID0 = 0;
 	float tX = 0.0f;
 	float tY = 0.0f;
 
-	m_fOffsetX = OffsetX;
-	m_fOffsetY = OffsetY;
+	m_Offset = Offset;
 
 	for (int i = 0; i < m_MapRows; i++)
 	{
 		for (int j = 0; j < m_MapCols; j++)
 		{
 			VertID0 = (j + (i * m_MapCols)) * 4;
-			tX = (float)(j * TILE_W) + m_fOffsetX;
-			tY = (float)(i * TILE_H) + m_fOffsetY;
+			tX = (float)(j * TILE_W) + m_Offset.x;
+			tY = (float)(i * TILE_H) + m_Offset.y;
 			m_Vert[VertID0].x = tX;
 			m_Vert[VertID0].y = tY;
 			m_Vert[VertID0 + 1].x = tX + TILE_W;
@@ -334,6 +332,8 @@ int DX9Map::AddEnd()
 		UpdateVBMove();
 	}
 	m_bMapCreated = true;
+
+	m_OffsetZeroY = m_WindowH - (m_MapRows * TILE_H);
 
 	return 0;
 }
@@ -642,8 +642,8 @@ D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp)
 {
 	D3DXVECTOR2 Result;
 
-	float tX = -m_fOffsetX + Position.x;
-	float tY = -m_fOffsetY + Position.y;
+	float tX = -m_Offset.x + Position.x;
+	float tY = -m_Offset.y + Position.y;
 
 	int tYR = (int)tX % TILE_W;
 	int tMapX = (int)(tX / TILE_W);
@@ -668,8 +668,8 @@ float DX9Map::GetMapTileBoundary(int MapID, DX9MAPDIR Dir)
 
 	D3DXVECTOR2 tMapXY = ConvertIDToXY(MapID);
 
-	float tX = m_fOffsetX + tMapXY.x * TILE_W;
-	float tY = m_fOffsetY + tMapXY.y * TILE_H;
+	float tX = m_Offset.x + tMapXY.x * TILE_W;
+	float tY = m_Offset.y + tMapXY.y * TILE_H;
 
 	switch (Dir)
 	{

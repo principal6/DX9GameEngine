@@ -37,8 +37,8 @@ private:
 	std::vector<DX9VERTEX_IMAGE> m_VertMove;
 	int m_nVertMoveCount;
 
-	float m_fOffsetX;
-	float m_fOffsetY;
+	D3DXVECTOR2 m_Offset;
+	int m_OffsetZeroY;
 
 private:
 	int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size);
@@ -75,8 +75,8 @@ public:
 	int DX9Map::SetMapFragmentTile(int TileID, int X, int Y);
 	int DX9Map::SetMapFragmentMove(int MoveID, int X, int Y);
 	int DX9Map::SetMode(DX9MAPMODE Mode);
-	int DX9Map::SetPosition(float OffsetX, float OffsetY);
-	int DX9Map::SetGlobalPosition(float OffsetX, float OffsetY);
+	int DX9Map::SetPosition(D3DXVECTOR2 Offset);
+	int DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset);
 
 	// Load & Save
 	int DX9Map::LoadMapFromFile(std::wstring FileName);
@@ -89,6 +89,8 @@ public:
 	int DX9Map::GetMapRows() { return m_MapRows; };
 	int DX9Map::GetWidth() { return (m_MapCols * TILE_W); };
 	int DX9Map::GetHeight() { return (m_MapRows * TILE_H); };
+	D3DXVECTOR2	DX9Map::GetMapOffset() { return m_Offset; };
+	int DX9Map::GetMapOffsetZeroY() { return m_OffsetZeroY; };
 
 	// Converter
 	D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp = false);

@@ -48,16 +48,40 @@ int DX9Monster::SetMaxHP(int HPMax)
 	return 0;
 }
 
-int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Pos)
+int DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 {
-	DX9Anim::SetPosition(Pos);
 	D3DXVECTOR2 tPos = GetCenterPosition();
-	tPos.y = Pos.y;
+	tPos.y = Position.y;
 	tPos.y -= OFFSET_Y_HPBAR;
 	tPos.x -= (float)(m_HPFrame->GetWidth() / 2);
 	m_HPFrame->SetPosition(tPos);
 	m_HPBar->SetPosition(tPos);
 
+	return 0;
+}
+
+int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
+{
+	m_GlobalPos = Position;
+	CalculateGlobalPositionInverse();
+
+	SetPosition(m_GlobalPosInverse);
+	SetUIPosition(m_GlobalPosInverse);
+
+	return 0;
+}
+
+int DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY)
+{
+	D3DXVECTOR2 tGP = m_GlobalPos;
+	m_GlobalPos.x += MapOffset.x;
+	m_GlobalPos.y -= MapOffset.y - MapOffsetZeroY;
+
+	CalculateGlobalPositionInverse();
+	m_GlobalPos = tGP;
+
+	SetPosition(m_GlobalPosInverse);
+	SetUIPosition(m_GlobalPosInverse);
 	return 0;
 }
 

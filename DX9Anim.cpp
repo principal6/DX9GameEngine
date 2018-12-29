@@ -145,7 +145,7 @@ int DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
 int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
-	m_Pos = Pos;
+	//m_Pos = Pos;
 
 	return 0;
 }
@@ -153,7 +153,23 @@ int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
-	m_Pos = Pos;
+	//m_Pos = Pos;
+
+	return 0;
+}
+
+int DX9Anim::CalculateGlobalPositionInverse()
+{
+	m_GlobalPosInverse = m_GlobalPos;
+	m_GlobalPosInverse.y = m_WindowH - m_ScaledH - m_GlobalPos.y;
+
+	return 0;
+}
+
+int DX9Anim::CalculateGlobalPosition()
+{
+	m_GlobalPos = m_GlobalPosInverse;
+	m_GlobalPos.y = m_WindowH - m_ScaledH - m_GlobalPosInverse.y;
 
 	return 0;
 }
