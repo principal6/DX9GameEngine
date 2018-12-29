@@ -14,10 +14,10 @@ DX9Image::DX9Image()
 	m_Pos = D3DXVECTOR2(0.0f, 0.0f);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 
-	m_nWidth = 10;
-	m_nHeight = 10;
-	m_nScaledW = 10;
-	m_nScaledH = 10;
+	m_Width = 10;
+	m_Height = 10;
+	m_ScaledW = 10;
+	m_ScaledH = 10;
 	m_VisibleW = -1;
 	m_VisibleH = -1;
 }
@@ -42,9 +42,9 @@ int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
 int DX9Image::CreateVB()
 {
 	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_nWidth, m_Pos.y + m_nHeight, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_Width, m_Pos.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x, m_Pos.y + m_Height, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+	m_Vert.push_back(DX9VERTEX_IMAGE(m_Pos.x + m_Width, m_Pos.y + m_Height, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
 	m_VertCount = (int)m_Vert.size();
 
 	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
@@ -149,7 +149,7 @@ int DX9Image::SetPosition(D3DXVECTOR2 Pos)
 
 int DX9Image::SetPositionCentered(D3DXVECTOR2 Pos)
 {
-	m_Pos = D3DXVECTOR2(Pos.x - (m_nScaledW / 2), Pos.y - (m_nScaledH / 2));
+	m_Pos = D3DXVECTOR2(Pos.x - (m_ScaledW / 2), Pos.y - (m_ScaledH / 2));
 	m_Pos = Pos;
 	UpdateVertData();
 	return 0;
@@ -157,10 +157,10 @@ int DX9Image::SetPositionCentered(D3DXVECTOR2 Pos)
 
 int DX9Image::SetSize(int Width, int Height)
 {
-	m_nWidth = Width;
-	m_nHeight = Height;
-	m_nScaledW = (int)(m_nWidth * m_Scale.x);
-	m_nScaledH = (int)(m_nHeight * m_Scale.y);
+	m_Width = Width;
+	m_Height = Height;
+	m_ScaledW = (int)(m_Width * m_Scale.x);
+	m_ScaledH = (int)(m_Height * m_Scale.y);
 	UpdateVertData();
 	return 0;
 }
@@ -168,8 +168,8 @@ int DX9Image::SetSize(int Width, int Height)
 int DX9Image::SetScale(D3DXVECTOR2 Scale)
 {
 	m_Scale = Scale;
-	m_nScaledW = (int)(m_nWidth * m_Scale.x);
-	m_nScaledH = (int)(m_nHeight * m_Scale.y);
+	m_ScaledW = (int)(m_Width * m_Scale.x);
+	m_ScaledH = (int)(m_Height * m_Scale.y);
 	UpdateVertData();
 	return 0;
 }
@@ -254,11 +254,11 @@ int DX9Image::SetTexture(std::wstring FileName)
 		D3DX_DEFAULT, D3DX_DEFAULT, 0, &tImgInfo, nullptr, &m_pTexture)))
 		return -1;
 
-	m_nWidth = tImgInfo.Width;
-	m_nHeight = tImgInfo.Height;
+	m_Width = tImgInfo.Width;
+	m_Height = tImgInfo.Height;
 
-	m_nScaledW = (int)(m_nWidth * m_Scale.x);
-	m_nScaledH = (int)(m_nHeight * m_Scale.y);
+	m_ScaledW = (int)(m_Width * m_Scale.x);
+	m_ScaledH = (int)(m_Height * m_Scale.y);
 	
 	UpdateVertData();
 
@@ -270,8 +270,8 @@ int DX9Image::SetBoundingnBox(D3DXVECTOR2 Size)
 	m_BB.PosOffset.x = -Size.x / 2;
 	m_BB.PosOffset.y = -Size.y;
 
-	m_BB.Size.x = (float)m_nScaledW + Size.x;
-	m_BB.Size.y = (float)m_nScaledH + Size.y;
+	m_BB.Size.x = (float)m_ScaledW + Size.x;
+	m_BB.Size.y = (float)m_ScaledH + Size.y;
 
 	return 0;
 }
@@ -319,8 +319,8 @@ int DX9Image::UpdateVertData()
 	if (m_Vert.size() < 4)
 		return -1;
 
-	int tW = m_nWidth;
-	int tH = m_nHeight;
+	int tW = m_Width;
+	int tH = m_Height;
 
 	if (m_VisibleW != -1)
 		tW = m_VisibleW;
@@ -367,8 +367,8 @@ bool DX9Image::IsTextureLoaded()
 D3DXVECTOR2 DX9Image::GetCenterPosition()
 {
 	D3DXVECTOR2 Result = m_Pos;
-	Result.x += m_nScaledW / 2;
-	Result.y += m_nScaledH / 2;
+	Result.x += m_ScaledW / 2;
+	Result.y += m_ScaledH / 2;
 
 	return Result;
 }

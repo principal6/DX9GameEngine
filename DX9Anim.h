@@ -13,13 +13,6 @@ private:
 	int m_nRows;
 	int m_nCols;
 
-	int m_nUnitW;
-	int m_nUnitH;
-
-	// Position
-	D3DXVECTOR2 m_SprFeetPos;
-	D3DXVECTOR2 m_Velocity;
-
 	// Animation
 	DX9ANIMDIR m_nAnimDir;
 	DX9ANIMID m_nCurrAnimID;
@@ -29,13 +22,27 @@ private:
 	bool m_bBeingAnimated;
 	bool m_bRepeating;
 
+protected:
+	int m_UnitW;
+	int m_UnitH;
+	int m_WindowW;
+	int m_WindowH;
+	float m_WindowHalfW;
+	float m_WindowHalfH;
+	D3DXVECTOR2 m_GlobalPos;
+
 private:
 	int DX9Anim::SetNumRowsAndCols(int numCols, int numRows);
+
+protected:
+	int DX9Anim::SetPosition(D3DXVECTOR2 Pos);
+	int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos);
 
 public:
 	DX9Anim();
 	~DX9Anim() {};
 
+	int DX9Anim::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight);
 	int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale = 1.0f);
 
 	int DX9Anim::SetFrame(int FrameID);
@@ -45,21 +52,11 @@ public:
 	bool DX9Anim::IsBeingAnimated() { return m_bBeingAnimated; };
 	
 	int DX9Anim::SetAnimDir(DX9ANIMDIR Direction);
-	int DX9Anim::SetPosition(D3DXVECTOR2 Pos);
-	int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos);
 
 	DX9ANIMDIR DX9Anim::GetAnimDir() { return m_nAnimDir; };
-	int DX9Anim::GetScaledSprWidth() { return m_nScaledW; };
-	int DX9Anim::GetScaledSprHeight() { return m_nScaledH; };
+	int DX9Anim::GetScaledSprWidth() { return m_ScaledW; };
+	int DX9Anim::GetScaledSprHeight() { return m_ScaledH; };
 	D3DXVECTOR2 DX9Anim::GetCenterPosition() { return DX9Image::GetCenterPosition(); };
-	D3DXVECTOR2 DX9Anim::GetSpriteFeetPos() { return m_SprFeetPos; };
-
-	int DX9Anim::MoveWithVelocity();
-	int DX9Anim::MoveConst(D3DXVECTOR2 dXY);
-	int DX9Anim::Accelerate(D3DXVECTOR2 Accel);
-	int DX9Anim::AddVelocity(D3DXVECTOR2 Vel);
-	int DX9Anim::SetVelocity(D3DXVECTOR2 Vel);
-	D3DXVECTOR2 DX9Anim::GetVelocity() { return m_Velocity; };
 };
 
 #endif

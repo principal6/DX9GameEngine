@@ -5,8 +5,13 @@ DX9Anim::DX9Anim()
 	m_nRows = 0;
 	m_nCols = 0;
 
-	m_nUnitW = 0;
-	m_nUnitH = 0;
+	m_UnitW = 0;
+	m_UnitH = 0;
+
+	m_WindowW = 0;
+	m_WindowH = 0;
+	m_WindowHalfW = 0.0f;
+	m_WindowHalfH = 0.0f;
 
 	m_nAnimDir = DX9ANIMDIR::Right;
 	m_nCurrAnimID = DX9ANIMID::Idle;
@@ -14,9 +19,19 @@ DX9Anim::DX9Anim()
 	m_nAnimCount = 0;
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
+}
 
-	m_SprFeetPos = D3DXVECTOR2(0.0f, 0.0f);
-	m_Velocity = D3DXVECTOR2(0.0f, 0.0f);
+int DX9Anim::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight)
+{
+	DX9Image::Create(pD3DDev, BaseDir);
+
+	m_WindowW = WindowWidth;
+	m_WindowH = WindowHeight;
+
+	m_WindowHalfW = (float)(m_WindowW / 2);
+	m_WindowHalfH = (float)(m_WindowH / 2);
+
+	return 0;
 }
 
 int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
@@ -24,8 +39,8 @@ int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Sc
 	DX9Image::SetTexture(TextureFN);
 	SetNumRowsAndCols(numCols, numRows);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
-	m_nScaledW = (int)(m_nUnitW * Scale);
-	m_nScaledH = (int)(m_nUnitH * Scale);
+	m_ScaledW = (int)(m_UnitW * Scale);
+	m_ScaledH = (int)(m_UnitH * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
@@ -38,10 +53,10 @@ int DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 	m_nCols = numCols;
 	m_nRows = numRows;
 
-	m_nUnitW = (int)(m_nWidth / numCols);
-	m_nUnitH = (int)(m_nHeight / numRows);
+	m_UnitW = (int)(m_Width / numCols);
+	m_UnitH = (int)(m_Height / numRows);
 	
-	SetSize(m_nUnitW, m_nUnitH);
+	SetSize(m_UnitW, m_UnitH);
 	SetFrame(0);
 
 	return 0;
@@ -131,8 +146,6 @@ int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
 	m_Pos = Pos;
-	m_SprFeetPos.x = Pos.x + m_nScaledW / 2;
-	m_SprFeetPos.y = Pos.y + m_nScaledH;
 
 	return 0;
 }
@@ -141,49 +154,6 @@ int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
 	m_Pos = Pos;
-	m_SprFeetPos.x = Pos.x + m_nScaledW / 2;
-	m_SprFeetPos.y = Pos.y + m_nScaledH;
-
-	return 0;
-}
-
-int DX9Anim::Accelerate(D3DXVECTOR2 Accel)
-{
-	m_Velocity += Accel;
-
-	return 0;
-}
-
-int DX9Anim::AddVelocity(D3DXVECTOR2 Vel)
-{
-	m_Velocity += Vel;
-
-	return 0;
-}
-
-int DX9Anim::SetVelocity(D3DXVECTOR2 Vel)
-{
-	m_Velocity = Vel;
-
-	return 0;
-}
-
-int DX9Anim::MoveWithVelocity()
-{
-	m_Pos += m_Velocity;
-	m_SprFeetPos += m_Velocity;
-
-	SetPosition(m_Pos);
-
-	return 0;
-}
-
-int DX9Anim::MoveConst(D3DXVECTOR2 dXY)
-{
-	m_Pos += dXY;
-	m_SprFeetPos += dXY;
-
-	SetPosition(m_Pos);
 
 	return 0;
 }

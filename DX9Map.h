@@ -19,12 +19,13 @@ private:
 	bool m_bMapCreated;
 	DX9MAPMODE m_CurrMapMode;
 
-	int m_nMapCols;
-	int m_nMapRows;
-	int	m_nTileSheetWidth;
-	int	m_nTileSheetHeight;
-	int	m_nMoveSheetWidth;
-	int	m_nMoveSheetHeight;
+	int m_WindowH;
+	int m_MapCols;
+	int m_MapRows;
+	int	m_TileSheetWidth;
+	int	m_TileSheetHeight;
+	int	m_MoveSheetWidth;
+	int	m_MoveSheetHeight;
 	std::wstring m_MapName;
 	std::wstring m_TileName;
 	std::wstring m_MapDataInString;
@@ -57,7 +58,7 @@ public:
 	DX9Map();
 	~DX9Map() {};
 
-	int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir);
+	int DX9Map::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowHeight);
 	int DX9Map::Destroy();
 	
 	// Graphics
@@ -75,6 +76,7 @@ public:
 	int DX9Map::SetMapFragmentMove(int MoveID, int X, int Y);
 	int DX9Map::SetMode(DX9MAPMODE Mode);
 	int DX9Map::SetPosition(float OffsetX, float OffsetY);
+	int DX9Map::SetGlobalPosition(float OffsetX, float OffsetY);
 
 	// Load & Save
 	int DX9Map::LoadMapFromFile(std::wstring FileName);
@@ -83,14 +85,13 @@ public:
 	// Getter
 	int DX9Map::GetMapName(std::wstring *pStr);
 	int DX9Map::GetTileName(std::wstring *pStr);
-	int DX9Map::GetMapCols() { return m_nMapCols; };
-	int DX9Map::GetMapRows() { return m_nMapRows; };
-	int DX9Map::GetWidth() { return (m_nMapCols * TILE_W); };
-	int DX9Map::GetHeight() { return (m_nMapRows * TILE_H); };
+	int DX9Map::GetMapCols() { return m_MapCols; };
+	int DX9Map::GetMapRows() { return m_MapRows; };
+	int DX9Map::GetWidth() { return (m_MapCols * TILE_W); };
+	int DX9Map::GetHeight() { return (m_MapRows * TILE_H); };
 
 	// Converter
-	D3DXVECTOR2 DX9Map::ConvertScrPosToXY(D3DXVECTOR2 ScreenPos);
-	D3DXVECTOR2 DX9Map::ConvertScrPosToXYRoundUp(D3DXVECTOR2 ScreenPos);
+	D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp = false);
 	D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID);
 	int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY);
 

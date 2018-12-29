@@ -72,8 +72,8 @@ int DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
 	DX9Image::SetTexture(FileName);
 	m_TACols = numCols;
 	m_TARows = numRows;
-	m_UnitW = m_nWidth / m_TACols;
-	m_UnitH = m_nHeight / m_TARows;
+	m_UnitW = m_Width / m_TACols;
+	m_UnitH = m_Height / m_TARows;
 	return 0;
 }
 

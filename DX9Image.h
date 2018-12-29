@@ -29,10 +29,10 @@ protected:
 
 	D3DXVECTOR2 m_Pos;
 	D3DXVECTOR2 m_Scale;
-	int m_nWidth;
-	int m_nHeight;
-	int m_nScaledW;
-	int m_nScaledH;
+	int m_Width;
+	int m_Height;
+	int m_ScaledW;
+	int m_ScaledH;
 	int m_VisibleW;
 	int m_VisibleH;
 
@@ -73,10 +73,10 @@ public:
 
 	D3DXVECTOR2 DX9Image::GetPosition() { return m_Pos; };
 	D3DXVECTOR2 DX9Image::GetCenterPosition();
-	int DX9Image::GetWidth() { return m_nWidth;	};
-	int DX9Image::GetHeight() { return m_nHeight; };
-	int DX9Image::GetScaledWidth() { return m_nScaledW; };
-	int DX9Image::GetScaledHeight() { return m_nScaledH; };
+	int DX9Image::GetWidth() { return m_Width;	};
+	int DX9Image::GetHeight() { return m_Height; };
+	int DX9Image::GetScaledWidth() { return m_ScaledW; };
+	int DX9Image::GetScaledHeight() { return m_ScaledH; };
 	DX9BOUNDINGBOX DX9Image::GetBoundingBox();
 
 	bool DX9Image::IsTextureLoaded();

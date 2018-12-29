@@ -22,11 +22,11 @@ public:
 	DX9Monster();
 	~DX9Monster() {};
 
-	int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir);
+	int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight);
 	int DX9Monster::Destroy();
 	
 	int DX9Monster::SetMaxHP(int HPMax);
-	int DX9Monster::SetPosition(D3DXVECTOR2 Pos);
+	int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Pos);
 
 	int DX9Monster::Damage(int Damage);
 

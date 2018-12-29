@@ -7,9 +7,9 @@ DX9Monster::DX9Monster() {
 	m_HPBar = nullptr;
 }
 
-int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
+int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight)
 {
-	DX9Anim::Create(pD3DDev, BaseDir);
+	DX9Anim::Create(pD3DDev, BaseDir, WindowWidth, WindowHeight);
 	
 	m_HPFrame = new DX9Image;
 	m_HPFrame->Create(pD3DDev, BaseDir);
@@ -48,7 +48,7 @@ int DX9Monster::SetMaxHP(int HPMax)
 	return 0;
 }
 
-int DX9Monster::SetPosition(D3DXVECTOR2 Pos)
+int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Pos)
 {
 	DX9Anim::SetPosition(Pos);
 	D3DXVECTOR2 tPos = GetCenterPosition();
