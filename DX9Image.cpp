@@ -16,6 +16,10 @@ DX9Image::DX9Image()
 
 	m_nWidth = 10;
 	m_nHeight = 10;
+	m_nScaledW = 10;
+	m_nScaledH = 10;
+	m_VisibleW = 0;
+	m_VisibleH = 0;
 }
 
 int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
@@ -170,7 +174,15 @@ int DX9Image::SetScale(D3DXVECTOR2 Scale)
 	return 0;
 }
 
-int DX9Image::SetRange(float u1, float u2, float v1, float v2)
+int DX9Image::SetVisibleRange(int Width, int Height)
+{
+	m_VisibleW = Width;
+	m_VisibleH = Height;
+	UpdateVertData();
+	return 0;
+}
+
+int DX9Image::SetUVRange(float u1, float u2, float v1, float v2)
 {
 	if (m_Vert.size())
 	{
@@ -244,6 +256,9 @@ int DX9Image::SetTexture(std::wstring FileName)
 
 	m_nWidth = tImgInfo.Width;
 	m_nHeight = tImgInfo.Height;
+
+	m_nScaledW = (int)(m_nWidth * m_Scale.x);
+	m_nScaledH = (int)(m_nHeight * m_Scale.y);
 	
 	UpdateVertData();
 
@@ -304,14 +319,22 @@ int DX9Image::UpdateVertData()
 	if (m_Vert.size() < 4)
 		return -1;
 
+	int tW = m_nWidth;
+	int tH = m_nHeight;
+
+	if (m_VisibleW)
+		tW = m_VisibleW;
+	if (m_VisibleH)
+		tH = m_VisibleH;
+
 	m_Vert[0].x = m_Pos.x;
 	m_Vert[0].y = m_Pos.y;
-	m_Vert[1].x = m_Pos.x + m_nWidth * m_Scale.x;
+	m_Vert[1].x = m_Pos.x + tW * m_Scale.x;
 	m_Vert[1].y = m_Pos.y;
 	m_Vert[2].x = m_Pos.x;
-	m_Vert[2].y = m_Pos.y + m_nHeight * m_Scale.y;
-	m_Vert[3].x = m_Pos.x + m_nWidth * m_Scale.x;
-	m_Vert[3].y = m_Pos.y + m_nHeight * m_Scale.y;
+	m_Vert[2].y = m_Pos.y + tH * m_Scale.y;
+	m_Vert[3].x = m_Pos.x + tW * m_Scale.x;
+	m_Vert[3].y = m_Pos.y + tH * m_Scale.y;
 
 	UpdateVB();
 	return 0;

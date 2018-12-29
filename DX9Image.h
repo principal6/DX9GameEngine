@@ -33,6 +33,8 @@ protected:
 	int m_nHeight;
 	int m_nScaledW;
 	int m_nScaledH;
+	int m_VisibleW;
+	int m_VisibleH;
 
 	// Collision
 	DX9BOUNDINGBOX m_BB;
@@ -63,7 +65,8 @@ public:
 	int DX9Image::SetPositionCentered(D3DXVECTOR2 Pos);
 	int DX9Image::SetSize(int Width, int Height);
 	int DX9Image::SetScale(D3DXVECTOR2 Scale);
-	int DX9Image::SetRange(float u1, float u2, float v1, float v2);
+	int DX9Image::SetVisibleRange(int Width, int Height);
+	int DX9Image::SetUVRange(float u1, float u2, float v1, float v2);
 	int DX9Image::SetAlpha(int Alpha);
 	int DX9Image::SetTexture(std::wstring FileName);
 	int DX9Image::SetBoundingnBox(D3DXVECTOR2 Size);

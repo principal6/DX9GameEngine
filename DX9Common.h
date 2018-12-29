@@ -93,6 +93,26 @@ enum class DX9EFF_TYPE
 	FlyUp,
 };
 
+struct DX9UV
+{
+	float u1;
+	float u2;
+	float v1;
+	float v2;
+
+	DX9UV() : u1(0), u2(0), v1(0), v2(0) {};
+	DX9UV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
+};
+
+struct DX9MAPDATA
+{
+	int TileID;
+	int MoveID;
+
+	DX9MAPDATA() : TileID(0), MoveID(0) {};
+	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
+};
+
 class DX9EFF_TYPE_DATA
 {
 private:
@@ -150,26 +170,6 @@ enum class DX9MAPDIR
 	Down,
 	Left,
 	Right,
-};
-
-struct DX9UV
-{
-	float u1;
-	float u2;
-	float v1;
-	float v2;
-
-	DX9UV() : u1(0), u2(0), v1(0), v2(0) {};
-	DX9UV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
-};
-
-struct DX9MAPDATA
-{
-	int TileID;
-	int MoveID;
-
-	DX9MAPDATA() : TileID(0), MoveID(0) {};
-	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
 };
 
 enum class DX9ANIMID

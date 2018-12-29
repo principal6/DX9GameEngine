@@ -81,6 +81,7 @@ int main()
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetPosition(D3DXVECTOR2(10.0f, (float)(WINDOW_H - gDXMonster->GetScaledSprHeight() - TILE_H)));
+	gDXMonster->SetMaxHP(200);
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);

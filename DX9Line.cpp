@@ -7,6 +7,8 @@ int DX9Line::Create(LPDIRECT3DDEVICE9 pD3DDev)
 	m_pIB = nullptr;
 	m_Vert.clear();
 	m_Ind.clear();
+	m_VertCount = 0;
+	m_IndCount = 0;
 
 	return 0;
 }
@@ -80,19 +82,6 @@ int DX9Line::AddEnd()
 	CreateIB();
 	UpdateVB();
 	UpdateIB();
-
-	m_VertBackup = m_Vert;
-	return 0;
-}
-
-int DX9Line::SetPositionOffset(D3DXVECTOR2 Offset)
-{
-	for (int i = 0; i < m_VertCount; i++)
-	{
-		m_Vert[i].x = m_VertBackup[i].x + Offset.x;
-		m_Vert[i].y = m_VertBackup[i].y + Offset.y;
-	}
-	UpdateVB();
 	return 0;
 }
 
@@ -119,19 +108,6 @@ int DX9Line::SetBoxPosition(D3DXVECTOR2 StartPos, D3DXVECTOR2 Size)
 	m_Vert[7].y = StartPos.y + Size.y;
 	
 	UpdateVB();
-	return 0;
-}
-
-int DX9Line::Draw()
-{
-	m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_pDevice->SetTexture(0, nullptr);
-
-	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_LINE));
-	m_pDevice->SetFVF(D3DFVF_LINE);
-	m_pDevice->SetIndices(m_pIB);
-	m_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, m_VertCount, 0, m_IndCount);
-
 	return 0;
 }
 
@@ -213,4 +189,17 @@ int DX9Line::UpdateIB()
 	}
 
 	return -1;
+}
+
+int DX9Line::Draw()
+{
+	m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	m_pDevice->SetTexture(0, nullptr);
+
+	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(DX9VERTEX_LINE));
+	m_pDevice->SetFVF(D3DFVF_LINE);
+	m_pDevice->SetIndices(m_pIB);
+	m_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, m_VertCount, 0, m_IndCount);
+
+	return 0;
 }

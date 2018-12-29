@@ -1,7 +1,8 @@
 #include "DX9Monster.h"
 
 DX9Monster::DX9Monster() {
-	m_fHPPercent = 1.0f;
+	m_HPMax = 0;
+	m_HPCurr = 0;
 	m_HPFrame = nullptr;
 	m_HPBar = nullptr;
 }
@@ -39,11 +40,10 @@ int DX9Monster::Destroy()
 	return 0;
 }
 
-int DX9Monster::Draw()
+int DX9Monster::SetMaxHP(int HPMax)
 {
-	DX9Anim::Draw();
-	m_HPFrame->Draw();
-	m_HPBar->Draw();
+	m_HPMax = HPMax;
+	m_HPCurr = HPMax;
 
 	return 0;
 }
@@ -57,6 +57,27 @@ int DX9Monster::SetPosition(D3DXVECTOR2 Pos)
 	tPos.x -= (float)(m_HPFrame->GetWidth() / 2);
 	m_HPFrame->SetPosition(tPos);
 	m_HPBar->SetPosition(tPos);
+
+	return 0;
+}
+
+int DX9Monster::CalculateHP()
+{
+	float fPercent = (float)m_HPCurr / (float)m_HPMax;
+	float tW = (float)m_HPBar->GetScaledWidth();
+
+	m_HPBar->SetVisibleRange((int)(tW * fPercent), m_HPBar->GetScaledHeight());
+
+	return 0;
+}
+
+int DX9Monster::Draw()
+{
+	CalculateHP();
+
+	DX9Anim::Draw();
+	m_HPFrame->Draw();
+	m_HPBar->Draw();
 
 	return 0;
 }

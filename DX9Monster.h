@@ -10,9 +10,13 @@ const float OFFSET_Y_HPBAR = 16.0f;
 class DX9Monster : public DX9Anim
 {
 private:
-	float m_fHPPercent;
+	int m_HPMax;
+	int m_HPCurr;
 	DX9Image *m_HPFrame;
 	DX9Image *m_HPBar;
+
+private:
+	int DX9Monster::CalculateHP();
 
 public:
 	DX9Monster();
@@ -20,9 +24,11 @@ public:
 
 	int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir);
 	int DX9Monster::Destroy();
+	
+	int DX9Monster::SetMaxHP(int HPMax);
+	int DX9Monster::SetPosition(D3DXVECTOR2 Pos);
 
 	int DX9Monster::Draw();
-	int DX9Monster::SetPosition(D3DXVECTOR2 Pos);
 };
 
 #endif
