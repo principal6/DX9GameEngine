@@ -147,16 +147,19 @@ private:
 	int m_MaxRepeatCount;
 	int m_CurrRepeatCount;
 	DX9BOUNDINGBOX m_BB;
+	int m_Damage;
 
 public:
 	DX9EFF_INST_DATA(): m_pNext(nullptr), m_Pos(D3DXVECTOR2(0, 0)) {};
-	DX9EFF_INST_DATA(int TypeDataID, D3DXVECTOR2 Position, int CurrFrame, DX9BOUNDINGBOX BB, int RepeatCount) :
-		m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Pos(Position), m_CurrFrame(CurrFrame), m_BB(BB), m_MaxRepeatCount(RepeatCount) {};
+	DX9EFF_INST_DATA(int TypeDataID, D3DXVECTOR2 Position, int CurrFrame, DX9BOUNDINGBOX BB, int Damage, int RepeatCount) :
+		m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Pos(Position), m_CurrFrame(CurrFrame), m_BB(BB),
+		m_Damage(Damage), m_MaxRepeatCount(RepeatCount) {};
 	
 	// Setter
 	void SetNext(DX9EFF_INST_DATA* Next) { m_pNext = Next; };
 	void SetCurrFrame(int FrameID) { m_CurrFrame = FrameID; };
 	void SetCurrRepeatCount(int Value) { m_CurrRepeatCount = Value; };
+	void SetDamage(int Damage) { m_Damage = Damage; };
 
 	// Getter
 	DX9BOUNDINGBOX GetBoundingBox() { return m_BB; };
@@ -166,6 +169,7 @@ public:
 	int GetCurrRepeatCount() { return m_CurrRepeatCount; };
 	int GetCurrFrame() { return m_CurrFrame; };
 	int GetTypeDataID() { return m_TypeDataID; };
+	int GetDamage() { return m_Damage; };
 };
 
 enum class DX9MAPDIR

@@ -18,8 +18,8 @@ DX9Image::DX9Image()
 	m_nHeight = 10;
 	m_nScaledW = 10;
 	m_nScaledH = 10;
-	m_VisibleW = 0;
-	m_VisibleH = 0;
+	m_VisibleW = -1;
+	m_VisibleH = -1;
 }
 
 int DX9Image::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
@@ -322,9 +322,9 @@ int DX9Image::UpdateVertData()
 	int tW = m_nWidth;
 	int tH = m_nHeight;
 
-	if (m_VisibleW)
+	if (m_VisibleW != -1)
 		tW = m_VisibleW;
-	if (m_VisibleH)
+	if (m_VisibleH != -1)
 		tH = m_VisibleH;
 
 	m_Vert[0].x = m_Pos.x;

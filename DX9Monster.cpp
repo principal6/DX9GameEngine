@@ -71,6 +71,15 @@ int DX9Monster::CalculateHP()
 	return 0;
 }
 
+int DX9Monster::Damage(int Damage)
+{
+	m_HPCurr -= Damage;
+	if (m_HPCurr < 0)
+		m_HPCurr = 0;
+
+	return 0;
+}
+
 int DX9Monster::Draw()
 {
 	CalculateHP();

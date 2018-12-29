@@ -163,6 +163,7 @@ int MainLoop()
 		gDXSprite->Draw();
 		gDXSprite->DrawBoundingBox();
 
+		gDXEffect->CheckCollisionWithMonsters(gDXMonster);
 		gDXEffect->Update();
 		gDXEffect->Draw();
 		gDXEffect->DrawBoundingBox();
@@ -258,7 +259,7 @@ int DetectInput()
 		if (gKeyPressCount == 0)
 		{
 			gKeyPressCount++;
-			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir());
+			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir(), 20);
 		}
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))

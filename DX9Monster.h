@@ -28,6 +28,8 @@ public:
 	int DX9Monster::SetMaxHP(int HPMax);
 	int DX9Monster::SetPosition(D3DXVECTOR2 Pos);
 
+	int DX9Monster::Damage(int Damage);
+
 	int DX9Monster::Draw();
 };
 

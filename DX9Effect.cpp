@@ -85,7 +85,7 @@ int DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3D
 	return 0;
 }
 
-int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir)
+int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
 	if (m_InstanceCount >= MAX_VB_COUNT)
 		return -1;
@@ -113,17 +113,18 @@ int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir)
 	tBB.PosOffset.y = (float)(-tBBSize.y) / 2.0f;
 	tBB.Size.x = m_UnitW + tBBSize.x;
 	tBB.Size.y = m_UnitH + tBBSize.y;
+	tBB.PosOffset += NewPos;
 
 	int tRepeatCount = m_TypeData[EffectID].GetRepeatCount();
 
 	if (m_pFisrtInstance == nullptr)
 	{
-		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, tRepeatCount);
+		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, Damage, tRepeatCount);
 		m_pLastInstance = m_pFisrtInstance;
 	}
 	else
 	{
-		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, tRepeatCount));
+		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, Damage, tRepeatCount));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
 	
@@ -197,7 +198,7 @@ int DX9Effect::Update()
 			m_IndCount = (int)m_Ind.size();
 			
 			DX9BOUNDINGBOX tBB = iterator->GetBoundingBox();
-			m_BBLine.AddBox(tPos + tBB.PosOffset, tBB.Size, 0xFFFFFFFF);
+			m_BBLine.AddBox(tBB.PosOffset, tBB.Size, 0xFFFFFFFF);
 
 			iterator = iterator->GetNext();
 			iterator_n++;
@@ -230,4 +231,76 @@ int DX9Effect::DrawBoundingBox()
 	}
 
 	return -1;
+}
+
+int DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
+{
+	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
+	DX9EFF_INST_DATA* next = nullptr;
+
+	if (iterator == pInstance)
+	{
+		next = pInstance->GetNext();
+		delete pInstance;
+		m_pFisrtInstance = next;
+		iterator = next;
+		if (next == nullptr)
+			m_pLastInstance = iterator;
+	}
+
+	while (iterator)
+	{
+		if (iterator->GetNext() == pInstance)
+		{
+			next = pInstance->GetNext();
+			iterator->SetNext(next);
+			delete pInstance;
+			if (next == nullptr)
+				m_pLastInstance = iterator;
+		}
+		iterator = iterator->GetNext();
+	}
+
+	return 0;
+}
+
+void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
+{
+	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
+	DX9EFF_INST_DATA* iterator_prev = nullptr;
+	int iterator_n = 0;
+
+	if (iterator == nullptr)
+		return;
+
+	while (iterator)
+	{
+		// Collision Check
+		DX9BOUNDINGBOX tBBEfffect = iterator->GetBoundingBox();
+		D3DXVECTOR2 tBBEFFPS = tBBEfffect.PosOffset;
+		D3DXVECTOR2 tBBEFFPE = tBBEfffect.PosOffset + tBBEfffect.Size;
+		DX9BOUNDINGBOX tBBMonster = pMonsters->GetBoundingBox();
+		D3DXVECTOR2 tBBMONPS = tBBMonster.PosOffset;
+		D3DXVECTOR2 tBBMONPE = tBBMonster.PosOffset + tBBMonster.Size;
+
+		bool bCollision = false;
+		if ((tBBEFFPS.x <= tBBMONPE.x) && (tBBEFFPE.x >= tBBMONPS.x))
+		{
+			if ((tBBEFFPS.y <= tBBMONPE.y) && (tBBEFFPE.y >= tBBMONPS.y))
+			{
+				bCollision = true;
+				pMonsters->Damage(iterator->GetDamage());
+				iterator->SetDamage(0);
+
+				//DX9EFF_INST_DATA* temp = iterator_prev;
+				//DeleteInstance(iterator);
+				//iterator = temp;
+			}
+		}
+
+		iterator_prev = iterator;
+		if (iterator)
+			iterator = iterator->GetNext();
+	}
+
 }
