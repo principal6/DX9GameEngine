@@ -114,14 +114,16 @@ int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir)
 	tBB.Size.x = m_UnitW + tBBSize.x;
 	tBB.Size.y = m_UnitH + tBBSize.y;
 
+	int tRepeatCount = m_TypeData[EffectID].GetRepeatCount();
+
 	if (m_pFisrtInstance == nullptr)
 	{
-		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB);
+		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, tRepeatCount);
 		m_pLastInstance = m_pFisrtInstance;
 	}
 	else
 	{
-		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB));
+		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, tRepeatCount));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
 	
@@ -159,15 +161,28 @@ int DX9Effect::Update()
 		float v1 = (float)(tCurrFrame / m_TACols) / (float)m_TARows;
 		float v2 = v1 + (float)1 / (float)m_TARows;
 
+		int tCurrRepeatCount = iterator->GetCurrRepeatCount();
+		int tMaxRepeatCount = m_TypeData[tTypeDataID].GetRepeatCount();
+
 		// All frames advancing (+1) per every Update()
 		tCurrFrame++;
 		if (tCurrFrame > tEndFrame)
 		{
-			m_pFisrtInstance = iterator->GetNext();
-			delete iterator;
-			iterator = m_pFisrtInstance;
+			if (tCurrRepeatCount < tMaxRepeatCount - 1)
+			{
+				tCurrRepeatCount++;
+				tCurrFrame = tStartFrame;
+				iterator->SetCurrRepeatCount(tCurrRepeatCount);
+			}
+			else
+			{
+				m_pFisrtInstance = iterator->GetNext();
+				delete iterator;
+				iterator = m_pFisrtInstance;
+			}
 		}
-		else
+
+		if (tCurrFrame <= tEndFrame)
 		{
 			iterator->SetCurrFrame(tCurrFrame);
 
