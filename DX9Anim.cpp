@@ -1,11 +1,5 @@
 #include "DX9Anim.h"
 
-// Static member declaration
-int DX9Anim::m_WindowW;
-int DX9Anim::m_WindowH;
-float DX9Anim::m_WindowHalfW;
-float DX9Anim::m_WindowHalfH;
-
 DX9Anim::DX9Anim()
 {
 	m_nRows = 0;
@@ -18,33 +12,22 @@ DX9Anim::DX9Anim()
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_WindowW = 0;
-	m_WindowH = 0;
-	m_WindowHalfW = 0.0f;
-	m_WindowHalfH = 0.0f;
-
 	m_UnitW = 0;
 	m_UnitH = 0;
 	m_GlobalPos = D3DXVECTOR2(0, 0);
 	m_GlobalPosInverse = D3DXVECTOR2(0, 0);
 }
 
-void DX9Anim::Create(int WindowWidth, int WindowHeight)
+void DX9Anim::Create()
 {
 	DX9Image::Create();
-
-	m_WindowW = WindowWidth;
-	m_WindowH = WindowHeight;
-
-	m_WindowHalfW = (float)(m_WindowW / 2);
-	m_WindowHalfH = (float)(m_WindowH / 2);
 }
 
 void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
 {
 	DX9Image::SetTexture(TextureFN);
-	SetNumRowsAndCols(numCols, numRows);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
+	SetNumRowsAndCols(numCols, numRows); // m_UnitW & m_UnitH are set here
 	m_ScaledW = (int)(m_UnitW * Scale);
 	m_ScaledH = (int)(m_UnitH * Scale);
 
@@ -77,7 +60,7 @@ void DX9Anim::SetFrame(int FrameID)
 	float v1 = ((float)FrameY / (float)m_nRows);
 	float v2 = ((float)(FrameY + 1) / (float)m_nRows);
 
-	// 이걸 해야 주변 텍스처를 침범하지 않음!★
+	//@warning: UV offset is done in order to make sure the image borders do not invade contiguous images
 	u1 += UV_OFFSET;
 	v1 += UV_OFFSET;
 
@@ -127,7 +110,7 @@ void DX9Anim::Animate()
 	SetFrame(m_nCurrFrameID);
 }
 
-void DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
+void DX9Anim::SetDirection(DX9ANIMDIR Direction)
 {
 	m_nAnimDir = Direction;
 }
@@ -159,17 +142,17 @@ bool DX9Anim::IsBeingAnimated() const
 	return m_bBeingAnimated;
 }
 
-int DX9Anim::GetScaledSprWidth() const
+int DX9Anim::GetScaledUnitWidth() const
 {
 	return m_ScaledW;
 }
 
-int DX9Anim::GetScaledSprHeight() const
+int DX9Anim::GetScaledUnitHeight() const
 {
 	return m_ScaledH;
 }
 
-DX9ANIMDIR DX9Anim::GetAnimDir() const
+DX9ANIMDIR DX9Anim::GetDirection() const
 {
 	return m_nAnimDir;
 }

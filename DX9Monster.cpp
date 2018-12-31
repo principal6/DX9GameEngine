@@ -7,9 +7,9 @@ DX9Monster::DX9Monster() {
 	m_HPBar = nullptr;
 }
 
-void DX9Monster::Create(int WindowWidth, int WindowHeight)
+void DX9Monster::Create()
 {
-	DX9Anim::Create(WindowWidth, WindowHeight);
+	DX9Anim::Create();
 	
 	m_HPFrame = new DX9Image;
 	m_HPFrame->Create();

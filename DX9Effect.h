@@ -35,11 +35,11 @@ public:
 
 	void DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
 		D3DXVECTOR2 BBSize, int RepeatCount = 1);
-	void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage);
+	void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, D3DXVECTOR2 MapOffset, DX9ANIMDIR Dir, int Damage);
 
-	void DX9Effect::Update();
+	void DX9Effect::Update(D3DXVECTOR2 MapOffset);
 	void DX9Effect::Draw() const override;
 	void DX9Effect::DrawBoundingBox() override;
 
-	void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters);
+	void DX9Effect::CheckCollisionWithMonsters(D3DXVECTOR2 MapOffset, DX9Monster* pMonsters);
 };

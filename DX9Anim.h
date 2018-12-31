@@ -10,7 +10,6 @@ private:
 	int m_nRows;
 	int m_nCols;
 
-	// Animation
 	DX9ANIMDIR m_nAnimDir;
 	DX9ANIMID m_nCurrAnimID;
 	int m_nCurrFrameID;
@@ -20,11 +19,6 @@ private:
 	bool m_bRepeating;
 
 protected:
-	static int m_WindowW;
-	static int m_WindowH;
-	static float m_WindowHalfW;
-	static float m_WindowHalfH;
-
 	int m_UnitW;
 	int m_UnitH;
 	D3DXVECTOR2 m_GlobalPos;
@@ -43,7 +37,7 @@ public:
 	DX9Anim();
 	virtual ~DX9Anim() {};
 
-	virtual void DX9Anim::Create(int WindowWidth, int WindowHeight);
+	virtual void DX9Anim::Create() override;
 	void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale = 1.0f);
 
 	void DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);	
@@ -51,12 +45,11 @@ public:
 
 	void DX9Anim::SetFrame(int FrameID);
 	void DX9Anim::SetAnimation(DX9ANIMID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
-	void DX9Anim::SetAnimDir(DX9ANIMDIR Direction);
-	//virtual void DX9Anim::SetGlobalPosition(D3DXVECTOR2 Position);
+	void DX9Anim::SetDirection(DX9ANIMDIR Direction);
 
 	bool DX9Anim::IsBeingAnimated() const;
-	int DX9Anim::GetScaledSprWidth() const;
-	int DX9Anim::GetScaledSprHeight() const;
-	DX9ANIMDIR DX9Anim::GetAnimDir() const;
+	int DX9Anim::GetScaledUnitWidth() const;
+	int DX9Anim::GetScaledUnitHeight() const;
+	DX9ANIMDIR DX9Anim::GetDirection() const;
 	D3DXVECTOR2 DX9Anim::GetCenterPosition() const;
 };

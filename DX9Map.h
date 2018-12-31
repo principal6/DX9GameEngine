@@ -72,9 +72,9 @@ public:
 
 	void DX9Map::SetMode(DX9MAPMODE Mode);
 	void DX9Map::SetPosition(D3DXVECTOR2 Offset);
-	void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset);
 	void DX9Map::SetMapFragmentTile(int TileID, int X, int Y);
 	void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y);
+	void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset); // For map movement
 
 	bool DX9Map::IsMapCreated() const;
 	int DX9Map::GetMapName(std::wstring *pStr) const;

@@ -8,6 +8,10 @@ class DX9Image
 protected:
 	static LPDIRECT3DDEVICE9 m_pDevice;
 	static std::wstring m_BaseDir;
+	static int m_WindowW;
+	static int m_WindowH;
+	static float m_WindowHalfW;
+	static float m_WindowHalfH;
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
@@ -44,7 +48,7 @@ public:
 	virtual ~DX9Image() {};
 
 	//@warning: SetStaticMembers() should be called at least once in an instance
-	void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir);
+	void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir, int WindowWidth, int WindowHeight);
 	virtual void DX9Image::Create();
 	virtual void DX9Image::Destroy();
 

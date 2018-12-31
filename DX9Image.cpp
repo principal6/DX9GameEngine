@@ -1,8 +1,12 @@
 #include "DX9Image.h"
 
-// Static member declaration
+// Static members declaration (they must not be initialized anywhere else)
 LPDIRECT3DDEVICE9 DX9Image::m_pDevice = nullptr;
 std::wstring DX9Image::m_BaseDir;
+int DX9Image::m_WindowW = 0;
+int DX9Image::m_WindowH = 0;
+float DX9Image::m_WindowHalfW = 0.0f;
+float DX9Image::m_WindowHalfH = 0.0f;
 
 DX9Image::DX9Image()
 {
@@ -10,8 +14,7 @@ DX9Image::DX9Image()
 	m_pIndexBuffer = nullptr;
 	m_pTexture = nullptr;
 
-	m_VertCount = 0;
-	m_IndCount = 0;
+	ClearVertexAndIndexData();
 
 	m_Width = 10;
 	m_Height = 10;
@@ -23,10 +26,16 @@ DX9Image::DX9Image()
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 }
 
-void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir)
+void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir, int WindowWidth, int WindowHeight)
 {
 	m_pDevice = pDevice;
 	m_BaseDir = BaseDir;
+
+	m_WindowW = WindowWidth;
+	m_WindowH = WindowHeight;
+
+	m_WindowHalfW = (float)(m_WindowW / 2);
+	m_WindowHalfH = (float)(m_WindowH / 2);
 }
 
 void DX9Image::Create()

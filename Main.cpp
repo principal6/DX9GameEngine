@@ -62,12 +62,12 @@ int main()
 	gDXInput->Create(gDXBase->GetInstance(), gDXBase->GetHWND());
 
 	gDXImage = new DX9Image;
-	gDXImage->SetStaticMembers(gDXBase->GetDevice(), wszBaseDir);
+	gDXImage->SetStaticMembers(gDXBase->GetDevice(), wszBaseDir, WINDOW_W, WINDOW_H);
 	gDXImage->Create();
 	gDXImage->SetTexture(L"bg_forest_evening.png");
 
 	gDXSprite = new DX9Sprite;
-	gDXSprite->Create(WINDOW_W, WINDOW_H);
+	gDXSprite->Create();
 	gDXSprite->MakeUnit(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
@@ -77,7 +77,7 @@ int main()
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
 	gDXMonster = new DX9Monster;
-	gDXMonster->Create(WINDOW_W, WINDOW_H);
+	gDXMonster->Create();
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 32.0f));
@@ -91,7 +91,6 @@ int main()
 	gDXMap = new DX9Map;
 	gDXMap->Create(WINDOW_H);
 	gDXMap->LoadMapFromFile(L"map01.jwm");
-	//gDXMap->SetGlobalPosition(D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXFont = new DX9Font;
 	gDXFont->Create(gDXBase->GetDevice(), WINDOW_W, WINDOW_H);
@@ -170,8 +169,8 @@ int MainLoop()
 
 		gDXSprite->Draw();
 		
-		gDXEffect->CheckCollisionWithMonsters(gDXMonster);
-		gDXEffect->Update();
+		gDXEffect->CheckCollisionWithMonsters(gDXMap->GetMapOffset(), gDXMonster);
+		gDXEffect->Update(gDXMap->GetMapOffset());
 		gDXEffect->Draw();
 		
 		if (gbDrawBB)
@@ -257,14 +256,14 @@ int DetectInput()
 	{
 		MoveSprite(D3DXVECTOR2(kStride, 0));
 		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
-		gDXSprite->SetAnimDir(DX9ANIMDIR::Right);
+		gDXSprite->SetDirection(DX9ANIMDIR::Right);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
 		MoveSprite(D3DXVECTOR2(-kStride, 0));
 		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
-		gDXSprite->SetAnimDir(DX9ANIMDIR::Left);
+		gDXSprite->SetDirection(DX9ANIMDIR::Left);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LCONTROL))
@@ -276,7 +275,7 @@ int DetectInput()
 		if (gKeyPressCount == 0)
 		{
 			gKeyPressCount++;
-			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetAnimDir(), 20);
+			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXMap->GetMapOffset(), gDXSprite->GetDirection(), 20);
 		}
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
