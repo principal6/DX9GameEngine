@@ -17,7 +17,7 @@
 #define D3DFVF_LINE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
 const int MAX_UNIT_COUNT = 100;
-const float UV_OFFSET = 0.005f;
+const float UV_OFFSET = 0.002f;
 const wchar_t ASSET_DIR[] = L"\\Data\\";
 
 struct DX9VERTEX_LINE

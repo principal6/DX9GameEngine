@@ -20,7 +20,7 @@ public:
 	DX9Monster();
 	~DX9Monster() {};
 
-	void DX9Monster::Create() override;
+	void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice) override;
 	void DX9Monster::Destroy() override;
 	
 	void DX9Monster::SetMaxHP(int HPMax);

@@ -28,7 +28,7 @@ public:
 	DX9Effect();
 	~DX9Effect() {};
 
-	void DX9Effect::Create() override;
+	void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice) override;
 	void DX9Effect::Destroy() override;
 
 	void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows);

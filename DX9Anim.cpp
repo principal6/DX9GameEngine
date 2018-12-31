@@ -18,9 +18,9 @@ DX9Anim::DX9Anim()
 	m_GlobalPosInverse = D3DXVECTOR2(0, 0);
 }
 
-void DX9Anim::Create()
+void DX9Anim::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Image::Create();
+	DX9Image::Create(pDevice);
 }
 
 void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)

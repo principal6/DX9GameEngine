@@ -59,7 +59,7 @@ public:
 	DX9Map();
 	virtual ~DX9Map() {};
 
-	void DX9Map::Create(int WindowHeight);
+	void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, int WindowHeight);
 	void DX9Map::Destroy() override;
 	
 	void DX9Map::CreateNewMap(std::wstring Name, int MapCols, int MapRows);

@@ -6,9 +6,9 @@ DX9Sprite::DX9Sprite()
 	m_Velocity = D3DXVECTOR2(0.0f, 0.0f);
 }
 
-void DX9Sprite::Create()
+void DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Anim::Create();
+	DX9Anim::Create(pDevice);
 	SetGlobalPosition(m_GlobalPos);
 }
 

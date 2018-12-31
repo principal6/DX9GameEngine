@@ -11,7 +11,7 @@ public:
 	DX9Sprite();
 	~DX9Sprite() {};
 
-	void DX9Sprite::Create() override;
+	void DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice) override;
 	void DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position);
 
 	D3DXVECTOR2 DX9Sprite::GetGlobalPosition() const;

@@ -6,7 +6,7 @@
 class DX9Image
 {
 protected:
-	static LPDIRECT3DDEVICE9 m_pDevice;
+	LPDIRECT3DDEVICE9 m_pDevice;
 	static std::wstring m_BaseDir;
 	static int m_WindowW;
 	static int m_WindowH;
@@ -41,15 +41,14 @@ protected:
 	void DX9Image::UpdateIndexBuffer();
 	void DX9Image::UpdateVertexData();
 	void DX9Image::UpdateVertexData(float u1, float v1, float u2, float v2);
-	void DX9Image::SetSize(int Width, int Height);
 
 public:
 	DX9Image();
 	virtual ~DX9Image() {};
 
 	//@warning: SetStaticMembers() should be called at least once in an instance
-	void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir, int WindowWidth, int WindowHeight);
-	virtual void DX9Image::Create();
+	void DX9Image::SetStaticMembers(std::wstring BaseDir, int WindowWidth, int WindowHeight);
+	virtual void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice);
 	virtual void DX9Image::Destroy();
 
 	virtual void DX9Image::Draw() const;
@@ -58,6 +57,7 @@ public:
 	void DX9Image::FlipVertical();
 
 	void DX9Image::SetTexture(std::wstring FileName);
+	void DX9Image::SetSize(int Width, int Height); //@warning: only used in Map Editor
 	void DX9Image::SetPosition(D3DXVECTOR2 Position);
 	void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
 	void DX9Image::SetScale(D3DXVECTOR2 Scale);

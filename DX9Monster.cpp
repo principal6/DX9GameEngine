@@ -7,16 +7,16 @@ DX9Monster::DX9Monster() {
 	m_HPBar = nullptr;
 }
 
-void DX9Monster::Create()
+void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Anim::Create();
+	DX9Anim::Create(pDevice);
 	
 	m_HPFrame = new DX9Image;
-	m_HPFrame->Create();
+	m_HPFrame->Create(pDevice);
 	m_HPFrame->SetTexture(L"hpbarbg.png");
 
 	m_HPBar = new DX9Image;
-	m_HPBar->Create();
+	m_HPBar->Create(pDevice);
 	m_HPBar->SetTexture(L"hpbar.png");
 }
 

@@ -37,7 +37,7 @@ public:
 	DX9Anim();
 	virtual ~DX9Anim() {};
 
-	virtual void DX9Anim::Create() override;
+	virtual void DX9Anim::Create(LPDIRECT3DDEVICE9 pDevice) override;
 	void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale = 1.0f);
 
 	void DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);	

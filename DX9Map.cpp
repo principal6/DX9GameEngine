@@ -21,8 +21,10 @@ DX9Map::DX9Map()
 	m_OffsetZeroY = 0;
 }
 
-void DX9Map::Create(int WindowHeight)
+void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, int WindowHeight)
 {
+	m_pDevice = pDevice;
+
 	ClearAllData();
 	m_Vert.clear();
 	m_Ind.clear();
@@ -460,9 +462,19 @@ D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp) con
 
 void DX9Map::SetMode(DX9MAPMODE Mode)
 {
-	if (m_bMoveTextureLoaded)
+	switch (Mode)
 	{
+	case DX9MAPMODE::TileMode:
 		m_CurrMapMode = Mode;
+		return;
+	case DX9MAPMODE::MoveMode:
+		if (m_bMoveTextureLoaded)
+		{
+			m_CurrMapMode = Mode;
+			return;
+		}
+	default:
+		break;
 	}
 
 	//@warning SetMoveTexture() should have been called first
@@ -530,6 +542,13 @@ void DX9Map::SetMapFragmentTile(int TileID, int X, int Y)
 		int VertID0 = MapID * 4;
 
 		DX9UV tUV = ConvertIDtoUV(TileID, m_TileSheetWidth, m_TileSheetHeight);
+
+		//@warning: UV offset is done in order to make sure the image borders do not invade contiguous images
+		tUV.u1 += UV_OFFSET;
+		tUV.v1 += UV_OFFSET;
+		tUV.u2 -= UV_OFFSET;
+		tUV.v2 -= UV_OFFSET;
+
 		DWORD tColor;
 		if (TileID == -1)
 		{

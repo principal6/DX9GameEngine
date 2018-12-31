@@ -62,12 +62,12 @@ int main()
 	gDXInput->Create(gDXBase->GetInstance(), gDXBase->GetHWND());
 
 	gDXImage = new DX9Image;
-	gDXImage->SetStaticMembers(gDXBase->GetDevice(), wszBaseDir, WINDOW_W, WINDOW_H);
-	gDXImage->Create();
+	gDXImage->SetStaticMembers(wszBaseDir, WINDOW_W, WINDOW_H);
+	gDXImage->Create(gDXBase->GetDevice());
 	gDXImage->SetTexture(L"bg_forest_evening.png");
 
 	gDXSprite = new DX9Sprite;
-	gDXSprite->Create();
+	gDXSprite->Create(gDXBase->GetDevice());
 	gDXSprite->MakeUnit(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
@@ -77,19 +77,19 @@ int main()
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
 	gDXMonster = new DX9Monster;
-	gDXMonster->Create();
+	gDXMonster->Create(gDXBase->GetDevice());
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 32.0f));
 	gDXMonster->SetMaxHP(200);
 
 	gDXEffect = new DX9Effect;
-	gDXEffect->Create();
+	gDXEffect->Create(gDXBase->GetDevice());
 	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
 	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXMap = new DX9Map;
-	gDXMap->Create(WINDOW_H);
+	gDXMap->Create(gDXBase->GetDevice(), WINDOW_H);
 	gDXMap->LoadMapFromFile(L"map01.jwm");
 
 	gDXFont = new DX9Font;

@@ -10,9 +10,9 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-void DX9Effect::Create()
+void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Image::Create();
+	DX9Image::Create(pDevice);
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();

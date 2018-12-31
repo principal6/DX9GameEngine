@@ -1,7 +1,6 @@
 #include "DX9Image.h"
 
 // Static members declaration (they must not be initialized anywhere else)
-LPDIRECT3DDEVICE9 DX9Image::m_pDevice = nullptr;
 std::wstring DX9Image::m_BaseDir;
 int DX9Image::m_WindowW = 0;
 int DX9Image::m_WindowH = 0;
@@ -16,8 +15,8 @@ DX9Image::DX9Image()
 
 	ClearVertexAndIndexData();
 
-	m_Width = 10;
-	m_Height = 10;
+	m_Width = 100;
+	m_Height = 100;
 	m_ScaledW = m_Width;
 	m_ScaledH = m_Height;
 	m_VisibleW = -1;
@@ -26,9 +25,8 @@ DX9Image::DX9Image()
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 }
 
-void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir, int WindowWidth, int WindowHeight)
+void DX9Image::SetStaticMembers(std::wstring BaseDir, int WindowWidth, int WindowHeight)
 {
-	m_pDevice = pDevice;
 	m_BaseDir = BaseDir;
 
 	m_WindowW = WindowWidth;
@@ -38,8 +36,10 @@ void DX9Image::SetStaticMembers(LPDIRECT3DDEVICE9 pDevice, std::wstring BaseDir,
 	m_WindowHalfH = (float)(m_WindowH / 2);
 }
 
-void DX9Image::Create()
+void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
 {
+	m_pDevice = pDevice;
+
 	ClearVertexAndIndexData();
 	CreateVertexBuffer();
 	CreateIndexBuffer();
@@ -86,11 +86,14 @@ void DX9Image::ClearVertexAndIndexData()
 
 void DX9Image::CreateVertexBuffer()
 {
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x + m_Width, m_Position.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-	m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x + m_Width, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
-	m_VertCount = (int)m_Vert.size();
+	if (m_Vert.size() == 0)
+	{
+		m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+		m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x + m_Width, m_Position.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+		m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+		m_Vert.push_back(DX9VERTEX_IMAGE(m_Position.x + m_Width, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+		m_VertCount = (int)m_Vert.size();
+	}
 
 	int rVertSize = sizeof(DX9VERTEX_IMAGE) * m_VertCount;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVertexBuffer, nullptr)))
@@ -101,9 +104,12 @@ void DX9Image::CreateVertexBuffer()
 
 void DX9Image::CreateIndexBuffer()
 {
-	m_Ind.push_back(DX9INDEX3(0, 1, 3));
-	m_Ind.push_back(DX9INDEX3(0, 3, 2));
-	m_IndCount = (int)m_Ind.size();
+	if (m_Ind.size() == 0)
+	{
+		m_Ind.push_back(DX9INDEX3(0, 1, 3));
+		m_Ind.push_back(DX9INDEX3(0, 3, 2));
+		m_IndCount = (int)m_Ind.size();
+	}
 
 	int rIndSize = sizeof(DX9INDEX3) * m_IndCount;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, nullptr)))
@@ -264,6 +270,11 @@ void DX9Image::SetUVRange(float u1, float u2, float v1, float v2)
 {
 	if (m_Vert.size())
 	{
+		//@warning: UV offset is done in order to make sure the image borders do not invade contiguous images
+		u1 += UV_OFFSET;
+		v1 += UV_OFFSET;
+		u2 -= UV_OFFSET;
+		v2 -= UV_OFFSET;
 		UpdateVertexData(u1, v1, u2, v2);
 	}
 }
@@ -275,7 +286,7 @@ void DX9Image::SetAlpha(int Alpha)
 		Alpha = min(255, Alpha);
 		Alpha = max(0, Alpha);
 
-		for (DX9VERTEX_IMAGE iterator : m_Vert)
+		for (DX9VERTEX_IMAGE& iterator : m_Vert)
 		{
 			iterator.color = D3DCOLOR_ARGB(Alpha, 255, 255, 255);
 		}
