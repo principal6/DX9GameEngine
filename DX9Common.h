@@ -124,7 +124,7 @@ enum class DX9MAPDIR
 
 enum class DX9ANIMID
 {
-	Idle = 0,
+	Idle,
 	Walk,
 	Attack1,
 	Attack2,

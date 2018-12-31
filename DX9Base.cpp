@@ -25,21 +25,18 @@ DX9Base::DX9Base()
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
+void DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
 {
 	COLOR_RGB rBGColor = COLOR_RGB(255, 0, 255);
 
-	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor)
-		== nullptr)
-		return -1;
+	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor) == nullptr)
+		return;
 
 	if (InitD3D() == -1)
-		return -1;
-
-	return 0;
+		return;
 }
 
-int DX9Base::CreateOnWindow(HWND hWnd)
+void DX9Base::CreateOnWindow(HWND hWnd)
 {
 	COLOR_RGB rBGColor = COLOR_RGB(255, 0, 255);
 
@@ -47,9 +44,7 @@ int DX9Base::CreateOnWindow(HWND hWnd)
 	m_hInstance = GetModuleHandle(nullptr);
 
 	if (InitD3D() == -1)
-		return -1;
-
-	return 0;
+		return;
 }
 
 void DX9Base::Destroy()
@@ -70,10 +65,8 @@ void DX9Base::Destroy()
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
 	DX9WINDOW_STYLE WindowStyle, COLOR_RGB BackColor)
 {
-	// 멤버 변수에 인스턴스 핸들 대입
 	m_hInstance = GetModuleHandle(nullptr);
 
-	// 윈도우 클래스 등록
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
 	r_WndClass.cbWndExtra = 0;
@@ -87,17 +80,12 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	r_WndClass.style = CS_HREDRAW | CS_VREDRAW;
 	RegisterClass(&r_WndClass);
 
-	// 윈도우 정확한 픽셀 크기로 맞추기
 	RECT rWndRect = { X, Y, X + Width, Y + Height };
 	AdjustWindowRect(&rWndRect, (DWORD)WindowStyle, false);
 
-	// 윈도우 생성
-	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle,
-		rWndRect.left, rWndRect.top,
-		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top,
-		nullptr, (HMENU)nullptr, m_hInstance, nullptr);
+	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle, rWndRect.left, rWndRect.top,
+		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, nullptr, (HMENU)nullptr, m_hInstance, nullptr);
 
-	// 윈도우 표시
 	ShowWindow(m_hWnd, SW_SHOW);
 
 	UnregisterClass(Name, m_hInstance);
@@ -110,7 +98,7 @@ void DX9Base::SetBackgroundColor(D3DCOLOR color)
 	m_BGColor = color;
 }
 
-int DX9Base::Run(int(*pMainLoop)())
+void DX9Base::Run(int(*pMainLoop)())
 {
 	while (m_MSG.message != WM_QUIT)
 	{
@@ -124,8 +112,6 @@ int DX9Base::Run(int(*pMainLoop)())
 			pMainLoop();
 		}
 	}
-
-	return 0;
 }
 
 int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel)

@@ -2,7 +2,7 @@
 
 const int MAX_FONT_NUM = 10;
 
-class DX9Font
+class DX9Font final
 {
 private:
 	LPDIRECT3DDEVICE9 m_pDevice;

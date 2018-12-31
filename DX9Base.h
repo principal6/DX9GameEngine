@@ -4,13 +4,11 @@
 
 class DX9Base final
 {
-// 윈도우 변수
 private:
 	HINSTANCE m_hInstance;
 	HWND m_hWnd;
 	MSG m_MSG;
 
-// DX9 변수
 private:
 	LPDIRECT3D9 m_pD3D;
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
@@ -26,9 +24,9 @@ public:
 	DX9Base();
 	~DX9Base() {};
 
-	int DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height);
-	int DX9Base::CreateOnWindow(HWND hWnd);
-	int DX9Base::Run(int(*pMainLoop)());
+	void DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height);
+	void DX9Base::CreateOnWindow(HWND hWnd);
+	void DX9Base::Run(int(*pMainLoop)());
 	int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel);
 	void DX9Base::Destroy();
 	void DX9Base::Halt();

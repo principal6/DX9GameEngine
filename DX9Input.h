@@ -10,7 +10,7 @@ const int NUM_KEYS = 256;
 #include "DX9Common.h"
 #include <dinput.h>
 
-class DX9Input
+class DX9Input final
 {
 private:
 	HINSTANCE m_hInstance;
