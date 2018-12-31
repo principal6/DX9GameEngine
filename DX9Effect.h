@@ -33,7 +33,7 @@ public:
 
 	void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows);
 
-	void DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
+	void DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
 		D3DXVECTOR2 BBSize, int RepeatCount = 1);
 	void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, D3DXVECTOR2 MapOffset, DX9ANIMDIR Dir, int Damage);
 

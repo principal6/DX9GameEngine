@@ -67,10 +67,10 @@ void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
 	m_UnitH = m_Height / m_TextureAtlasRows;
 }
 
-void DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
+void DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
 	D3DXVECTOR2 BBSize, int RepeatCount)
 {
-	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, StartFrame, EndFrame, SpawnOffset, BBSize, RepeatCount));
+	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, AnimData, SpawnOffset, BBSize, RepeatCount));
 	m_TypeCount = (int)m_TypeData.size();
 }
 
@@ -286,6 +286,7 @@ void DX9Effect::CheckCollisionWithMonsters(D3DXVECTOR2 MapOffset, DX9Monster* pM
 				pMonsters->Damage(iterator->GetDamage());
 				iterator->SetDamage(0);
 
+				// @warning: The codes below make disappear the effect immediately
 				//DX9EFF_INST_DATA* temp = iterator_prev;
 				//DeleteInstance(iterator);
 				//iterator = temp;

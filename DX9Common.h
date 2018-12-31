@@ -187,22 +187,20 @@ class DX9EFF_TYPE_DATA
 {
 private:
 	DX9EFF_TYPE m_Type;
-	int m_StartFrame;
-	int m_EndFrame;
+	DX9ANIMDATA m_AnimData;
 	D3DXVECTOR2 m_SpawnOffset;
 	int m_RepeatCount;
 	D3DXVECTOR2 m_BBSize;
 
 public:
-	DX9EFF_TYPE_DATA() : m_StartFrame(0), m_EndFrame(0), m_RepeatCount(1) {};
-	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int RepeatCount) :
-		m_Type(Type), m_StartFrame(StartFrame), m_EndFrame(EndFrame), m_SpawnOffset(SpawnOffset),
-		m_BBSize(BBSize), m_RepeatCount(RepeatCount) {};
+	DX9EFF_TYPE_DATA() : m_AnimData(DX9ANIMDATA(0, 0)), m_RepeatCount(1) {};
+	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int RepeatCount) :
+		m_Type(Type), m_AnimData(AnimData), m_SpawnOffset(SpawnOffset), m_BBSize(BBSize), m_RepeatCount(RepeatCount) {};
 
 	D3DXVECTOR2 GetSpawnOffset() { return m_SpawnOffset; };
 	D3DXVECTOR2 GetBoundingBoxSize() { return m_BBSize; };
-	int GetStartFrame() { return m_StartFrame; };
-	int GetEndFrame() { return m_EndFrame; };
+	int GetStartFrame() { return m_AnimData.FrameS; };
+	int GetEndFrame() { return m_AnimData.FrameE; };
 	int GetRepeatCount() { return m_RepeatCount; };
 };
 
@@ -235,14 +233,14 @@ public:
 	void SetBoundingBox(DX9BOUNDINGBOX NewBB) { m_BB = NewBB; };
 
 	// Getter
-	DX9BOUNDINGBOX GetBoundingBox() { return m_BB; };
-	DX9EFF_INST_DATA* GetNext() { return m_pNext; };
-	DX9EFF_TYPE GetType() { return m_Type; };
-	D3DXVECTOR2 GetPos() { return m_Position; };
-	D3DXVECTOR2 GetOffset() { return m_Offset; };
-	int GetCurrRepeatCount() { return m_CurrRepeatCount; };
-	int GetCurrFrame() { return m_CurrFrame; };
-	int GetTypeDataID() { return m_TypeDataID; };
-	int GetDamage() { return m_Damage; };
+	DX9BOUNDINGBOX GetBoundingBox() const { return m_BB; };
+	DX9EFF_INST_DATA* GetNext() const { return m_pNext; };
+	DX9EFF_TYPE GetType() const { return m_Type; };
+	D3DXVECTOR2 GetPos() const { return m_Position; };
+	D3DXVECTOR2 GetOffset() const { return m_Offset; };
+	int GetCurrRepeatCount() const { return m_CurrRepeatCount; };
+	int GetCurrFrame() const { return m_CurrFrame; };
+	int GetTypeDataID() const { return m_TypeDataID; };
+	int GetDamage() const { return m_Damage; };
 };
 /*---------------------------------------------------------------------------*/

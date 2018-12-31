@@ -14,9 +14,9 @@
 
 // Function headers
 int MainLoop();
-int DetectInput();
-int Gravitate();
-int MoveSprite(D3DXVECTOR2 Velocity);
+void DetectInput();
+void Gravitate();
+void MoveSprite(D3DXVECTOR2 Velocity);
 
 // Constants
 const int WINDOW_X = 50;
@@ -86,7 +86,7 @@ int main()
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create();
 	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
-	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 63, D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
+	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXMap = new DX9Map;
 	gDXMap->Create(WINDOW_H);
@@ -192,7 +192,7 @@ int MainLoop()
 	return 0;
 }
 
-int Gravitate()
+void Gravitate()
 {
 	gDXSprite->Accelerate(kGravity);
 	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
@@ -222,33 +222,27 @@ int Gravitate()
 	}
 	
 	gDXSprite->SetVelocity(tNewVel);
-
-	return 0;
 }
 
-int Jump()
+void Jump()
 {
 	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
 	if ((gbHitGround == false) || (tCurrSprVel.y > 0)) // Currently the sprite is falling down
-		return -1;
+		return;
 
 	gbHitGround = false;
 	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), kJumpPow);
 	
 	gDXSprite->SetVelocity(tNewVel);
-
-	return 0;
 }
 
-int MoveSprite(D3DXVECTOR2 Velocity)
+void MoveSprite(D3DXVECTOR2 Velocity)
 {
 	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), Velocity);
 	gDXSprite->MoveConst(tNewVel);
-
-	return 0;
 }
 
-int DetectInput()
+void DetectInput()
 {
 	gbWalking = false;
 
@@ -302,6 +296,4 @@ int DetectInput()
 	{
 		gDXSprite->SetAnimation(DX9ANIMID::Idle);
 	}
-
-	return 0;
 }
