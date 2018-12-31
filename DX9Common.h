@@ -1,24 +1,24 @@
 #pragma once
 
-#ifndef _DX9COMMON_H_
-#define _DX9COMMON_H_
-
 #include <iostream>
 #include <Windows.h>
 #include <d3dx9.h>
 #include <cassert>
-//#include <vector>
+#include <vector>
 
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "d3d9.lib")
 
 #define CINT const int
+#define WSTRING std::wstring
+#define VECTOR std::vector
 
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define D3DFVF_LINE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE)
 
 const int MAX_UNIT_COUNT = 100;
 const float UV_OFFSET = 0.005f;
+const wchar_t ASSET_DIR[] = L"\\Data\\";
 
 struct DX9VERTEX_LINE
 {
@@ -106,75 +106,6 @@ struct DX9MAPDATA
 	DX9MAPDATA(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
 };
 
-//***** DX9Effect *****
-enum class DX9EFF_TYPE
-{
-	Still,
-	FlyRight,
-	FlyDown,
-	FlyUp,
-};
-
-class DX9EFF_TYPE_DATA
-{
-private:
-	DX9EFF_TYPE m_Type;
-	int m_StartFrame;
-	int m_EndFrame;
-	D3DXVECTOR2 m_SpawnOffset;
-	int m_RepeatCount;
-	D3DXVECTOR2 m_BBSize;
-
-public:
-	DX9EFF_TYPE_DATA() : m_StartFrame(0), m_EndFrame(0), m_RepeatCount(1) {};
-	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int RepeatCount) :
-		m_Type(Type), m_StartFrame(StartFrame), m_EndFrame(EndFrame), m_SpawnOffset(SpawnOffset),
-		m_BBSize(BBSize), m_RepeatCount(RepeatCount) {};
-
-	D3DXVECTOR2 GetSpawnOffset() { return m_SpawnOffset; };
-	D3DXVECTOR2 GetBoundingBoxSize() { return m_BBSize; };
-	int GetStartFrame() { return m_StartFrame; };
-	int GetEndFrame() { return m_EndFrame; };
-	int GetRepeatCount() { return m_RepeatCount; };
-};
-
-class DX9EFF_INST_DATA
-{
-private:
-	DX9EFF_INST_DATA* m_pNext;
-	DX9EFF_TYPE m_Type;
-	int m_TypeDataID;
-	D3DXVECTOR2 m_Pos;
-	int m_CurrFrame;
-	int m_MaxRepeatCount;
-	int m_CurrRepeatCount;
-	DX9BOUNDINGBOX m_BB;
-	int m_Damage;
-
-public:
-	DX9EFF_INST_DATA(): m_pNext(nullptr), m_Pos(D3DXVECTOR2(0, 0)) {};
-	DX9EFF_INST_DATA(int TypeDataID, D3DXVECTOR2 Position, int CurrFrame, DX9BOUNDINGBOX BB, int Damage, int RepeatCount) :
-		m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Pos(Position), m_CurrFrame(CurrFrame), m_BB(BB),
-		m_Damage(Damage), m_MaxRepeatCount(RepeatCount) {};
-	
-	// Setter
-	void SetNext(DX9EFF_INST_DATA* Next) { m_pNext = Next; };
-	void SetCurrFrame(int FrameID) { m_CurrFrame = FrameID; };
-	void SetCurrRepeatCount(int Value) { m_CurrRepeatCount = Value; };
-	void SetDamage(int Damage) { m_Damage = Damage; };
-
-	// Getter
-	DX9BOUNDINGBOX GetBoundingBox() { return m_BB; };
-	DX9EFF_INST_DATA* GetNext() { return m_pNext; };
-	DX9EFF_TYPE GetType() { return m_Type; };
-	D3DXVECTOR2 GetPos() { return m_Pos; };
-	int GetCurrRepeatCount() { return m_CurrRepeatCount; };
-	int GetCurrFrame() { return m_CurrFrame; };
-	int GetTypeDataID() { return m_TypeDataID; };
-	int GetDamage() { return m_Damage; };
-};
-//**********
-
 enum class DX9FONT_ID
 {
 	Title,
@@ -241,4 +172,73 @@ enum class DX9ANIMDIR
 	Right,
 };
 
-#endif
+/*-----------------------------------------------------------------------------
+DX9Effect class related enum, class
+-----------------------------------------------------------------------------*/
+enum class DX9EFF_TYPE
+{
+	Still,
+	FlyRight,
+	FlyDown,
+	FlyUp,
+};
+
+class DX9EFF_TYPE_DATA
+{
+private:
+	DX9EFF_TYPE m_Type;
+	int m_StartFrame;
+	int m_EndFrame;
+	D3DXVECTOR2 m_SpawnOffset;
+	int m_RepeatCount;
+	D3DXVECTOR2 m_BBSize;
+
+public:
+	DX9EFF_TYPE_DATA() : m_StartFrame(0), m_EndFrame(0), m_RepeatCount(1) {};
+	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int RepeatCount) :
+		m_Type(Type), m_StartFrame(StartFrame), m_EndFrame(EndFrame), m_SpawnOffset(SpawnOffset),
+		m_BBSize(BBSize), m_RepeatCount(RepeatCount) {};
+
+	D3DXVECTOR2 GetSpawnOffset() { return m_SpawnOffset; };
+	D3DXVECTOR2 GetBoundingBoxSize() { return m_BBSize; };
+	int GetStartFrame() { return m_StartFrame; };
+	int GetEndFrame() { return m_EndFrame; };
+	int GetRepeatCount() { return m_RepeatCount; };
+};
+
+class DX9EFF_INST_DATA
+{
+private:
+	DX9EFF_INST_DATA* m_pNext;
+	DX9EFF_TYPE m_Type;
+	int m_TypeDataID;
+	D3DXVECTOR2 m_Position;
+	int m_CurrFrame;
+	int m_MaxRepeatCount;
+	int m_CurrRepeatCount;
+	DX9BOUNDINGBOX m_BB;
+	int m_Damage;
+
+public:
+	DX9EFF_INST_DATA() : m_pNext(nullptr), m_Position(D3DXVECTOR2(0, 0)) {};
+	DX9EFF_INST_DATA(int TypeDataID, D3DXVECTOR2 Position, int CurrFrame, DX9BOUNDINGBOX BB, int Damage, int RepeatCount) :
+		m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Position(Position), m_CurrFrame(CurrFrame), m_BB(BB),
+		m_Damage(Damage), m_MaxRepeatCount(RepeatCount) {};
+
+	// Setter
+	void SetNext(DX9EFF_INST_DATA* Next) { m_pNext = Next; };
+	void SetCurrFrame(int FrameID) { m_CurrFrame = FrameID; };
+	void SetCurrRepeatCount(int Value) { m_CurrRepeatCount = Value; };
+	void SetDamage(int Damage) { m_Damage = Damage; };
+
+	// Getter
+	DX9BOUNDINGBOX GetBoundingBox() { return m_BB; };
+	DX9EFF_INST_DATA* GetNext() { return m_pNext; };
+	DX9EFF_TYPE GetType() { return m_Type; };
+	D3DXVECTOR2 GetPos() { return m_Position; };
+	int GetCurrRepeatCount() { return m_CurrRepeatCount; };
+	int GetCurrFrame() { return m_CurrFrame; };
+	int GetTypeDataID() { return m_TypeDataID; };
+	int GetDamage() { return m_Damage; };
+};
+/*---------------------------------------------------------------------------*/

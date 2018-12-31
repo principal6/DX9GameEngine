@@ -1,17 +1,15 @@
 #include "DX9Anim.h"
 
+// Static member declaration
+int DX9Anim::m_WindowW;
+int DX9Anim::m_WindowH;
+float DX9Anim::m_WindowHalfW;
+float DX9Anim::m_WindowHalfH;
+
 DX9Anim::DX9Anim()
 {
 	m_nRows = 0;
 	m_nCols = 0;
-
-	m_UnitW = 0;
-	m_UnitH = 0;
-
-	m_WindowW = 0;
-	m_WindowH = 0;
-	m_WindowHalfW = 0.0f;
-	m_WindowHalfH = 0.0f;
 
 	m_nAnimDir = DX9ANIMDIR::Right;
 	m_nCurrAnimID = DX9ANIMID::Idle;
@@ -19,22 +17,30 @@ DX9Anim::DX9Anim()
 	m_nAnimCount = 0;
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
+
+	m_WindowW = 0;
+	m_WindowH = 0;
+	m_WindowHalfW = 0.0f;
+	m_WindowHalfH = 0.0f;
+
+	m_UnitW = 0;
+	m_UnitH = 0;
+	m_GlobalPos = D3DXVECTOR2(0, 0);
+	m_GlobalPosInverse = D3DXVECTOR2(0, 0);
 }
 
-int DX9Anim::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight)
+void DX9Anim::Create(int WindowWidth, int WindowHeight)
 {
-	DX9Image::Create(pD3DDev, BaseDir);
+	DX9Image::Create();
 
 	m_WindowW = WindowWidth;
 	m_WindowH = WindowHeight;
 
 	m_WindowHalfW = (float)(m_WindowW / 2);
 	m_WindowHalfH = (float)(m_WindowH / 2);
-
-	return 0;
 }
 
-int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
+void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
 {
 	DX9Image::SetTexture(TextureFN);
 	SetNumRowsAndCols(numCols, numRows);
@@ -44,11 +50,9 @@ int DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Sc
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
-
-	return 0;
 }
 
-int DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
+void DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 {
 	m_nCols = numCols;
 	m_nRows = numRows;
@@ -58,16 +62,12 @@ int DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 	
 	SetSize(m_UnitW, m_UnitH);
 	SetFrame(0);
-
-	return 0;
 }
 
-int DX9Anim::SetFrame(int FrameID)
+void DX9Anim::SetFrame(int FrameID)
 {
-	if (m_nRows == 0)
-		return -1;
-	if (m_nCols == 0)
-		return -1;
+	if ((m_nRows == 0) || (m_nCols == 0))
+		return;
 	
 	int FrameX = (FrameID % m_nCols);
 	int FrameY = (FrameID / m_nCols);
@@ -84,27 +84,23 @@ int DX9Anim::SetFrame(int FrameID)
 	switch (m_nAnimDir)
 	{
 	case DX9ANIMDIR::Left:
-		UpdateVertData(u2, v1, u1, v2);
+		UpdateVertexData(u2, v1, u1, v2);
 		break;
 	case DX9ANIMDIR::Right:
-		UpdateVertData(u1, v1, u2, v2);
+		UpdateVertexData(u1, v1, u2, v2);
 		break;
 	default:
 		break;
 	}
-	
-	return 0;
 }
 
-int DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
+void DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
 {
 	m_Anims[(int)AnimID].FrameS = StartFrame;
 	m_Anims[(int)AnimID].FrameE = EndFrame;
-
-	return 0;
 }
 
-int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
+void DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
 {
 	if ((m_nCurrAnimID != AnimID) || (bForcedSet))
 	{
@@ -115,11 +111,9 @@ int DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet,
 
 		SetFrame(m_nCurrFrameID);
 	}
-
-	return 0;
 }
 
-int DX9Anim::Animate()
+void DX9Anim::Animate()
 {	
 	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE) {
 		m_nCurrFrameID++;
@@ -131,45 +125,56 @@ int DX9Anim::Animate()
 	}
 	
 	SetFrame(m_nCurrFrameID);
-
-	return 0;
 }
 
-int DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
+void DX9Anim::SetAnimDir(DX9ANIMDIR Direction)
 {
 	m_nAnimDir = Direction;
-
-	return 0;
 }
 
-int DX9Anim::SetPosition(D3DXVECTOR2 Pos)
+void DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
-	//m_Pos = Pos;
-
-	return 0;
 }
 
-int DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
+void DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
-	//m_Pos = Pos;
-
-	return 0;
 }
 
-int DX9Anim::CalculateGlobalPositionInverse()
+void DX9Anim::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
 	m_GlobalPosInverse.y = m_WindowH - m_ScaledH - m_GlobalPos.y;
-
-	return 0;
 }
 
-int DX9Anim::CalculateGlobalPosition()
+void DX9Anim::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
 	m_GlobalPos.y = m_WindowH - m_ScaledH - m_GlobalPosInverse.y;
+}
 
-	return 0;
+bool DX9Anim::IsBeingAnimated() const
+{
+	return m_bBeingAnimated;
+}
+
+int DX9Anim::GetScaledSprWidth() const
+{
+	return m_ScaledW;
+}
+
+int DX9Anim::GetScaledSprHeight() const
+{
+	return m_ScaledH;
+}
+
+DX9ANIMDIR DX9Anim::GetAnimDir() const
+{
+	return m_nAnimDir;
+}
+
+D3DXVECTOR2 DX9Anim::GetCenterPosition() const
+{
+	return DX9Image::GetCenterPosition();
 }

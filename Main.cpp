@@ -12,13 +12,13 @@
 #define new new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #endif
 
-// 함수 헤더
+// Function headers
 int MainLoop();
 int DetectInput();
 int Gravitate();
 int MoveSprite(D3DXVECTOR2 Velocity);
 
-// 상수
+// Constants
 const int WINDOW_X = 50;
 const int WINDOW_Y = 50;
 const int WINDOW_W = 800;
@@ -28,7 +28,7 @@ const D3DXVECTOR2 kJumpPow = D3DXVECTOR2(0.0f, -14.0f);
 const float kStride = 5.0f;
 const int KEY_PRESS_INTERVAL = 20;
 
-// 변수
+// Variables
 bool gbHitGround = false;
 bool gbWalking = false;
 bool gbDrawBB = false;
@@ -38,7 +38,7 @@ ULONGLONG gTimerAnim = 0;
 int gFPS = 0;
 int gKeyPressCount = 0;
 
-// 클래스
+// Classes
 DX9Base* gDXBase;
 DX9Input* gDXInput;
 DX9Image* gDXImage;
@@ -62,11 +62,12 @@ int main()
 	gDXInput->Create(gDXBase->GetInstance(), gDXBase->GetHWND());
 
 	gDXImage = new DX9Image;
-	gDXImage->Create(gDXBase->GetDevice(), wszBaseDir);
+	gDXImage->SetStaticMembers(gDXBase->GetDevice(), wszBaseDir);
+	gDXImage->Create();
 	gDXImage->SetTexture(L"bg_forest_evening.png");
 
 	gDXSprite = new DX9Sprite;
-	gDXSprite->Create(gDXBase->GetDevice(), wszBaseDir, WINDOW_W, WINDOW_H);
+	gDXSprite->Create(WINDOW_W, WINDOW_H);
 	gDXSprite->MakeUnit(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
@@ -76,21 +77,21 @@ int main()
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
 	gDXMonster = new DX9Monster;
-	gDXMonster->Create(gDXBase->GetDevice(), wszBaseDir, WINDOW_W, WINDOW_H);
+	gDXMonster->Create(WINDOW_W, WINDOW_H);
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
 	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 32.0f));
 	gDXMonster->SetMaxHP(200);
 
 	gDXEffect = new DX9Effect;
-	gDXEffect->Create(gDXBase->GetDevice(), wszBaseDir);
+	gDXEffect->Create();
 	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
 	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, 0, 63, D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXMap = new DX9Map;
-	gDXMap->Create(gDXBase->GetDevice(), wszBaseDir, WINDOW_H);
+	gDXMap->Create(WINDOW_H);
 	gDXMap->LoadMapFromFile(L"map01.jwm");
-	gDXMap->SetGlobalPosition(D3DXVECTOR2(0.0f, 0.0f));
+	//gDXMap->SetGlobalPosition(D3DXVECTOR2(0.0f, 0.0f));
 
 	gDXFont = new DX9Font;
 	gDXFont->Create(gDXBase->GetDevice(), WINDOW_W, WINDOW_H);
@@ -98,10 +99,10 @@ int main()
 
 	gTimerStart = GetTickCount64();
 
-	// 메인 루프 실행
+	// Enter in the main loop
 	gDXBase->Run(MainLoop);
 	
-	// 종료 전 객체 파괴
+	// Destroy all objects before the program ends
 	gDXFont->Destroy();
 	gDXMap->Destroy();
 	gDXEffect->Destroy();
@@ -127,7 +128,7 @@ int MainLoop()
 {
 	DetectInput();
 
-	// FPS용 타이머
+	// Timer for calculating FPS
 	if (GetTickCount64() >= gTimerSec + 1000)
 	{
 		gTimerSec = GetTickCount64();
@@ -136,7 +137,7 @@ int MainLoop()
 		gFPS = 0;
 	}
 
-	// 애니메이션용 타이머
+	// Timer for steady animations
 	if (GetTickCount64() >= gTimerAnim + 80)
 	{
 		gTimerAnim = GetTickCount64();
@@ -152,7 +153,7 @@ int MainLoop()
 			gKeyPressCount = 0;
 	}
 	
-	
+	// Apply gravity to the sprite
 	Gravitate();
 	gDXSprite->MoveWithVelocity();
 
@@ -164,7 +165,7 @@ int MainLoop()
 		gDXMap->SetGlobalPosition(-tOffset);
 		gDXMap->Draw();
 
-		gDXMonster->UpdateGlobalPosition(gDXMap->GetMapOffset(), gDXMap->GetMapOffsetZeroY());
+		gDXMonster->UpdateGlobalPosition(gDXMap->GetMapOffset(), (float)gDXMap->GetMapOffsetZeroY());
 		gDXMonster->Draw();
 
 		gDXSprite->Draw();
@@ -207,16 +208,16 @@ int Gravitate()
 		else
 		{
 			gbHitGround = true;
-			gDXSprite->SetFrame(19); // 착지
+			gDXSprite->SetFrame(19); // Land on
 		}	
 	}
 	else
 	{
 		if (tCurrSprVel.y < 0)
-			gDXSprite->SetFrame(17); // 점프 중
+			gDXSprite->SetFrame(17); // Jumping
 
 		if (tCurrSprVel.y > 0)
-			gDXSprite->SetFrame(18); // 낙하 중
+			gDXSprite->SetFrame(18); // Falling down
 
 		gbHitGround = false;
 	}
@@ -229,7 +230,7 @@ int Gravitate()
 int Jump()
 {
 	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
-	if ((gbHitGround == false) || (tCurrSprVel.y > 0)) // 현재 낙하 중
+	if ((gbHitGround == false) || (tCurrSprVel.y > 0)) // Currently the sprite is falling down
 		return -1;
 
 	gbHitGround = false;

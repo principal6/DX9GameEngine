@@ -2,52 +2,44 @@
 
 DX9Effect::DX9Effect()
 {
-	m_TACols = 0;
-	m_TARows = 0;
+	m_TextureAtlasCols = 0;
+	m_TextureAtlasRows = 0;
 	m_TypeCount = 0;
 	m_InstanceCount = 0;
 	m_pFisrtInstance = nullptr;
 	m_pLastInstance = nullptr;
 }	
 
-int DX9Effect::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir)
+void DX9Effect::Create()
 {
-	m_pDevice = pD3DDev;
-	m_Vert.clear();
-	m_Ind.clear();
-	m_BaseDir = BaseDir;
+	DX9Image::Create();
+	DX9Image::ClearVertexAndIndexData();
 
-	CreateVB();
-	CreateIB();
+	CreateVertexBuffer();
+	CreateIndexBuffer();
 
-	m_BBLine.CreateMax(pD3DDev);
-
-	return 0;
+	m_BBLine.CreateMax(m_pDevice);
 }
 
-int DX9Effect::CreateVB()
+void DX9Effect::CreateVertexBuffer()
 {
 	int rVertSize = sizeof(DX9VERTEX_IMAGE) * MAX_UNIT_COUNT * 4;
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
+	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVertexBuffer, nullptr)))
 	{
-		return -1;
+		return;
 	}
-
-	return 0;
 }
 
-int DX9Effect::CreateIB()
+void DX9Effect::CreateIndexBuffer()
 {
 	int rIndSize = sizeof(DX9INDEX3) * MAX_UNIT_COUNT * 2;
-	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
+	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, nullptr)))
 	{
-		return -1;
+		return;
 	}
-
-	return 0;
 }
 
-int DX9Effect::Destroy()
+void DX9Effect::Destroy()
 {
 	if (m_pFisrtInstance)
 	{
@@ -64,31 +56,28 @@ int DX9Effect::Destroy()
 	}
 
 	DX9Image::Destroy();
-	return 0;
 }
 
-int DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
+void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
 {
 	DX9Image::SetTexture(FileName);
-	m_TACols = numCols;
-	m_TARows = numRows;
-	m_UnitW = m_Width / m_TACols;
-	m_UnitH = m_Height / m_TARows;
-	return 0;
+	m_TextureAtlasCols = numCols;
+	m_TextureAtlasRows = numRows;
+	m_UnitW = m_Width / m_TextureAtlasCols;
+	m_UnitH = m_Height / m_TextureAtlasRows;
 }
 
-int DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
+void DX9Effect::AddEffectType(DX9EFF_TYPE Type, int StartFrame, int EndFrame, D3DXVECTOR2 SpawnOffset,
 	D3DXVECTOR2 BBSize, int RepeatCount)
 {
 	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, StartFrame, EndFrame, SpawnOffset, BBSize, RepeatCount));
 	m_TypeCount = (int)m_TypeData.size();
-	return 0;
 }
 
-int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
+void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
-		return -1;
+		return;
 
 	m_InstanceCount++;
 
@@ -127,16 +116,11 @@ int DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, 0, tBB, Damage, tRepeatCount));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
-	
-	return 0;
 }
 
-int DX9Effect::Update()
+void DX9Effect::Update()
 {
-	m_Vert.clear();
-	m_Ind.clear();
-	m_VertCount = 0;
-	m_IndCount = 0;
+	DX9Image::ClearVertexAndIndexData();
 	m_BBLine.Clear();
 
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
@@ -145,7 +129,7 @@ int DX9Effect::Update()
 	if (iterator == nullptr)
 	{
 		m_InstanceCount = iterator_n;
-		return -1;
+		return;
 	}
 
 	while (iterator)
@@ -160,10 +144,10 @@ int DX9Effect::Update()
 
 		int tCurrFrame = iterator->GetCurrFrame();
 
-		float u1 = (float)(tCurrFrame % m_TACols) / (float)m_TACols;
-		float u2 = u1 + (float)1 / (float)m_TACols;
-		float v1 = (float)(tCurrFrame / m_TACols) / (float)m_TARows;
-		float v2 = v1 + (float)1 / (float)m_TARows;
+		float u1 = (float)(tCurrFrame % m_TextureAtlasCols) / (float)m_TextureAtlasCols;
+		float u2 = u1 + (float)1 / (float)m_TextureAtlasCols;
+		float v1 = (float)(tCurrFrame / m_TextureAtlasCols) / (float)m_TextureAtlasRows;
+		float v2 = v1 + (float)1 / (float)m_TextureAtlasRows;
 
 		int tCurrRepeatCount = iterator->GetCurrRepeatCount();
 		int tMaxRepeatCount = m_TypeData[tTypeDataID].GetRepeatCount();
@@ -180,7 +164,7 @@ int DX9Effect::Update()
 			}
 			else
 			{
-				// Life circle ends here
+				// DX9Effect's life circle ends here
 				m_pFisrtInstance = iterator->GetNext();
 				delete iterator;
 				iterator = m_pFisrtInstance;
@@ -212,35 +196,29 @@ int DX9Effect::Update()
 	m_BBLine.UpdateVB();
 	m_BBLine.UpdateIB();
 
-	DX9Image::UpdateVB();
-	DX9Image::UpdateIB();
+	DX9Image::UpdateVertexBuffer();
+	DX9Image::UpdateIndexBuffer();
 
 	m_InstanceCount = iterator_n;
-
-	return 0;
 }
 
-int DX9Effect::Draw()
+void DX9Effect::Draw() const
 {
 	if (m_pFisrtInstance)
 	{
-		return DX9Image::Draw();
+		DX9Image::Draw();
 	}
-
-	return -1;
 }
 
-int DX9Effect::DrawBoundingBox()
+void DX9Effect::DrawBoundingBox()
 {
 	if (m_pFisrtInstance)
 	{
-		return m_BBLine.Draw();
+		m_BBLine.Draw();
 	}
-
-	return -1;
 }
 
-int DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
+void DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 {
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
 	DX9EFF_INST_DATA* next = nullptr;
@@ -267,8 +245,6 @@ int DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 		}
 		iterator = iterator->GetNext();
 	}
-
-	return 0;
 }
 
 void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
@@ -282,7 +258,7 @@ void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
 
 	while (iterator)
 	{
-		// Collision Check
+		// Check collision per each DX9Effect
 		DX9BOUNDINGBOX tBBEfffect = iterator->GetBoundingBox();
 		D3DXVECTOR2 tBBEFFPS = tBBEfffect.PosOffset;
 		D3DXVECTOR2 tBBEFFPE = tBBEfffect.PosOffset + tBBEfffect.Size;

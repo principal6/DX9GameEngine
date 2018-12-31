@@ -1,10 +1,8 @@
 #pragma once
 
-#ifndef _DX9INPUT_H_
-#define _DX9INPUT_H_
-
 #define DIRECTINPUT_VERSION 0x0800
-#define NUM_KEYS 256
+
+const int NUM_KEYS = 256;
 
 #pragma comment (lib, "dinput8.lib")
 #pragma comment (lib, "dxguid.lib")
@@ -27,10 +25,11 @@ private:
 	bool m_KeyUp[NUM_KEYS];
 	DIMOUSESTATE2 m_MouseState;
 
-	int		m_MouseX, m_MouseY;
-	bool	m_MouseBtnDown[3];
-	bool	m_MouseBtnUp[3];
-	bool	m_MouseBtnIdle[3];
+	int m_MouseX;
+	int m_MouseY;
+	bool m_MouseBtnDown[3];
+	bool m_MouseBtnUp[3];
+	bool m_MouseBtnIdle[3];
 
 private:
 	bool DX9Input::CreateMouseDevice(DWORD dwFlags);
@@ -50,8 +49,6 @@ public:
 	bool DX9Input::OnMouseButtonDown(int button);
 	bool DX9Input::OnMouseButtonUp(int button);
 
-	bool DX9Input::GetKeyState(DWORD DIK_KeyCode);
 	bool DX9Input::GetMouseButtonDown(int button);
+	bool DX9Input::GetKeyState(DWORD DIK_KeyCode) const;
 };
-
-#endif

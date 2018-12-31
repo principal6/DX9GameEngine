@@ -52,7 +52,7 @@ int DX9Base::CreateOnWindow(HWND hWnd)
 	return 0;
 }
 
-int DX9Base::Destroy()
+void DX9Base::Destroy()
 {
 	if (m_pD3DDevice != nullptr)
 	{
@@ -65,8 +65,6 @@ int DX9Base::Destroy()
 		m_pD3D->Release();
 		m_pD3D = nullptr;
 	}
-
-	return 0;
 }
 
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
@@ -107,11 +105,9 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	return m_hWnd;
 }
 
-int DX9Base::SetBGColor(D3DCOLOR color)
+void DX9Base::SetBackgroundColor(D3DCOLOR color)
 {
 	m_BGColor = color;
-
-	return 0;
 }
 
 int DX9Base::Run(int(*pMainLoop)())
@@ -145,11 +141,9 @@ int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel)
 	return (int)m_MSG.wParam;
 }
 
-int DX9Base::Halt()
+void DX9Base::Halt()
 {
 	DestroyWindow(m_hWnd);
-
-	return 0;
 }
 
 int DX9Base::InitD3D()
@@ -172,10 +166,10 @@ int DX9Base::InitD3D()
 	return 0;
 }
 
-int DX9Base::Resize(HWND hWnd)
+void DX9Base::Resize(HWND hWnd)
 {
 	if (!m_pD3DDevice)
-		return -1;
+		return;
 
 	D3DPRESENT_PARAMETERS D3DPP;
 	ZeroMemory(&D3DPP, sizeof(D3DPP));
@@ -185,24 +179,31 @@ int DX9Base::Resize(HWND hWnd)
 	D3DPP.hDeviceWindow = hWnd;
 
 	m_pD3DDevice->Reset(&D3DPP);
-
-	return 0;
 }
 
-int DX9Base::BeginRender()
+void DX9Base::BeginRender() const
 {
 	m_pD3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, m_BGColor, 1.0f, 0);
-
-	if (SUCCEEDED(m_pD3DDevice->BeginScene()))
-		return 0;
-
-	return -1;
+	m_pD3DDevice->BeginScene();
 }
 
-int DX9Base::EndRender()
+void DX9Base::EndRender() const
 {
 	m_pD3DDevice->EndScene();
 	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
+}
 
-	return 0;
+LPDIRECT3DDEVICE9 DX9Base::GetDevice() const
+{
+	return m_pD3DDevice;
+}
+
+HINSTANCE DX9Base::GetInstance() const
+{ 
+	return m_hInstance;
+}
+
+HWND DX9Base::GetHWND() const
+{ 
+	return m_hWnd;
 }

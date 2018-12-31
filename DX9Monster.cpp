@@ -7,22 +7,20 @@ DX9Monster::DX9Monster() {
 	m_HPBar = nullptr;
 }
 
-int DX9Monster::Create(LPDIRECT3DDEVICE9 pD3DDev, std::wstring BaseDir, int WindowWidth, int WindowHeight)
+void DX9Monster::Create(int WindowWidth, int WindowHeight)
 {
-	DX9Anim::Create(pD3DDev, BaseDir, WindowWidth, WindowHeight);
+	DX9Anim::Create(WindowWidth, WindowHeight);
 	
 	m_HPFrame = new DX9Image;
-	m_HPFrame->Create(pD3DDev, BaseDir);
+	m_HPFrame->Create();
 	m_HPFrame->SetTexture(L"hpbarbg.png");
 
 	m_HPBar = new DX9Image;
-	m_HPBar->Create(pD3DDev, BaseDir);
+	m_HPBar->Create();
 	m_HPBar->SetTexture(L"hpbar.png");
-
-	return 0;
 }
 
-int DX9Monster::Destroy()
+void DX9Monster::Destroy()
 {
 	if (m_HPFrame)
 	{
@@ -37,18 +35,15 @@ int DX9Monster::Destroy()
 	}
 
 	DX9Anim::Destroy();
-	return 0;
 }
 
-int DX9Monster::SetMaxHP(int HPMax)
+void DX9Monster::SetMaxHP(int HPMax)
 {
 	m_HPMax = HPMax;
 	m_HPCurr = HPMax;
-
-	return 0;
 }
 
-int DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
+void DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 {
 	D3DXVECTOR2 tPos = GetCenterPosition();
 	tPos.y = Position.y;
@@ -56,22 +51,18 @@ int DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 	tPos.x -= (float)(m_HPFrame->GetWidth() / 2);
 	m_HPFrame->SetPosition(tPos);
 	m_HPBar->SetPosition(tPos);
-
-	return 0;
 }
 
-int DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
+void DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
 {
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
 
 	SetPosition(m_GlobalPosInverse);
 	SetUIPosition(m_GlobalPosInverse);
-
-	return 0;
 }
 
-int DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY)
+void DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY)
 {
 	D3DXVECTOR2 tGP = m_GlobalPos;
 	m_GlobalPos.x += MapOffset.x;
@@ -82,35 +73,33 @@ int DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY
 
 	SetPosition(m_GlobalPosInverse);
 	SetUIPosition(m_GlobalPosInverse);
-	return 0;
 }
 
-int DX9Monster::CalculateHP()
+void DX9Monster::CalculateHP()
 {
-	float fPercent = (float)m_HPCurr / (float)m_HPMax;
+	float fPercent = (float)DX9Monster::m_HPCurr / (float)m_HPMax;
 	float tW = (float)m_HPBar->GetScaledWidth();
 
 	m_HPBar->SetVisibleRange((int)(tW * fPercent), m_HPBar->GetScaledHeight());
-
-	return 0;
 }
 
-int DX9Monster::Damage(int Damage)
+void DX9Monster::Damage(int Damage)
 {
 	m_HPCurr -= Damage;
 	if (m_HPCurr < 0)
 		m_HPCurr = 0;
-
-	return 0;
 }
 
-int DX9Monster::Draw()
+void DX9Monster::Draw()
 {
 	CalculateHP();
 
 	DX9Anim::Draw();
 	m_HPFrame->Draw();
 	m_HPBar->Draw();
+}
 
-	return 0;
+D3DXVECTOR2 DX9Monster::GetGlobalPosition() const
+{
+	return m_GlobalPos;
 }

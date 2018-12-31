@@ -20,12 +20,12 @@ public:
 	DX9Font();
 	~DX9Font() {};
 
-	int DX9Font::Create(LPDIRECT3DDEVICE9 pDevice, int ScreenW, int ScreenH);
-	int DX9Font::Destroy();
+	void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice, int ScreenW, int ScreenH);
+	void DX9Font::Destroy();
 
-	int DX9Font::MakeFont(DX9FONT_ID ID, std::wstring FontName, int FontSize, bool IsBold);
-	int DX9Font::SelectFont(DX9FONT_ID ID);
-	int DX9Font::SetFontColor(DWORD Color);
+	void DX9Font::MakeFont(DX9FONT_ID ID, std::wstring FontName, int FontSize, bool IsBold);
+	void DX9Font::SelectFont(DX9FONT_ID ID);
+	void DX9Font::SetFontColor(DWORD Color);
 
-	int DX9Font::Draw(int X, int Y, std::wstring String);
+	void DX9Font::Draw(int X, int Y, std::wstring String);
 };

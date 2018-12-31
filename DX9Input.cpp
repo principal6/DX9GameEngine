@@ -209,7 +209,7 @@ bool DX9Input::OnMouseButtonUp(int button)
 	return false;
 }
 
-bool DX9Input::GetKeyState(DWORD DIK_KeyCode)
+bool DX9Input::GetKeyState(DWORD DIK_KeyCode) const
 {
 	if (m_BufferKeyState[DIK_KeyCode] & 0x80)
 	{
