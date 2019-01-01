@@ -9,6 +9,7 @@ class DX9Monster final : public DX9Life
 private:
 	int m_HPMax;
 	int m_HPCurr;
+	bool m_bUILoaded;
 	DX9Image *m_HPFrame;
 	DX9Image *m_HPBar;
 

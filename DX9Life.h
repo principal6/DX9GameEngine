@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DX9Anim.h"
+#include "DX9AnimUnit.h"
 
-class DX9Life : public DX9Anim
+class DX9Life : public DX9AnimUnit
 {
 protected:
 	D3DXVECTOR2 m_GlobalPos;

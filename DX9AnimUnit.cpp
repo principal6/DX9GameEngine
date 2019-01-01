@@ -1,6 +1,6 @@
-#include "DX9Anim.h"
+#include "DX9AnimUnit.h"
 
-DX9Anim::DX9Anim()
+DX9AnimUnit::DX9AnimUnit()
 {
 	m_nRows = 0;
 	m_nCols = 0;
@@ -16,17 +16,17 @@ DX9Anim::DX9Anim()
 	m_UnitH = 0;
 }
 
-void DX9Anim::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice)
 {
 	DX9Image::Create(pDevice);
 }
 
-void DX9Anim::Destroy()
+void DX9AnimUnit::Destroy()
 {
 	DX9Image::Destroy();
 }
 
-void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
+void DX9AnimUnit::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
 {
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
@@ -38,7 +38,7 @@ void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float S
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
 }
 
-void DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
+void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows)
 {
 	m_nCols = numCols;
 	m_nRows = numRows;
@@ -50,22 +50,22 @@ void DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 	SetFrame(0);
 }
 
-void DX9Anim::SetTexture(std::wstring FileName)
+void DX9AnimUnit::SetTexture(std::wstring FileName)
 {
 	DX9Image::SetTexture(FileName);
 }
 
-void DX9Anim::SetScale(D3DXVECTOR2 Scale)
+void DX9AnimUnit::SetScale(D3DXVECTOR2 Scale)
 {
 	DX9Image::SetScale(Scale);
 }
 
-void DX9Anim::SetAlpha(int Alpha)
+void DX9AnimUnit::SetAlpha(int Alpha)
 {
-	DX9Anim::SetAlpha(Alpha);
+	DX9Image::SetAlpha(Alpha);
 }
 
-void DX9Anim::SetFrame(int FrameID)
+void DX9AnimUnit::SetFrame(int FrameID)
 {
 	if ((m_nRows == 0) || (m_nCols == 0))
 		return;
@@ -95,13 +95,13 @@ void DX9Anim::SetFrame(int FrameID)
 	}
 }
 
-void DX9Anim::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
+void DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
 {
 	m_Anims[(int)AnimID].FrameS = StartFrame;
 	m_Anims[(int)AnimID].FrameE = EndFrame;
 }
 
-void DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
+void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
 {
 	if ((m_nCurrAnimID != AnimID) || (bForcedSet))
 	{
@@ -114,7 +114,7 @@ void DX9Anim::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet
 	}
 }
 
-void DX9Anim::Animate()
+void DX9AnimUnit::Animate()
 {	
 	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE) {
 		m_nCurrFrameID++;
@@ -128,62 +128,62 @@ void DX9Anim::Animate()
 	SetFrame(m_nCurrFrameID);
 }
 
-void DX9Anim::SetDirection(DX9ANIMDIR Direction)
+void DX9AnimUnit::SetDirection(DX9ANIMDIR Direction)
 {
 	m_nAnimDir = Direction;
 }
 
-void DX9Anim::SetBoundingnBox(D3DXVECTOR2 Size)
+void DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size)
 {
 	DX9Image::SetBoundingnBox(Size);
 }
 
-void DX9Anim::SetPosition(D3DXVECTOR2 Pos)
+void DX9AnimUnit::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
 }
 
-void DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
+void DX9AnimUnit::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
 }
 
-bool DX9Anim::IsBeingAnimated() const
+bool DX9AnimUnit::IsBeingAnimated() const
 {
 	return m_bBeingAnimated;
 }
 
-int DX9Anim::GetScaledUnitWidth() const
+int DX9AnimUnit::GetScaledUnitWidth() const
 {
 	return m_ScaledW;
 }
 
-int DX9Anim::GetScaledUnitHeight() const
+int DX9AnimUnit::GetScaledUnitHeight() const
 {
 	return m_ScaledH;
 }
 
-DX9ANIMDIR DX9Anim::GetDirection() const
+DX9ANIMDIR DX9AnimUnit::GetDirection() const
 {
 	return m_nAnimDir;
 }
 
-D3DXVECTOR2 DX9Anim::GetCenterPosition() const
+D3DXVECTOR2 DX9AnimUnit::GetCenterPosition() const
 {
 	return DX9Image::GetCenterPosition();
 }
 
-DX9BOUNDINGBOX DX9Anim::GetBoundingBox() const
+DX9BOUNDINGBOX DX9AnimUnit::GetBoundingBox() const
 {
 	return DX9Image::GetBoundingBox();
 }
 
-void DX9Anim::Draw() const
+void DX9AnimUnit::Draw() const
 {
 	DX9Image::Draw();
 }
 
-void DX9Anim::DrawBoundingBox()
+void DX9AnimUnit::DrawBoundingBox()
 {
 	DX9Image::DrawBoundingBox();
 }

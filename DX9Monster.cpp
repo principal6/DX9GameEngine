@@ -3,13 +3,14 @@
 DX9Monster::DX9Monster() {
 	m_HPMax = 0;
 	m_HPCurr = 0;
+	m_bUILoaded = false;
 	m_HPFrame = nullptr;
 	m_HPBar = nullptr;
 }
 
 void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Anim::Create(pDevice);
+	DX9Life::Create(pDevice);
 	
 	m_HPFrame = new DX9Image;
 	m_HPFrame->Create(pDevice);
@@ -18,6 +19,8 @@ void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice)
 	m_HPBar = new DX9Image;
 	m_HPBar->Create(pDevice);
 	m_HPBar->SetTexture(L"hpbar.png");
+
+	m_bUILoaded = true;
 }
 
 void DX9Monster::Destroy()
@@ -34,7 +37,7 @@ void DX9Monster::Destroy()
 		delete m_HPBar;
 	}
 
-	DX9Anim::Destroy();
+	DX9Life::Destroy();
 }
 
 void DX9Monster::SetMaxHP(int HPMax)
@@ -59,7 +62,9 @@ void DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
 	CalculateGlobalPositionInverse();
 
 	SetPosition(m_GlobalPosInverse);
-	SetUIPosition(m_GlobalPosInverse);
+
+	if (m_bUILoaded)
+		SetUIPosition(m_GlobalPosInverse);
 }
 
 void DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY)
@@ -72,7 +77,9 @@ void DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZero
 	m_GlobalPos = tGP;
 
 	SetPosition(m_GlobalPosInverse);
-	SetUIPosition(m_GlobalPosInverse);
+
+	if (m_bUILoaded)
+		SetUIPosition(m_GlobalPosInverse);
 }
 
 void DX9Monster::CalculateHP()
@@ -94,7 +101,7 @@ void DX9Monster::Draw()
 {
 	CalculateHP();
 
-	DX9Anim::Draw();
+	DX9Life::Draw();
 	m_HPFrame->Draw();
 	m_HPBar->Draw();
 }

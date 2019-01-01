@@ -9,7 +9,7 @@ DX9Life::DX9Life()
 
 void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Anim::Create(pDevice);
+	DX9AnimUnit::Create(pDevice);
 	SetGlobalPosition(m_GlobalPos);
 }
 
