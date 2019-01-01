@@ -2,7 +2,7 @@
 #include "DX9Input.h"
 #include "DX9Image.h"
 #include "DX9Sprite.h"
-#include "DX9Monster.h"
+#include "DX9Monsters.h"
 #include "DX9Effect.h"
 #include "DX9Map.h"
 #include "DX9Font.h"
@@ -21,7 +21,6 @@ const int WINDOW_X = 50;
 const int WINDOW_Y = 50;
 const int WINDOW_W = 800;
 const int WINDOW_H = 600;
-const float kStride = 5.0f;
 const int KEY_PRESS_INTERVAL = 20;
 
 // Variables
@@ -39,7 +38,7 @@ DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Map* gDXMap;
 DX9Sprite* gDXSprite;
-DX9Monster* gDXMonster;
+DX9Monsters* gDXMonsters;
 DX9Effect* gDXEffect;
 DX9Font* gDXFont;
 
@@ -78,12 +77,15 @@ int main()
 	gDXSprite->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
-	gDXMonster = new DX9Monster();
-	gDXMonster->Create(gDXBase->GetDevice(), gDXMap);
-	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
-	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
-	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 60.0f));
-	gDXMonster->SetMaxHP(200);
+	gDXMonsters = new DX9Monsters();
+	gDXMonsters->Create(gDXBase->GetDevice(), gDXMap);
+	gDXMonsters->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
+		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Idle, 0, 3))
+		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Walk, 4, 7));
+	gDXMonsters->Spawn(L"Mage", D3DXVECTOR2(560.0f, 60.0f))
+		->SetAnimation(DX9ANIMID::Idle);
+	gDXMonsters->Spawn(L"Mage", D3DXVECTOR2(400.0f, 300.0f))
+		->SetAnimation(DX9ANIMID::Walk);
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), gDXMap);
@@ -102,7 +104,7 @@ int main()
 	// Destroy all objects before the program ends
 	gDXFont->Destroy();
 	gDXEffect->Destroy();
-	gDXMonster->Destroy();
+	gDXMonsters->Destroy();
 	gDXSprite->Destroy();
 	gDXMap->Destroy();
 	gDXImage->Destroy();
@@ -111,7 +113,7 @@ int main()
 
 	delete gDXFont;
 	delete gDXEffect;
-	delete gDXMonster;
+	delete gDXMonsters;
 	delete gDXSprite;
 	delete gDXMap;
 	delete gDXImage;
@@ -138,7 +140,7 @@ int MainLoop()
 	if (GetTickCount64() >= gTimerAnim + 80)
 	{
 		gTimerAnim = GetTickCount64();
-		gDXMonster->Animate();
+		gDXMonsters->Animate();
 		gDXSprite->Animate();
 	}
 
@@ -151,7 +153,7 @@ int MainLoop()
 	}
 	
 	// Apply gravity
-	gDXMonster->Gravitate();
+	gDXMonsters->Gravitate();
 	gDXSprite->Gravitate();
 
 	gDXBase->BeginRender();
@@ -162,15 +164,15 @@ int MainLoop()
 		gDXMap->SetGlobalPosition(-tOffset);
 		gDXMap->Draw();
 
-		gDXMonster->Draw();
+		gDXMonsters->Draw();
 		gDXSprite->Draw();
 		
-		gDXEffect->CheckCollisionWithMonsters(gDXMonster);
+		gDXEffect->CheckCollisionWithMonsters(gDXMonsters);
 		gDXEffect->Draw();
 		
 		if (gbDrawBB)
 		{
-			gDXMonster->DrawBoundingBox();
+			gDXMonsters->DrawBoundingBox();
 			gDXSprite->DrawBoundingBox();
 			gDXEffect->DrawBoundingBox();
 		}

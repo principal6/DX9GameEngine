@@ -260,7 +260,7 @@ void DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 	}
 }
 
-void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
+void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters)
 {
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
@@ -272,32 +272,39 @@ void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
 
 	while (iterator)
 	{
-		// Check collision per each DX9Effect
-		D3DXVECTOR2 SpawnOffset = iterator->GetOffset();
-		DX9BOUNDINGBOX tBBEfffect = iterator->GetBoundingBox();
-		tBBEfffect.PosOffset.x += -SpawnOffset.x + MapOffset.x;
-		tBBEfffect.PosOffset.y -= SpawnOffset.y - MapOffset.y;
-		D3DXVECTOR2 tBBEFFPS = tBBEfffect.PosOffset;
-		D3DXVECTOR2 tBBEFFPE = tBBEfffect.PosOffset + tBBEfffect.Size;
-		DX9BOUNDINGBOX tBBMonster = pMonsters->GetBoundingBox();
-		D3DXVECTOR2 tBBMONPS = tBBMonster.PosOffset;
-		D3DXVECTOR2 tBBMONPE = tBBMonster.PosOffset + tBBMonster.Size;
+		std::vector<DX9MonsterInstance>* pInstances = pMonsters->GetInstancePointer();
 
-		bool bCollision = false;
-		if ((tBBEFFPS.x <= tBBMONPE.x) && (tBBEFFPE.x >= tBBMONPS.x))
+		for (int i = 0; i < pInstances->size(); i++)
 		{
-			if ((tBBEFFPS.y <= tBBMONPE.y) && (tBBEFFPE.y >= tBBMONPS.y))
-			{
-				bCollision = true;
-				pMonsters->Damage(iterator->GetDamage());
-				iterator->SetDamage(0);
+			// Check collision per each DX9Effect
+			D3DXVECTOR2 SpawnOffset = iterator->GetOffset();
+			DX9BOUNDINGBOX tBBEfffect = iterator->GetBoundingBox();
+			tBBEfffect.PosOffset.x += -SpawnOffset.x + MapOffset.x;
+			tBBEfffect.PosOffset.y -= SpawnOffset.y - MapOffset.y;
+			D3DXVECTOR2 tBBEFFPS = tBBEfffect.PosOffset;
+			D3DXVECTOR2 tBBEFFPE = tBBEfffect.PosOffset + tBBEfffect.Size;
+			
+			DX9BOUNDINGBOX tBBMonster = (*pInstances)[i].GetBoundingBox();
+			D3DXVECTOR2 tBBMONPS = tBBMonster.PosOffset;
+			D3DXVECTOR2 tBBMONPE = tBBMonster.PosOffset + tBBMonster.Size;
 
-				// @warning: The codes below make disappear the effect immediately
-				//DX9EFF_INST_DATA* temp = iterator_prev;
-				//DeleteInstance(iterator);
-				//iterator = temp;
+			bool bCollision = false;
+			if ((tBBEFFPS.x <= tBBMONPE.x) && (tBBEFFPE.x >= tBBMONPS.x))
+			{
+				if ((tBBEFFPS.y <= tBBMONPE.y) && (tBBEFFPE.y >= tBBMONPS.y))
+				{
+					bCollision = true;
+					(*pInstances)[i].Damage(iterator->GetDamage());
+					iterator->SetDamage(0);
+
+					// @warning: The codes below make disappear the effect immediately
+					//DX9EFF_INST_DATA* temp = iterator_prev;
+					//DeleteInstance(iterator);
+					//iterator = temp;
+				}
 			}
 		}
+
 
 		iterator_prev = iterator;
 		if (iterator)

@@ -9,8 +9,9 @@
 #pragma comment (lib, "d3dx9.lib")
 #pragma comment (lib, "d3d9.lib")
 
+using WSTRING = std::wstring;
+
 #define CINT const int
-#define WSTRING std::wstring
 #define VECTOR std::vector
 
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)

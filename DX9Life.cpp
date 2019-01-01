@@ -173,7 +173,8 @@ void DX9Life::Gravitate()
 		else
 		{
 			m_bHitGround = true;
-			SetAnimation(DX9ANIMID::Landing, true, true);
+			//SetAnimation(DX9ANIMID::Landing, true, true); // This is only for main Sprite
+			SetAnimation(DX9ANIMID::Idle, true, true);
 		}
 	}
 	else

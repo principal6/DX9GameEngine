@@ -116,10 +116,12 @@ void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForce
 
 void DX9AnimUnit::Animate()
 {	
-	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE) {
+	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE)
+	{
 		m_nCurrFrameID++;
 	}
-	else {
+	else
+	{
 		m_nCurrFrameID = m_Anims[(int)m_nCurrAnimID].FrameS;
 		if (!m_bRepeating)
 			m_bBeingAnimated = false;
