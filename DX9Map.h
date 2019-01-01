@@ -81,8 +81,8 @@ public:
 	int DX9Map::GetTileName(std::wstring *pStr) const;
 	int DX9Map::GetMapCols() const;
 	int DX9Map::GetMapRows() const;
-	int DX9Map::GetWidth() const;
-	int DX9Map::GetHeight() const;
+	int DX9Map::GetWidth() const override;
+	int DX9Map::GetHeight() const override;
 	D3DXVECTOR2	DX9Map::GetMapOffset() const;
 	int DX9Map::GetMapOffsetZeroY() const;
 	D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(DX9BOUNDINGBOX BB, D3DXVECTOR2 Velocity) const;

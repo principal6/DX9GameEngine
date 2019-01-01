@@ -9,6 +9,7 @@ float DX9Image::m_WindowHalfH = 0.0f;
 
 DX9Image::DX9Image()
 {
+	m_pDevice = nullptr;
 	m_pVertexBuffer = nullptr;
 	m_pIndexBuffer = nullptr;
 	m_pTexture = nullptr;
@@ -201,6 +202,15 @@ void DX9Image::FlipVertical()
 	UpdateVertexBuffer();
 }
 
+void DX9Image::SetSize(int Width, int Height)
+{
+	m_Width = Width;
+	m_Height = Height;
+	m_ScaledW = (int)(m_Width * m_Scale.x);
+	m_ScaledH = (int)(m_Height * m_Scale.y);
+	UpdateVertexData();
+}
+
 void DX9Image::SetTexture(std::wstring FileName)
 {
 	if (m_pTexture)
@@ -224,15 +234,6 @@ void DX9Image::SetTexture(std::wstring FileName)
 	m_ScaledW = (int)(m_Width * m_Scale.x);
 	m_ScaledH = (int)(m_Height * m_Scale.y);
 
-	UpdateVertexData();
-}
-
-void DX9Image::SetSize(int Width, int Height)
-{
-	m_Width = Width;
-	m_Height = Height;
-	m_ScaledW = (int)(m_Width * m_Scale.x);
-	m_ScaledH = (int)(m_Height * m_Scale.y);
 	UpdateVertexData();
 }
 

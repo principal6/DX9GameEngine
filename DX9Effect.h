@@ -6,7 +6,6 @@
 class DX9Effect final : protected DX9Image
 {
 private:
-	std::wstring m_TextureAtlasFileName;
 	int m_TextureAtlasCols;
 	int m_TextureAtlasRows;
 	int m_UnitW;

@@ -98,8 +98,3 @@ void DX9Monster::Draw()
 	m_HPFrame->Draw();
 	m_HPBar->Draw();
 }
-
-D3DXVECTOR2 DX9Monster::GetGlobalPosition() const
-{
-	return m_GlobalPos;
-}

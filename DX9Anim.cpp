@@ -14,13 +14,16 @@ DX9Anim::DX9Anim()
 
 	m_UnitW = 0;
 	m_UnitH = 0;
-	m_GlobalPos = D3DXVECTOR2(0, 0);
-	m_GlobalPosInverse = D3DXVECTOR2(0, 0);
 }
 
 void DX9Anim::Create(LPDIRECT3DDEVICE9 pDevice)
 {
 	DX9Image::Create(pDevice);
+}
+
+void DX9Anim::Destroy()
+{
+	DX9Image::Destroy();
 }
 
 void DX9Anim::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
@@ -45,6 +48,21 @@ void DX9Anim::SetNumRowsAndCols(int numCols, int numRows)
 	
 	SetSize(m_UnitW, m_UnitH);
 	SetFrame(0);
+}
+
+void DX9Anim::SetTexture(std::wstring FileName)
+{
+	DX9Image::SetTexture(FileName);
+}
+
+void DX9Anim::SetScale(D3DXVECTOR2 Scale)
+{
+	DX9Image::SetScale(Scale);
+}
+
+void DX9Anim::SetAlpha(int Alpha)
+{
+	DX9Anim::SetAlpha(Alpha);
 }
 
 void DX9Anim::SetFrame(int FrameID)
@@ -115,6 +133,11 @@ void DX9Anim::SetDirection(DX9ANIMDIR Direction)
 	m_nAnimDir = Direction;
 }
 
+void DX9Anim::SetBoundingnBox(D3DXVECTOR2 Size)
+{
+	DX9Image::SetBoundingnBox(Size);
+}
+
 void DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
@@ -123,18 +146,6 @@ void DX9Anim::SetPosition(D3DXVECTOR2 Pos)
 void DX9Anim::SetPositionCentered(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPositionCentered(Pos);
-}
-
-void DX9Anim::CalculateGlobalPositionInverse()
-{
-	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_WindowH - m_ScaledH - m_GlobalPos.y;
-}
-
-void DX9Anim::CalculateGlobalPosition()
-{
-	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_WindowH - m_ScaledH - m_GlobalPosInverse.y;
 }
 
 bool DX9Anim::IsBeingAnimated() const
@@ -160,4 +171,19 @@ DX9ANIMDIR DX9Anim::GetDirection() const
 D3DXVECTOR2 DX9Anim::GetCenterPosition() const
 {
 	return DX9Image::GetCenterPosition();
+}
+
+DX9BOUNDINGBOX DX9Anim::GetBoundingBox() const
+{
+	return DX9Image::GetBoundingBox();
+}
+
+void DX9Anim::Draw() const
+{
+	DX9Image::Draw();
+}
+
+void DX9Anim::DrawBoundingBox()
+{
+	DX9Image::DrawBoundingBox();
 }
