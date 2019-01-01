@@ -15,21 +15,16 @@
 // Function headers
 int MainLoop();
 void DetectInput();
-void Gravitate();
-void MoveSprite(D3DXVECTOR2 Velocity);
 
 // Constants
 const int WINDOW_X = 50;
 const int WINDOW_Y = 50;
 const int WINDOW_W = 800;
 const int WINDOW_H = 600;
-const D3DXVECTOR2 kGravity = D3DXVECTOR2(0.0f, 0.5f);
-const D3DXVECTOR2 kJumpPow = D3DXVECTOR2(0.0f, -14.0f);
 const float kStride = 5.0f;
 const int KEY_PRESS_INTERVAL = 20;
 
 // Variables
-bool gbHitGround = false;
 bool gbWalking = false;
 bool gbDrawBB = false;
 ULONGLONG gTimerStart = 0;
@@ -42,10 +37,10 @@ int gKeyPressCount = 0;
 DX9Base* gDXBase;
 DX9Input* gDXInput;
 DX9Image* gDXImage;
+DX9Map* gDXMap;
 DX9Sprite* gDXSprite;
 DX9Monster* gDXMonster;
 DX9Effect* gDXEffect;
-DX9Map* gDXMap;
 DX9Font* gDXFont;
 
 int main()
@@ -66,31 +61,34 @@ int main()
 	gDXImage->Create(gDXBase->GetDevice());
 	gDXImage->SetTexture(L"bg_forest_evening.png");
 
-	gDXSprite = new DX9Sprite;
-	gDXSprite->Create(gDXBase->GetDevice());
+	gDXMap = new DX9Map;
+	gDXMap->Create(gDXBase->GetDevice(), WINDOW_H);
+	gDXMap->LoadMapFromFile(L"map01.jwm");
+
+	gDXSprite = new DX9Sprite();
+	gDXSprite->Create(gDXBase->GetDevice(), gDXMap);
 	gDXSprite->MakeUnit(L"advnt_full.png", 10, 10, 1.5f);
 	gDXSprite->AddAnimation(DX9ANIMID::Idle, 0, 0);
 	gDXSprite->AddAnimation(DX9ANIMID::Walk, 1, 5);
+	gDXSprite->AddAnimation(DX9ANIMID::Jumping, 17, 17);
+	gDXSprite->AddAnimation(DX9ANIMID::Falling, 18, 18);
+	gDXSprite->AddAnimation(DX9ANIMID::Landing, 19, 19);
 	gDXSprite->AddAnimation(DX9ANIMID::Attack1, 27, 28); // Punch
 	gDXSprite->AddAnimation(DX9ANIMID::Attack2, 24, 26); // HorzAttack
 	gDXSprite->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
-	gDXMonster = new DX9Monster;
-	gDXMonster->Create(gDXBase->GetDevice());
+	gDXMonster = new DX9Monster();
+	gDXMonster->Create(gDXBase->GetDevice(), gDXMap);
 	gDXMonster->MakeUnit(L"mage-1-85x94.png", 4, 2);
 	gDXMonster->AddAnimation(DX9ANIMID::Idle, 0, 7);
-	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 32.0f));
+	gDXMonster->SetGlobalPosition(D3DXVECTOR2(560.0f, 60.0f));
 	gDXMonster->SetMaxHP(200);
 
 	gDXEffect = new DX9Effect;
-	gDXEffect->Create(gDXBase->GetDevice());
+	gDXEffect->Create(gDXBase->GetDevice(), gDXMap);
 	gDXEffect->SetTextureAtlas(L"particlefx_14.png", 8, 8);
 	gDXEffect->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
-
-	gDXMap = new DX9Map;
-	gDXMap->Create(gDXBase->GetDevice(), WINDOW_H);
-	gDXMap->LoadMapFromFile(L"map01.jwm");
 
 	gDXFont = new DX9Font;
 	gDXFont->Create(gDXBase->GetDevice(), WINDOW_W, WINDOW_H);
@@ -98,24 +96,24 @@ int main()
 
 	gTimerStart = GetTickCount64();
 
-	// Enter in the main loop
+	// Enter into the main loop
 	gDXBase->Run(MainLoop);
 	
 	// Destroy all objects before the program ends
 	gDXFont->Destroy();
-	gDXMap->Destroy();
 	gDXEffect->Destroy();
 	gDXMonster->Destroy();
 	gDXSprite->Destroy();
+	gDXMap->Destroy();
 	gDXImage->Destroy();
 	gDXInput->Destroy();
 	gDXBase->Destroy();
 
 	delete gDXFont;
-	delete gDXMap;
 	delete gDXEffect;
 	delete gDXMonster;
 	delete gDXSprite;
+	delete gDXMap;
 	delete gDXImage;
 	delete gDXInput;
 	delete gDXBase;
@@ -152,9 +150,9 @@ int MainLoop()
 			gKeyPressCount = 0;
 	}
 	
-	// Apply gravity to the sprite
-	Gravitate();
-	gDXSprite->MoveWithVelocity();
+	// Apply gravity
+	gDXMonster->Gravitate();
+	gDXSprite->Gravitate();
 
 	gDXBase->BeginRender();
 
@@ -164,13 +162,10 @@ int MainLoop()
 		gDXMap->SetGlobalPosition(-tOffset);
 		gDXMap->Draw();
 
-		gDXMonster->UpdateGlobalPosition(gDXMap->GetMapOffset(), (float)gDXMap->GetMapOffsetZeroY());
 		gDXMonster->Draw();
-
 		gDXSprite->Draw();
 		
-		gDXEffect->CheckCollisionWithMonsters(gDXMap->GetMapOffset(), gDXMonster);
-		gDXEffect->Update(gDXMap->GetMapOffset());
+		gDXEffect->CheckCollisionWithMonsters(gDXMonster);
 		gDXEffect->Draw();
 		
 		if (gbDrawBB)
@@ -192,72 +187,18 @@ int MainLoop()
 	return 0;
 }
 
-void Gravitate()
-{
-	gDXSprite->Accelerate(kGravity);
-	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
-	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), tCurrSprVel);
-
-	if (tNewVel.y < tCurrSprVel.y)
-	{
-		if (gbHitGround)
-		{
-			tNewVel.y = 0;
-		}
-		else
-		{
-			gbHitGround = true;
-			gDXSprite->SetFrame(19); // Land on
-		}	
-	}
-	else
-	{
-		if (tCurrSprVel.y < 0)
-			gDXSprite->SetFrame(17); // Jumping
-
-		if (tCurrSprVel.y > 0)
-			gDXSprite->SetFrame(18); // Falling down
-
-		gbHitGround = false;
-	}
-	
-	gDXSprite->SetVelocity(tNewVel);
-}
-
-void Jump()
-{
-	D3DXVECTOR2 tCurrSprVel = gDXSprite->GetVelocity();
-	if ((gbHitGround == false) || (tCurrSprVel.y > 0)) // Currently the sprite is falling down
-		return;
-
-	gbHitGround = false;
-	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), kJumpPow);
-	
-	gDXSprite->SetVelocity(tNewVel);
-}
-
-void MoveSprite(D3DXVECTOR2 Velocity)
-{
-	D3DXVECTOR2 tNewVel = gDXMap->GetVelocityAfterCollision(gDXSprite->GetBoundingBox(), Velocity);
-	gDXSprite->MoveConst(tNewVel);
-}
-
 void DetectInput()
 {
 	gbWalking = false;
 
 	if (gDXInput->OnKeyDown(DIK_RIGHTARROW))
 	{
-		MoveSprite(D3DXVECTOR2(kStride, 0));
-		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
-		gDXSprite->SetDirection(DX9ANIMDIR::Right);
+		gDXSprite->Walk(DX9ANIMDIR::Right);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LEFTARROW))
 	{
-		MoveSprite(D3DXVECTOR2(-kStride, 0));
-		gDXSprite->SetAnimation(DX9ANIMID::Walk, true);
-		gDXSprite->SetDirection(DX9ANIMDIR::Left);
+		gDXSprite->Walk(DX9ANIMDIR::Left);
 		gbWalking = true;
 	}
 	if (gDXInput->OnKeyDown(DIK_LCONTROL))
@@ -269,12 +210,12 @@ void DetectInput()
 		if (gKeyPressCount == 0)
 		{
 			gKeyPressCount++;
-			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXMap->GetMapOffset(), gDXSprite->GetDirection(), 20);
+			gDXEffect->Spawn(0, gDXSprite->GetCenterPosition(), gDXSprite->GetDirection(), 20);
 		}
 	}
 	if (gDXInput->OnKeyDown(DIK_UPARROW))
 	{
-		Jump();
+		gDXSprite->Jump();
 		//MoveSprite(D3DXVECTOR2(0, -kStride)); // Exists for debugging
 	}
 	if (gDXInput->OnKeyDown(DIK_DOWNARROW))

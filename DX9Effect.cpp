@@ -10,7 +10,7 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
 	DX9Image::Create(pDevice);
 	DX9Image::ClearVertexAndIndexData();
@@ -19,6 +19,8 @@ void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice)
 	CreateIndexBuffer();
 
 	m_BBLine.CreateMax(m_pDevice);
+
+	m_pMap = pMap;
 }
 
 void DX9Effect::CreateVertexBuffer()
@@ -75,13 +77,14 @@ void DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR
 }
 
 // Every effect is spawned at global position
-void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, D3DXVECTOR2 MapOffset, DX9ANIMDIR Dir, int Damage)
+void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
 		return;
 
 	m_InstanceCount++;
 
+	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	D3DXVECTOR2 NewPos = Pos;
 	D3DXVECTOR2 SpawnOffsetBase = m_TypeData[EffectID].GetSpawnOffset();
 	NewPos.y += SpawnOffsetBase.y;
@@ -118,8 +121,9 @@ void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, D3DXVECTOR2 MapOffset, DX9A
 	}
 }
 
-void DX9Effect::Update(D3DXVECTOR2 MapOffset)
+void DX9Effect::Update()
 {
+	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9Image::ClearVertexAndIndexData();
 	m_BBLine.Clear();
 
@@ -210,10 +214,11 @@ void DX9Effect::Update(D3DXVECTOR2 MapOffset)
 	m_InstanceCount = iterator_n;
 }
 
-void DX9Effect::Draw() const
+void DX9Effect::Draw()
 {
 	if (m_pFisrtInstance)
 	{
+		Update();
 		DX9Image::Draw();
 	}
 }
@@ -255,8 +260,9 @@ void DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 	}
 }
 
-void DX9Effect::CheckCollisionWithMonsters(D3DXVECTOR2 MapOffset, DX9Monster* pMonsters)
+void DX9Effect::CheckCollisionWithMonsters(DX9Monster* pMonsters)
 {
+	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
 	DX9EFF_INST_DATA* iterator_prev = nullptr;
 	int iterator_n = 0;

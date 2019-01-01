@@ -126,6 +126,9 @@ enum class DX9ANIMID
 {
 	Idle,
 	Walk,
+	Jumping,
+	Falling,
+	Landing,
 	Attack1,
 	Attack2,
 	Attack3,

@@ -1,15 +1,23 @@
 #pragma once
 
 #include "DX9AnimUnit.h"
+#include "DX9Map.h"
+
+const D3DXVECTOR2 JUMP_POWER = D3DXVECTOR2(0.0f, -14.0f);
+const D3DXVECTOR2 GRAVITY = D3DXVECTOR2(0.0f, 0.5f);
+const float STRIDE = 5.0f;
 
 class DX9Life : public DX9AnimUnit
 {
 protected:
+	const DX9Map* m_pMap;
 	D3DXVECTOR2 m_GlobalPos;
 	D3DXVECTOR2 m_GlobalPosInverse;
 	D3DXVECTOR2 m_Velocity;
+	bool m_bHitGround;
 
 protected:
+	void DX9Life::SetMapPointer(DX9Map* pMap);
 	void DX9Life::CalculateGlobalPositionInverse();
 	void DX9Life::CalculateGlobalPosition();
 
@@ -30,4 +38,8 @@ public:
 	void DX9Life::SetVelocity(D3DXVECTOR2 Vel);
 	void DX9Life::MoveWithVelocity();
 	void DX9Life::MoveConst(D3DXVECTOR2 dXY);
+
+	void DX9Life::Walk(DX9ANIMDIR Direction);
+	void DX9Life::Jump();
+	void DX9Life::Gravitate();
 };

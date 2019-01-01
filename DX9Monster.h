@@ -16,16 +16,16 @@ private:
 private:
 	void DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
 	void DX9Monster::CalculateHP();
+	void DX9Monster::UpdateGlobalPosition();
 
 public:
 	DX9Monster();
 	~DX9Monster() {};
 
-	void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice) override;
+	void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
 	void DX9Monster::Destroy() override;
 	
 	void DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position) override;
-	void DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY);
 	void DX9Monster::SetMaxHP(int HPMax);
 	void DX9Monster::Damage(int Damage);
 

@@ -1,6 +1,7 @@
 #include "DX9Monster.h"
 
-DX9Monster::DX9Monster() {
+DX9Monster::DX9Monster()
+{
 	m_HPMax = 0;
 	m_HPCurr = 0;
 	m_bUILoaded = false;
@@ -8,10 +9,11 @@ DX9Monster::DX9Monster() {
 	m_HPBar = nullptr;
 }
 
-void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
 	DX9Life::Create(pDevice);
-	
+	DX9Life::SetMapPointer(pMap);
+
 	m_HPFrame = new DX9Image;
 	m_HPFrame->Create(pDevice);
 	m_HPFrame->SetTexture(L"hpbarbg.png");
@@ -67,8 +69,11 @@ void DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
 		SetUIPosition(m_GlobalPosInverse);
 }
 
-void DX9Monster::UpdateGlobalPosition(D3DXVECTOR2 MapOffset, float MapOffsetZeroY)
+void DX9Monster::UpdateGlobalPosition()
 {
+	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
+	float MapOffsetZeroY = (float)m_pMap->GetMapOffsetZeroY();
+
 	D3DXVECTOR2 tGP = m_GlobalPos;
 	m_GlobalPos.x += MapOffset.x;
 	m_GlobalPos.y -= MapOffset.y - MapOffsetZeroY;
@@ -100,6 +105,7 @@ void DX9Monster::Damage(int Damage)
 void DX9Monster::Draw()
 {
 	CalculateHP();
+	UpdateGlobalPosition();
 
 	DX9Life::Draw();
 	m_HPFrame->Draw();
