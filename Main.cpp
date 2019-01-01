@@ -80,12 +80,11 @@ int main()
 	gDXMonsters = new DX9Monsters();
 	gDXMonsters->Create(gDXBase->GetDevice(), gDXMap);
 	gDXMonsters->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
-		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Idle, 0, 3))
-		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Walk, 4, 7));
+		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Idle, 0, 7));
 	gDXMonsters->Spawn(L"Mage", D3DXVECTOR2(560.0f, 60.0f))
 		->SetAnimation(DX9ANIMID::Idle);
 	gDXMonsters->Spawn(L"Mage", D3DXVECTOR2(400.0f, 300.0f))
-		->SetAnimation(DX9ANIMID::Walk);
+		->SetAnimation(DX9ANIMID::Idle);
 
 	gDXEffect = new DX9Effect;
 	gDXEffect->Create(gDXBase->GetDevice(), gDXMap);
