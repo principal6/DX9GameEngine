@@ -183,7 +183,8 @@ void DX9Engine::MainLoop()
 
 	DrawAllBase();
 
-	m_pfRender();
+	if (m_pfRender)
+		m_pfRender();
 
 	DX9Base::EndRender();
 	m_FPS++;
@@ -198,7 +199,10 @@ void DX9Engine::DetectInput()
 	for (int i = 0; i < NUM_KEYS; i++)
 	{
 		if (m_Keys[i] == true)
-			m_pfKeyboard(i);
+		{
+			if (m_pfKeyboard)
+				m_pfKeyboard(i);
+		}
 	}
 
 	if ((!m_bSpriteWalking) && (!m_Sprite->IsBeingAnimated()))
