@@ -2,7 +2,7 @@
 #include "DX9Input.h"
 #include "DX9Image.h"
 #include "DX9Sprite.h"
-#include "DX9MonsterManager.h"
+#include "DX9Monsters.h"
 #include "DX9Effect.h"
 #include "DX9Map.h"
 #include "DX9Font.h"
@@ -38,7 +38,7 @@ DX9Input* gDXInput;
 DX9Image* gDXImage;
 DX9Map* gDXMap;
 DX9Sprite* gDXSprite;
-DX9MonsterManager* gDXMonsters;
+DX9Monsters* gDXMonsters;
 DX9Effect* gDXEffect;
 DX9Font* gDXFont;
 
@@ -77,7 +77,7 @@ int main()
 	gDXSprite->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f));
 	gDXSprite->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 	
-	gDXMonsters = new DX9MonsterManager();
+	gDXMonsters = new DX9Monsters();
 	gDXMonsters->Create(gDXBase->GetDevice(), gDXMap);
 	gDXMonsters->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
 		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Idle, 0, 7));

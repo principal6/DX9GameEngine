@@ -164,7 +164,7 @@
     <ClInclude Include="DX9Life.h" />
     <ClInclude Include="DX9Map.h" />
     <ClInclude Include="DX9Line.h" />
-    <ClInclude Include="DX9MonsterManager.h" />
+    <ClInclude Include="DX9Monsters.h" />
     <ClInclude Include="DX9Sprite.h" />
   </ItemGroup>
   <ItemGroup>
@@ -177,7 +177,7 @@
     <ClCompile Include="DX9Life.cpp" />
     <ClCompile Include="DX9Map.cpp" />
     <ClCompile Include="DX9Line.cpp" />
-    <ClCompile Include="DX9MonsterManager.cpp" />
+    <ClCompile Include="DX9Monsters.cpp" />
     <ClCompile Include="DX9Sprite.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
