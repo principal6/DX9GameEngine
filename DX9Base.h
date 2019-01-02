@@ -2,17 +2,18 @@
 
 #include "DX9Common.h"
 
-class DX9Base final
+class DX9Base
 {
-private:
-	HINSTANCE m_hInstance;
-	HWND m_hWnd;
-	MSG m_MSG;
-
 private:
 	LPDIRECT3D9 m_pD3D;
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
 	D3DCOLOR m_BGColor;
+	DX9SHARE_DATA* m_pShareData;
+
+protected:
+	HINSTANCE m_hInstance;
+	HWND m_hWnd;
+	MSG m_MSG;
 
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
@@ -24,12 +25,12 @@ public:
 	DX9Base();
 	~DX9Base() {};
 
-	void DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height);
+	bool DX9Base::Create(CINT X, CINT Y, DX9SHARE_DATA* pData);
 	void DX9Base::CreateOnWindow(HWND hWnd);
-	void DX9Base::Run(int(*pMainLoop)());
-	int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel);
-	void DX9Base::Destroy();
-	void DX9Base::Halt();
+	virtual void DX9Base::Run() = 0;
+	virtual int DX9Base::RunWithAccel(HACCEL hAccel) = 0;
+	virtual void DX9Base::Destroy();
+	virtual void DX9Base::Halt();
 	
 	void DX9Base::SetBackgroundColor(D3DCOLOR color);
 	void DX9Base::Resize(HWND hWnd);

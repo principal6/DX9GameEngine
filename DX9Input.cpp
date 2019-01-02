@@ -221,6 +221,27 @@ bool DX9Input::GetKeyState(DWORD DIK_KeyCode) const
 	}
 }
 
+void DX9Input::GetAllKeyState(bool* Keys)
+{
+	// Check all DIK states
+	HRESULT hr;
+	if (FAILED(hr = m_DIDevKeyboard->GetDeviceState(sizeof(m_BufferKeyState), (LPVOID)&m_BufferKeyState)))
+	{
+		if (hr == DIERR_INPUTLOST)
+		{
+			m_DIDevKeyboard->Acquire();
+		}
+	}
+
+	for (int i = 1; i <= NUM_KEYS; i++)
+	{
+		Keys[i] = false;
+
+		if (m_BufferKeyState[i] & 0x80)
+			Keys[i] = true;
+	}
+}
+
 bool DX9Input::GetMouseButtonDown(int button)
 {
 	CheckMouseButton(button);

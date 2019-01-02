@@ -11,10 +11,10 @@ DX9MonsterType* DX9MonsterType::AddAnimation(DX9MONANIMDATA Value)
 }
 
 /*-----------------------------------------------------------------------------
-	DX9MonsterInstance Class
+	DX9Monster Class
 -----------------------------------------------------------------------------*/
 
-DX9MonsterInstance::DX9MonsterInstance()
+DX9Monster::DX9Monster()
 {
 	m_HPCurr = 0;
 	m_bUILoaded = false;
@@ -22,23 +22,23 @@ DX9MonsterInstance::DX9MonsterInstance()
 	m_HPBar = nullptr;
 }
 
-void DX9MonsterInstance::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap)
 {
-	DX9Life::Create(pDevice);
+	DX9Life::Create(pDevice, pData);
 	DX9Life::SetMapPointer(pMap);
 
 	m_HPFrame = new DX9Image;
-	m_HPFrame->Create(pDevice);
+	m_HPFrame->Create(pDevice, pData);
 	m_HPFrame->SetTexture(L"hpbarbg.png");
 
 	m_HPBar = new DX9Image;
-	m_HPBar->Create(pDevice);
+	m_HPBar->Create(pDevice, pData);
 	m_HPBar->SetTexture(L"hpbar.png");
 
 	m_bUILoaded = true;
 }
 
-void DX9MonsterInstance::Destroy()
+void DX9Monster::Destroy()
 {
 	if (m_HPFrame)
 	{
@@ -55,7 +55,7 @@ void DX9MonsterInstance::Destroy()
 	DX9Life::Destroy();
 }
 
-void DX9MonsterInstance::SetUIPosition(D3DXVECTOR2 Position)
+void DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 {
 	D3DXVECTOR2 tPos = GetCenterPosition();
 	tPos.y = Position.y;
@@ -65,13 +65,13 @@ void DX9MonsterInstance::SetUIPosition(D3DXVECTOR2 Position)
 	m_HPBar->SetPosition(tPos);
 }
 
-void DX9MonsterInstance::SetMonsterType(DX9MonsterType Type)
+void DX9Monster::SetMonsterType(DX9MonsterType Type)
 {
 	m_Type = Type;
 	m_HPCurr = Type.m_HPMax;
 }
 
-void DX9MonsterInstance::SetGlobalPosition(D3DXVECTOR2 Position)
+DX9Monster* DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
 {
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
@@ -80,9 +80,11 @@ void DX9MonsterInstance::SetGlobalPosition(D3DXVECTOR2 Position)
 
 	if (m_bUILoaded)
 		SetUIPosition(m_GlobalPosInverse);
+
+	return this;
 }
 
-void DX9MonsterInstance::UpdateGlobalPosition()
+void DX9Monster::UpdateGlobalPosition()
 {
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	float MapOffsetZeroY = (float)m_pMap->GetMapOffsetZeroY();
@@ -100,22 +102,22 @@ void DX9MonsterInstance::UpdateGlobalPosition()
 		SetUIPosition(m_GlobalPosInverse);
 }
 
-void DX9MonsterInstance::CalculateHP()
+void DX9Monster::CalculateHP()
 {
-	float fPercent = (float)DX9MonsterInstance::m_HPCurr / (float)m_Type.m_HPMax;
+	float fPercent = (float)DX9Monster::m_HPCurr / (float)m_Type.m_HPMax;
 	float tW = (float)m_HPBar->GetScaledWidth();
 
 	m_HPBar->SetVisibleRange((int)(tW * fPercent), m_HPBar->GetScaledHeight());
 }
 
-void DX9MonsterInstance::Damage(int Damage)
+void DX9Monster::Damage(int Damage)
 {
 	m_HPCurr -= Damage;
 	if (m_HPCurr < 0)
 		m_HPCurr = 0;
 }
 
-void DX9MonsterInstance::Draw()
+void DX9Monster::Draw()
 {
 	CalculateHP();
 	UpdateGlobalPosition();
@@ -126,40 +128,41 @@ void DX9MonsterInstance::Draw()
 }
 
 /*-----------------------------------------------------------------------------
-	DX9Monsters Class
+	DX9MonsterManager Class
 -----------------------------------------------------------------------------*/
 
-void DX9Monsters::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap)
 {
 	m_pDevice = pDevice;
+	m_pShareData = pData;
 	m_pMap = pMap;
 }
 
-void DX9Monsters::Destroy()
+void DX9MonsterManager::Destroy()
 {
 	m_pDevice = nullptr;
 	m_pMap = nullptr;
 
-	for (DX9MonsterInstance& InstanceIterator : m_Instances)
+	for (DX9Monster& InstanceIterator : m_Instances)
 	{
 		InstanceIterator.Destroy();
 	}
 }
 
-DX9MonsterType* DX9Monsters::AddMonsterType(DX9MonsterType Value)
+DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value)
 {
 	m_Types.push_back(Value);
 	return &m_Types[m_Types.size() - 1];
 }
 
-DX9MonsterInstance* DX9Monsters::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
+DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
 {
 	for (DX9MonsterType& TypeIterator : m_Types)
 	{
 		if (TypeIterator.m_Name == MonsterName)
 		{
-			DX9MonsterInstance Temp;
-			Temp.Create(m_pDevice, m_pMap);
+			DX9Monster Temp;
+			Temp.Create(m_pDevice, m_pShareData, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
 			Temp.MakeUnit(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 
@@ -179,39 +182,39 @@ DX9MonsterInstance* DX9Monsters::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPo
 	return nullptr;
 }
 
-void DX9Monsters::Animate()
+void DX9MonsterManager::Animate()
 {
-	for (DX9MonsterInstance& InstanceIterator : m_Instances)
+	for (DX9Monster& InstanceIterator : m_Instances)
 	{
 		InstanceIterator.Animate();
 	}
 }
 
-void DX9Monsters::Gravitate()
+void DX9MonsterManager::Gravitate()
 {
-	for (DX9MonsterInstance& InstanceIterator : m_Instances)
+	for (DX9Monster& InstanceIterator : m_Instances)
 	{
 		InstanceIterator.Gravitate();
 	}
 }
 
-void DX9Monsters::Draw()
+void DX9MonsterManager::Draw()
 {
-	for (DX9MonsterInstance& InstanceIterator : m_Instances)
+	for (DX9Monster& InstanceIterator : m_Instances)
 	{
 		InstanceIterator.Draw();
 	}
 }
 
-void DX9Monsters::DrawBoundingBox()
+void DX9MonsterManager::DrawBoundingBox()
 {
-	for (DX9MonsterInstance& InstanceIterator : m_Instances)
+	for (DX9Monster& InstanceIterator : m_Instances)
 	{
 		InstanceIterator.DrawBoundingBox();
 	}
 }
 
-std::vector<DX9MonsterInstance>* DX9Monsters::GetInstancePointer()
+std::vector<DX9Monster>* DX9MonsterManager::GetInstancePointer()
 {
 	return &m_Instances;
 }

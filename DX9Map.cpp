@@ -4,7 +4,6 @@ DX9Map::DX9Map()
 {
 	m_CurrMapMode = DX9MAPMODE::TileMode;
 	m_bMapCreated = false;
-	m_WindowH = 0;
 	m_MapCols = 0;
 	m_MapRows = 0;
 	m_TileSheetWidth = 0;
@@ -21,14 +20,14 @@ DX9Map::DX9Map()
 	m_OffsetZeroY = 0;
 }
 
-void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, int WindowHeight)
+void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
 {
 	m_pDevice = pDevice;
+	m_pShareData = pData;
 
 	ClearAllData();
 	m_Vert.clear();
 	m_Ind.clear();
-	m_WindowH = WindowHeight;
 }
 
 void DX9Map::ClearAllData()
@@ -56,7 +55,7 @@ void DX9Map::Destroy()
 	DX9Image::Destroy();
 }
 
-void DX9Map::SetTileTexture(std::wstring FileName)
+void DX9Map::SetTileTexture(WSTRING FileName)
 {
 	DX9Image::SetTexture(FileName);
 
@@ -71,7 +70,7 @@ void DX9Map::SetTileTexture(std::wstring FileName)
 	}
 }
 
-void DX9Map::SetMoveTexture(std::wstring FileName)
+void DX9Map::SetMoveTexture(WSTRING FileName)
 {
 	if (m_pTextureMove)
 	{
@@ -79,8 +78,8 @@ void DX9Map::SetMoveTexture(std::wstring FileName)
 		m_pTextureMove = nullptr;
 	}
 
-	std::wstring NewFileName;
-	NewFileName = m_BaseDir;
+	WSTRING NewFileName;
+	NewFileName = m_pShareData->AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 
@@ -94,7 +93,7 @@ void DX9Map::SetMoveTexture(std::wstring FileName)
 	m_bMoveTextureLoaded = true;
 }
 
-void DX9Map::GetMapData(std::wstring *pStr) const
+void DX9Map::GetMapData(WSTRING *pStr) const
 {
 	wchar_t tempWC[255] = { 0 };
 	*pStr = m_MapName;
@@ -124,10 +123,10 @@ void DX9Map::GetMapData(std::wstring *pStr) const
 	}
 }
 
-void DX9Map::LoadMapFromFile(std::wstring FileName)
+void DX9Map::LoadMapFromFile(WSTRING FileName)
 {
-	std::wstring NewFileName;
-	NewFileName = m_BaseDir;
+	WSTRING NewFileName;
+	NewFileName = m_pShareData->AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 
@@ -136,7 +135,7 @@ void DX9Map::LoadMapFromFile(std::wstring FileName)
 	if (!filein.is_open())
 		return;
 
-	std::wstring fileText;
+	WSTRING fileText;
 
 	wchar_t tempText[MAX_LINE_LEN];
 	fileText.clear();
@@ -152,7 +151,7 @@ void DX9Map::LoadMapFromFile(std::wstring FileName)
 	CreateLoadedMap();
 }
 
-void DX9Map::CreateNewMap(std::wstring Name, int MapCols, int MapRows)
+void DX9Map::CreateNewMap(WSTRING Name, int MapCols, int MapRows)
 {
 	ClearAllData();
 
@@ -270,7 +269,7 @@ void DX9Map::AddEnd()
 	}
 
 	m_bMapCreated = true;
-	m_OffsetZeroY = m_WindowH - (m_MapRows * TILE_H);
+	m_OffsetZeroY = m_pShareData->WindowHeight - (m_MapRows * TILE_H);
 
 	SetGlobalPosition(D3DXVECTOR2(0, 0));
 }
@@ -295,7 +294,7 @@ void DX9Map::UpdateVertexBufferMove()
 	m_pVBMove->Unlock();
 }
 
-void DX9Map::SetMapData(std::wstring Str)
+void DX9Map::SetMapData(WSTRING Str)
 {
 	size_t tFind = -1;
 	int tInt = 0;
@@ -529,7 +528,7 @@ void DX9Map::SetPosition(D3DXVECTOR2 Offset)
 void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset)
 {
 	float MapH = (float)(m_MapRows * TILE_H);
-	float NewOffsetY = m_WindowH - MapH + Offset.y;
+	float NewOffsetY = m_pShareData->WindowHeight - MapH + Offset.y;
 
 	SetPosition(D3DXVECTOR2(Offset.x, NewOffsetY));
 }
@@ -642,7 +641,7 @@ void DX9Map::Draw() const
 
 int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const
 {
-	std::wstring tempStr;
+	WSTRING tempStr;
 	wchar_t tempWC[255] = { 0 };
 
 	int tTileID = m_MapData[DataID].TileID;
@@ -693,13 +692,13 @@ bool DX9Map::IsMapCreated() const
 	return m_bMapCreated;
 };
 
-int DX9Map::GetMapName(std::wstring *pStr) const
+int DX9Map::GetMapName(WSTRING *pStr) const
 {
 	*pStr = m_MapName;
 	return 0;
 }
 
-int DX9Map::GetTileName(std::wstring *pStr) const
+int DX9Map::GetTileName(WSTRING *pStr) const
 {
 	*pStr = m_TileName;
 	return 0;

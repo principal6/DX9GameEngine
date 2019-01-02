@@ -24,7 +24,7 @@ protected:
 
 private:
 	void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows);
-	void DX9AnimUnit::SetTexture(std::wstring FileName) override;
+	void DX9AnimUnit::SetTexture(WSTRING FileName) override;
 
 protected:
 	void DX9AnimUnit::SetPosition(D3DXVECTOR2 Pos) override;
@@ -34,19 +34,19 @@ public:
 	DX9AnimUnit();
 	virtual ~DX9AnimUnit() {};
 
-	virtual void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice) override;
+	virtual void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData) override;
 	virtual void DX9AnimUnit::Destroy() override;
-	void DX9AnimUnit::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale = 1.0f);
+	virtual DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f);
 
 	void DX9AnimUnit::SetScale(D3DXVECTOR2 Scale) override;
 	void DX9AnimUnit::SetAlpha(int Alpha) override;
 
-	void DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);	
+	virtual DX9AnimUnit* DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);
 	void DX9AnimUnit::Animate();
 	void DX9AnimUnit::SetFrame(int FrameID);
 	void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
 	void DX9AnimUnit::SetDirection(DX9ANIMDIR Direction);
-	void DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size) override;
+	virtual DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size) override;
 
 	bool DX9AnimUnit::IsBeingAnimated() const;
 	int DX9AnimUnit::GetScaledUnitWidth() const;

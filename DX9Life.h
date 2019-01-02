@@ -25,8 +25,8 @@ public:
 	DX9Life();
 	virtual ~DX9Life() {};
 
-	void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice) override;
-	virtual void DX9Life::SetGlobalPosition(D3DXVECTOR2 Position) = 0;
+	void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData) override;
+	virtual DX9Life* DX9Life::SetGlobalPosition(D3DXVECTOR2 Position) = 0;
 
 	D3DXVECTOR2 DX9Life::GetGlobalPosition() const;
 	D3DXVECTOR2 DX9Life::GetGlobalPositionInverse() const;

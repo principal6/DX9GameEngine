@@ -8,9 +8,9 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
 {
-	DX9AnimUnit::Create(pDevice);
+	DX9AnimUnit::Create(pDevice, pData);
 	SetGlobalPosition(m_GlobalPos);
 }
 
@@ -23,13 +23,13 @@ void DX9Life::SetMapPointer(DX9Map* pMap)
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_WindowH - m_ScaledH - m_GlobalPos.y;
+	m_GlobalPosInverse.y = m_pShareData->WindowHeight - m_ScaledH - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_WindowH - m_ScaledH - m_GlobalPosInverse.y;
+	m_GlobalPos.y = m_pShareData->WindowHeight - m_ScaledH - m_GlobalPosInverse.y;
 }
 
 D3DXVECTOR2 DX9Life::GetGlobalPosition() const
@@ -50,8 +50,8 @@ D3DXVECTOR2 DX9Life::GetVelocity() const
 D3DXVECTOR2 DX9Life::GetOffsetForMapMove() const
 {
 	D3DXVECTOR2 Result;
-	Result.x = m_GlobalPos.x - m_WindowHalfW;
-	Result.y = m_GlobalPosInverse.y - m_WindowHalfH;
+	Result.x = m_GlobalPos.x - m_pShareData->m_WindowHalfW;
+	Result.y = m_GlobalPosInverse.y - m_pShareData->m_WindowHalfH;
 
 	if (Result.x < 0)
 		Result.x = 0;
@@ -84,11 +84,11 @@ void DX9Life::MoveWithVelocity()
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_WindowHalfW)
+	if (m_GlobalPosInverse.x < m_pShareData->m_WindowHalfW)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
-	if (m_GlobalPosInverse.y > m_WindowHalfH)
+	if (m_GlobalPosInverse.y > m_pShareData->m_WindowHalfH)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
@@ -103,24 +103,24 @@ void DX9Life::MoveConst(D3DXVECTOR2 dXY)
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_WindowHalfW)
+	if (m_GlobalPosInverse.x < m_pShareData->m_WindowHalfW)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
 	else
 	{
-		if (m_Position.x != m_WindowHalfW)
-			m_Position.x = m_WindowHalfW;
+		if (m_Position.x != m_pShareData->m_WindowHalfW)
+			m_Position.x = m_pShareData->m_WindowHalfW;
 	}
 
-	if (m_GlobalPosInverse.y > m_WindowHalfH)
+	if (m_GlobalPosInverse.y > m_pShareData->m_WindowHalfH)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
 	else
 	{
-		if (m_Position.y != m_WindowHalfH)
-			m_Position.y = m_WindowHalfH;
+		if (m_Position.y != m_pShareData->m_WindowHalfH)
+			m_Position.y = m_pShareData->m_WindowHalfH;
 	}
 
 	SetPosition(m_Position);

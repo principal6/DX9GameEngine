@@ -25,15 +25,20 @@ DX9Base::DX9Base()
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-void DX9Base::Create(CINT X, CINT Y, CINT Width, CINT Height)
+bool DX9Base::Create(CINT X, CINT Y, DX9SHARE_DATA* pData)
 {
+	m_pShareData = pData;
+
 	COLOR_RGB rBGColor = COLOR_RGB(255, 0, 255);
 
-	if (CreateWND(L"Game", X, Y, Width, Height, DX9WINDOW_STYLE::OverlappedWindow, rBGColor) == nullptr)
-		return;
+	if (CreateWND(L"Game", X, Y, m_pShareData->WindowWidth, m_pShareData->WindowHeight, DX9WINDOW_STYLE::OverlappedWindow, rBGColor)
+		== nullptr)
+		return false;
 
 	if (InitD3D() == -1)
-		return;
+		return false;
+
+	return true;
 }
 
 void DX9Base::CreateOnWindow(HWND hWnd)
@@ -96,35 +101,6 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 void DX9Base::SetBackgroundColor(D3DCOLOR color)
 {
 	m_BGColor = color;
-}
-
-void DX9Base::Run(int(*pMainLoop)())
-{
-	while (m_MSG.message != WM_QUIT)
-	{
-		if (PeekMessage(&m_MSG, nullptr, 0U, 0U, PM_REMOVE))
-		{
-			TranslateMessage(&m_MSG);
-			DispatchMessage(&m_MSG);
-		}
-		else
-		{
-			pMainLoop();
-		}
-	}
-}
-
-int DX9Base::RunWithAccel(int(*pMainLoop)(), HACCEL hAccel)
-{
-	while (GetMessage(&m_MSG, 0, 0, 0)) {
-		if (!TranslateAccelerator(m_hWnd, hAccel, &m_MSG)) {
-			TranslateMessage(&m_MSG);
-			DispatchMessage(&m_MSG);
-			pMainLoop();
-		}
-	}
-
-	return (int)m_MSG.wParam;
 }
 
 void DX9Base::Halt()

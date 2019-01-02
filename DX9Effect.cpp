@@ -10,9 +10,9 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap)
 {
-	DX9Image::Create(pDevice);
+	DX9Image::Create(pDevice, pData);
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();
@@ -60,27 +60,31 @@ void DX9Effect::Destroy()
 	DX9Image::Destroy();
 }
 
-void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows)
+DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)
 {
 	DX9Image::SetTexture(FileName);
 	m_TextureAtlasCols = numCols;
 	m_TextureAtlasRows = numRows;
 	m_UnitW = m_Width / m_TextureAtlasCols;
 	m_UnitH = m_Height / m_TextureAtlasRows;
+
+	return this;
 }
 
-void DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
+DX9Effect* DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
 	D3DXVECTOR2 BBSize, int RepeatCount)
 {
 	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, AnimData, SpawnOffset, BBSize, RepeatCount));
 	m_TypeCount = (int)m_TypeData.size();
+
+	return this;
 }
 
 // Every effect is spawned at global position
-void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
+DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
-		return;
+		return nullptr;
 
 	m_InstanceCount++;
 
@@ -119,6 +123,8 @@ void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, MapOffset, 0, tBB, Damage, tRepeatCount));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
+
+	return this;
 }
 
 void DX9Effect::Update()
@@ -260,7 +266,7 @@ void DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 	}
 }
 
-void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters)
+void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters)
 {
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
@@ -272,7 +278,7 @@ void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters)
 
 	while (iterator)
 	{
-		std::vector<DX9MonsterInstance>* pInstances = pMonsters->GetInstancePointer();
+		std::vector<DX9Monster>* pInstances = pMonsters->GetInstancePointer();
 
 		for (int i = 0; i < pInstances->size(); i++)
 		{

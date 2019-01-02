@@ -16,9 +16,9 @@ DX9AnimUnit::DX9AnimUnit()
 	m_UnitH = 0;
 }
 
-void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
 {
-	DX9Image::Create(pDevice);
+	DX9Image::Create(pDevice, pData);
 }
 
 void DX9AnimUnit::Destroy()
@@ -26,7 +26,7 @@ void DX9AnimUnit::Destroy()
 	DX9Image::Destroy();
 }
 
-void DX9AnimUnit::MakeUnit(std::wstring TextureFN, int numCols, int numRows, float Scale)
+DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)
 {
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
@@ -36,6 +36,8 @@ void DX9AnimUnit::MakeUnit(std::wstring TextureFN, int numCols, int numRows, flo
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
+
+	return this;
 }
 
 void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows)
@@ -50,7 +52,7 @@ void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows)
 	SetFrame(0);
 }
 
-void DX9AnimUnit::SetTexture(std::wstring FileName)
+void DX9AnimUnit::SetTexture(WSTRING FileName)
 {
 	DX9Image::SetTexture(FileName);
 }
@@ -95,10 +97,12 @@ void DX9AnimUnit::SetFrame(int FrameID)
 	}
 }
 
-void DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
+DX9AnimUnit* DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
 {
 	m_Anims[(int)AnimID].FrameS = StartFrame;
 	m_Anims[(int)AnimID].FrameE = EndFrame;
+
+	return this;
 }
 
 void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
@@ -135,9 +139,10 @@ void DX9AnimUnit::SetDirection(DX9ANIMDIR Direction)
 	m_nAnimDir = Direction;
 }
 
-void DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size)
+DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size)
 {
 	DX9Image::SetBoundingnBox(Size);
+	return this;
 }
 
 void DX9AnimUnit::SetPosition(D3DXVECTOR2 Pos)

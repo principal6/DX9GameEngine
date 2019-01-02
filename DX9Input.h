@@ -51,4 +51,5 @@ public:
 
 	bool DX9Input::GetMouseButtonDown(int button);
 	bool DX9Input::GetKeyState(DWORD DIK_KeyCode) const;
+	void DX9Input::GetAllKeyState(bool* Keys);
 };

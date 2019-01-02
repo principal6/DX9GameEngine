@@ -11,7 +11,7 @@
 
 using WSTRING = std::wstring;
 
-#define CINT const int
+using CINT = const int;
 #define VECTOR std::vector
 
 #define D3DFVF_TEXTURE (D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)
@@ -20,6 +20,23 @@ using WSTRING = std::wstring;
 const int MAX_UNIT_COUNT = 100;
 const float UV_OFFSET = 0.002f;
 const wchar_t ASSET_DIR[] = L"\\Data\\";
+
+enum class DX9ERROR_CHECK
+{
+	OK,
+	OBJECT_NOT_CREATED,
+	CREATION_FAILED,
+};
+
+struct DX9SHARE_DATA
+{
+	static const int MAX_FILE_LEN = 255;
+	int WindowWidth;
+	int WindowHeight;
+	float m_WindowHalfW;
+	float m_WindowHalfH;
+	wchar_t AppDir[MAX_FILE_LEN] = { 0 };
+};
 
 struct DX9VERTEX_LINE
 {

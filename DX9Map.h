@@ -15,16 +15,15 @@ class DX9Map final : protected DX9Image
 private:
 	DX9MAPMODE m_CurrMapMode; // For Map Editor
 	bool m_bMapCreated;
-	int m_WindowH; // For calculating Y offset
 	int m_MapCols;
 	int m_MapRows;
 	int	m_TileSheetWidth;
 	int	m_TileSheetHeight;
 	int	m_MoveSheetWidth;
 	int	m_MoveSheetHeight;
-	std::wstring m_MapName;
-	std::wstring m_TileName;
-	std::wstring m_MapDataInString;
+	WSTRING m_MapName;
+	WSTRING m_TileName;
+	WSTRING m_MapDataInString;
 	std::vector<DX9MAPDATA> m_MapData;
 
 	bool m_bMoveTextureLoaded;
@@ -45,7 +44,7 @@ private:
 	void DX9Map::AddEnd();
 	void DX9Map::CreateVertexBufferMove(); // IndexBuffer is not needed because they are the same
 	void DX9Map::UpdateVertexBufferMove();
-	void DX9Map::SetMapData(std::wstring Str); // For loading maps
+	void DX9Map::SetMapData(WSTRING Str); // For loading maps
 
 	int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const;
 	bool DX9Map::IsMovableTile(int MapID, DX9MAPDIR Direction) const;
@@ -59,14 +58,14 @@ public:
 	DX9Map();
 	virtual ~DX9Map() {};
 
-	void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, int WindowHeight);
+	void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData);
 	void DX9Map::Destroy() override;
 	
-	void DX9Map::CreateNewMap(std::wstring Name, int MapCols, int MapRows);
-	void DX9Map::SetTileTexture(std::wstring FileName);
-	void DX9Map::SetMoveTexture(std::wstring FileName);
-	void DX9Map::LoadMapFromFile(std::wstring FileName);
-	void DX9Map::GetMapData(std::wstring *pOutputString) const; // For saving the map
+	void DX9Map::CreateNewMap(WSTRING Name, int MapCols, int MapRows);
+	void DX9Map::SetTileTexture(WSTRING FileName);
+	void DX9Map::SetMoveTexture(WSTRING FileName);
+	void DX9Map::LoadMapFromFile(WSTRING FileName);
+	void DX9Map::GetMapData(WSTRING *pOutputString) const; // For saving the map
 
 	void DX9Map::Draw() const override;
 
@@ -77,8 +76,8 @@ public:
 	void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset); // For map movement
 
 	bool DX9Map::IsMapCreated() const;
-	int DX9Map::GetMapName(std::wstring *pStr) const;
-	int DX9Map::GetTileName(std::wstring *pStr) const;
+	int DX9Map::GetMapName(WSTRING *pStr) const;
+	int DX9Map::GetTileName(WSTRING *pStr) const;
 	int DX9Map::GetMapCols() const;
 	int DX9Map::GetMapRows() const;
 	int DX9Map::GetWidth() const override;

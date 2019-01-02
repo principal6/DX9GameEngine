@@ -1,12 +1,5 @@
 #include "DX9Image.h"
 
-// Static members declaration (they must not be initialized anywhere else)
-std::wstring DX9Image::m_BaseDir;
-int DX9Image::m_WindowW = 0;
-int DX9Image::m_WindowH = 0;
-float DX9Image::m_WindowHalfW = 0.0f;
-float DX9Image::m_WindowHalfH = 0.0f;
-
 DX9Image::DX9Image()
 {
 	m_pDevice = nullptr;
@@ -26,20 +19,10 @@ DX9Image::DX9Image()
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 }
 
-void DX9Image::SetStaticMembers(std::wstring BaseDir, int WindowWidth, int WindowHeight)
-{
-	m_BaseDir = BaseDir;
-
-	m_WindowW = WindowWidth;
-	m_WindowH = WindowHeight;
-
-	m_WindowHalfW = (float)(m_WindowW / 2);
-	m_WindowHalfH = (float)(m_WindowH / 2);
-}
-
-void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
+void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
 {
 	m_pDevice = pDevice;
+	m_pShareData = pData;
 
 	ClearVertexAndIndexData();
 	CreateVertexBuffer();
@@ -211,7 +194,7 @@ void DX9Image::SetSize(int Width, int Height)
 	UpdateVertexData();
 }
 
-void DX9Image::SetTexture(std::wstring FileName)
+void DX9Image::SetTexture(WSTRING FileName)
 {
 	if (m_pTexture)
 	{
@@ -219,8 +202,8 @@ void DX9Image::SetTexture(std::wstring FileName)
 		m_pTexture = nullptr;
 	}
 
-	std::wstring NewFileName;
-	NewFileName = m_BaseDir;
+	WSTRING NewFileName;
+	NewFileName = m_pShareData->AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 
@@ -295,13 +278,15 @@ void DX9Image::SetAlpha(int Alpha)
 	}
 }
 
-void DX9Image::SetBoundingnBox(D3DXVECTOR2 Size)
+DX9Image* DX9Image::SetBoundingnBox(D3DXVECTOR2 Size)
 {
 	m_BB.PosOffset.x = -Size.x / 2.0f;
 	m_BB.PosOffset.y = -Size.y;
 
 	m_BB.Size.x = (float)m_ScaledW + Size.x;
 	m_BB.Size.y = (float)m_ScaledH + Size.y;
+
+	return this;
 }
 
 void DX9Image::UpdateVertexData()

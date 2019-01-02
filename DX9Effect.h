@@ -29,17 +29,17 @@ public:
 	DX9Effect();
 	~DX9Effect() {};
 
-	void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
+	void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap);
 	void DX9Effect::Destroy() override;
 
-	void DX9Effect::SetTextureAtlas(std::wstring FileName, int numCols, int numRows);
+	DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows);
 
-	void DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
+	DX9Effect* DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
 		D3DXVECTOR2 BBSize, int RepeatCount = 1);
-	void DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage);
+	DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage);
 
 	void DX9Effect::Draw();
 	void DX9Effect::DrawBoundingBox() override;
 
-	void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters);
+	void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters);
 };
