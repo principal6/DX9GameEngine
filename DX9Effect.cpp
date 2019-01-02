@@ -72,25 +72,34 @@ DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows
 }
 
 DX9Effect* DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
-	D3DXVECTOR2 BBSize, int RepeatCount)
+	D3DXVECTOR2 BBSize, int Delay, int RepeatCount)
 {
-	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, AnimData, SpawnOffset, BBSize, RepeatCount));
+	// Add this new effect type to the vector array
+	m_TypeData.push_back(DX9EFF_TYPE_DATA(Type, AnimData, SpawnOffset, BBSize, Delay, RepeatCount));
 	m_TypeCount = (int)m_TypeData.size();
+
+	// Set the delay count of this new effect type to zero
+	m_DelayCounts.push_back(0);
 
 	return this;
 }
 
 // Every effect is spawned at global position
-DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
+DX9Effect* DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage)
 {
+	// No more space for a new effect
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
+		return nullptr;
+
+	// Delay count is not set zero yet
+	if (m_DelayCounts[EffectTypeID] > 0)
 		return nullptr;
 
 	m_InstanceCount++;
 
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	D3DXVECTOR2 NewPos = Pos;
-	D3DXVECTOR2 SpawnOffsetBase = m_TypeData[EffectID].GetSpawnOffset();
+	D3DXVECTOR2 SpawnOffsetBase = m_TypeData[EffectTypeID].GetSpawnOffset();
 	NewPos.y += SpawnOffsetBase.y;
 	if (Dir == DX9ANIMDIR::Left)
 	{
@@ -103,7 +112,7 @@ DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int D
 	NewPos.x -= (m_UnitW / 2); // Moving to the image's center
 	NewPos.y -= (m_UnitH / 2);
 
-	D3DXVECTOR2 tBBSize = m_TypeData[EffectID].GetBoundingBoxSize();
+	D3DXVECTOR2 tBBSize = m_TypeData[EffectTypeID].GetBoundingBoxSize();
 	DX9BOUNDINGBOX tBB;
 	tBB.PosOffset.x = (float)(-tBBSize.x) / 2.0f;
 	tBB.PosOffset.y = (float)(-tBBSize.y) / 2.0f;
@@ -111,18 +120,20 @@ DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int D
 	tBB.Size.y = m_UnitH + tBBSize.y;
 	tBB.PosOffset += NewPos;
 
-	int tRepeatCount = m_TypeData[EffectID].GetRepeatCount();
+	int tRepeatCount = m_TypeData[EffectTypeID].GetRepeatCount();
 
 	if (m_pFisrtInstance == nullptr)
 	{
-		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectID, NewPos, MapOffset, 0, tBB, Damage, tRepeatCount);
+		m_pFisrtInstance = new DX9EFF_INST_DATA(EffectTypeID, NewPos, MapOffset, 0, tBB, Damage, tRepeatCount);
 		m_pLastInstance = m_pFisrtInstance;
 	}
 	else
 	{
-		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectID, NewPos, MapOffset, 0, tBB, Damage, tRepeatCount));
+		m_pLastInstance->SetNext(new DX9EFF_INST_DATA(EffectTypeID, NewPos, MapOffset, 0, tBB, Damage, tRepeatCount));
 		m_pLastInstance = m_pLastInstance->GetNext();
 	}
+
+	m_DelayCounts[EffectTypeID] = m_TypeData[EffectTypeID].GetDelay();
 
 	return this;
 }
@@ -138,10 +149,12 @@ void DX9Effect::Update()
 
 	if (iterator == nullptr)
 	{
+		// No instance to update
 		m_InstanceCount = iterator_n;
 		return;
 	}
 
+	// There are instances
 	while (iterator)
 	{
 		DX9EFF_TYPE tType = iterator->GetType();
@@ -166,14 +179,17 @@ void DX9Effect::Update()
 		tCurrFrame++;
 		if (tCurrFrame > tEndFrame)
 		{
+			// One animation cycle has ended
 			if (tCurrRepeatCount < tMaxRepeatCount - 1)
 			{
+				// It has to repeat the animation
 				tCurrRepeatCount++;
 				tCurrFrame = tStartFrame;
 				iterator->SetCurrRepeatCount(tCurrRepeatCount);
 			}
 			else
 			{
+				// It repeated all the animation cycles.
 				// DX9Effect's life circle ends here
 				m_pFisrtInstance = iterator->GetNext();
 				delete iterator;
@@ -183,6 +199,7 @@ void DX9Effect::Update()
 
 		if (tCurrFrame <= tEndFrame)
 		{
+			// Still being animated
 			iterator->SetCurrFrame(tCurrFrame);
 
 			D3DXVECTOR2 NewPos = tPos;
@@ -218,6 +235,13 @@ void DX9Effect::Update()
 	DX9Image::UpdateIndexBuffer();
 
 	m_InstanceCount = iterator_n;
+
+	// On each update, the delay counts -= 1
+	for (int& iterator : m_DelayCounts)
+	{
+		if (iterator > 0)
+			iterator--;
+	}
 }
 
 void DX9Effect::Draw()

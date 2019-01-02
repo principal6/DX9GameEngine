@@ -210,19 +210,23 @@ private:
 	DX9EFF_TYPE m_Type;
 	DX9ANIMDATA m_AnimData;
 	D3DXVECTOR2 m_SpawnOffset;
-	int m_RepeatCount;
 	D3DXVECTOR2 m_BBSize;
+	int m_Delay;
+	int m_RepeatCount;
 
 public:
 	DX9EFF_TYPE_DATA() : m_AnimData(DX9ANIMDATA(0, 0)), m_RepeatCount(1) {};
-	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int RepeatCount) :
-		m_Type(Type), m_AnimData(AnimData), m_SpawnOffset(SpawnOffset), m_BBSize(BBSize), m_RepeatCount(RepeatCount) {};
+	DX9EFF_TYPE_DATA(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize, int Delay,
+		int RepeatCount) :
+		m_Type(Type), m_AnimData(AnimData), m_SpawnOffset(SpawnOffset), m_BBSize(BBSize), m_Delay(Delay), 
+		m_RepeatCount(RepeatCount) {};
 
 	D3DXVECTOR2 GetSpawnOffset() { return m_SpawnOffset; };
 	D3DXVECTOR2 GetBoundingBoxSize() { return m_BBSize; };
 	int GetStartFrame() { return m_AnimData.FrameS; };
 	int GetEndFrame() { return m_AnimData.FrameE; };
 	int GetRepeatCount() { return m_RepeatCount; };
+	int GetDelay() { return m_Delay; };
 };
 
 class DX9EFF_INST_DATA

@@ -40,7 +40,7 @@ int main()
 
 	g_Engine.GetEffectManagerObject()
 		->SetTextureAtlas(L"particlefx_14.png", 8, 8)
-		->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f));
+		->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f), 20);
 
 	g_Engine.GetFontObject()
 		->MakeFont(DX9FONT_ID::Debug, L"±¼¸²", 14, true);

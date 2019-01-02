@@ -18,6 +18,7 @@ private:
 	DX9EFF_INST_DATA* m_pFisrtInstance;
 	DX9EFF_INST_DATA* m_pLastInstance;
 	int m_InstanceCount;
+	std::vector<int> m_DelayCounts;
 
 private:
 	void DX9Effect::CreateVertexBuffer() override;
@@ -35,8 +36,8 @@ public:
 	DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows);
 
 	DX9Effect* DX9Effect::AddEffectType(DX9EFF_TYPE Type, DX9ANIMDATA AnimData, D3DXVECTOR2 SpawnOffset,
-		D3DXVECTOR2 BBSize, int RepeatCount = 1);
-	DX9Effect* DX9Effect::Spawn(int EffectID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage);
+		D3DXVECTOR2 BBSize, int Delay, int RepeatCount = 1);
+	DX9Effect* DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, DX9ANIMDIR Dir, int Damage);
 
 	void DX9Effect::Draw();
 	void DX9Effect::DrawBoundingBox() override;
