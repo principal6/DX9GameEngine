@@ -74,7 +74,7 @@ public:
 	DX9Monsters Class
 -----------------------------------------------------------------------------*/
 
-class DX9Monsters
+class DX9MonsterManager
 {
 private:
 	LPDIRECT3DDEVICE9 m_pDevice;
@@ -85,19 +85,19 @@ private:
 	std::vector<DX9MonsterInstance> m_Instances;
 
 public:
-	DX9Monsters() {};
-	~DX9Monsters() {};
+	DX9MonsterManager() {};
+	~DX9MonsterManager() {};
 
-	void DX9Monsters::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
-	void DX9Monsters::Destroy();
+	void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
+	void DX9MonsterManager::Destroy();
 
-	DX9MonsterType* DX9Monsters::AddMonsterType(DX9MonsterType Value);
-	DX9MonsterInstance* DX9Monsters::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
+	DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);
+	DX9MonsterInstance* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
 
-	void DX9Monsters::Animate();
-	void DX9Monsters::Gravitate();
-	void DX9Monsters::Draw();
-	void DX9Monsters::DrawBoundingBox();
+	void DX9MonsterManager::Animate();
+	void DX9MonsterManager::Gravitate();
+	void DX9MonsterManager::Draw();
+	void DX9MonsterManager::DrawBoundingBox();
 
-	std::vector<DX9MonsterInstance>* DX9Monsters::GetInstancePointer();
+	std::vector<DX9MonsterInstance>* DX9MonsterManager::GetInstancePointer();
 };

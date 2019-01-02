@@ -1,4 +1,4 @@
-#include "DX9Monsters.h"
+#include "DX9MonsterManager.h"
 
 /*-----------------------------------------------------------------------------
 	DX9MonsterType Class
@@ -126,16 +126,16 @@ void DX9MonsterInstance::Draw()
 }
 
 /*-----------------------------------------------------------------------------
-	DX9Monsters Class
+	DX9MonsterManager Class
 -----------------------------------------------------------------------------*/
 
-void DX9Monsters::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
 	m_pDevice = pDevice;
 	m_pMap = pMap;
 }
 
-void DX9Monsters::Destroy()
+void DX9MonsterManager::Destroy()
 {
 	m_pDevice = nullptr;
 	m_pMap = nullptr;
@@ -146,13 +146,13 @@ void DX9Monsters::Destroy()
 	}
 }
 
-DX9MonsterType* DX9Monsters::AddMonsterType(DX9MonsterType Value)
+DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value)
 {
 	m_Types.push_back(Value);
 	return &m_Types[m_Types.size() - 1];
 }
 
-DX9MonsterInstance* DX9Monsters::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
+DX9MonsterInstance* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
 {
 	for (DX9MonsterType& TypeIterator : m_Types)
 	{
@@ -179,7 +179,7 @@ DX9MonsterInstance* DX9Monsters::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPo
 	return nullptr;
 }
 
-void DX9Monsters::Animate()
+void DX9MonsterManager::Animate()
 {
 	for (DX9MonsterInstance& InstanceIterator : m_Instances)
 	{
@@ -187,7 +187,7 @@ void DX9Monsters::Animate()
 	}
 }
 
-void DX9Monsters::Gravitate()
+void DX9MonsterManager::Gravitate()
 {
 	for (DX9MonsterInstance& InstanceIterator : m_Instances)
 	{
@@ -195,7 +195,7 @@ void DX9Monsters::Gravitate()
 	}
 }
 
-void DX9Monsters::Draw()
+void DX9MonsterManager::Draw()
 {
 	for (DX9MonsterInstance& InstanceIterator : m_Instances)
 	{
@@ -203,7 +203,7 @@ void DX9Monsters::Draw()
 	}
 }
 
-void DX9Monsters::DrawBoundingBox()
+void DX9MonsterManager::DrawBoundingBox()
 {
 	for (DX9MonsterInstance& InstanceIterator : m_Instances)
 	{
@@ -211,7 +211,7 @@ void DX9Monsters::DrawBoundingBox()
 	}
 }
 
-std::vector<DX9MonsterInstance>* DX9Monsters::GetInstancePointer()
+std::vector<DX9MonsterInstance>* DX9MonsterManager::GetInstancePointer()
 {
 	return &m_Instances;
 }
