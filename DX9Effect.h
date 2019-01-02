@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DX9Image.h"
-#include "DX9MonsterManager.h"
+#include "DX9Monsters.h"
 
 class DX9Effect final : protected DX9Image
 {
@@ -41,5 +41,5 @@ public:
 	void DX9Effect::Draw();
 	void DX9Effect::DrawBoundingBox() override;
 
-	void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsterManager);
+	void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters);
 };

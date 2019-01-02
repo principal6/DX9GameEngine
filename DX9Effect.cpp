@@ -260,7 +260,7 @@ void DX9Effect::DeleteInstance(DX9EFF_INST_DATA* pInstance)
 	}
 }
 
-void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsterManager)
+void DX9Effect::CheckCollisionWithMonsters(DX9Monsters* pMonsters)
 {
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9EFF_INST_DATA* iterator = m_pFisrtInstance;
