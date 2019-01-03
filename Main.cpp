@@ -16,7 +16,7 @@ int main()
 	if (DX_FAILED(g_Engine.Create(800, 600)))
 		return -1;
 
-	g_Engine.SetBackground(L"bg_forest_evening.png");
+	g_Engine.SetBackground(L"colored_talltrees.png");
 	g_Engine.LoadMap(L"map01.jwm");
 	g_Engine.SpriteCreate(L"advnt_full.png", 10, 10, 1.5f)
 		->AddAnimation(DX9Common::AnimationID::Idle, 0, 0)

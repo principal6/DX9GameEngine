@@ -1,7 +1,7 @@
 #include "DX9Common.h"
 
 const float DX9Common::UV_OFFSET = 0.002f;
-const wchar_t DX9Common::ASSET_DIR[] = L"\\Data\\";
+const wchar_t DX9Common::ASSET_DIR[] = L"\\Asset\\";
 HINSTANCE DX9Common::m_hInstance = nullptr;
 HWND DX9Common::m_hWnd = nullptr;
 WindowData DX9Common::m_WindowData;
