@@ -58,7 +58,7 @@ void Render()
 {
 	g_Engine.GetFontObject()
 		->SelectFont(DX9Common::FontID::Debug)
-		->SetFontColor(D3DCOLOR_ARGB(255, 0, 255, 120))
+		->SetFontColor(D3DCOLOR_ARGB(255, 0, 100, 50))
 		->Draw(0, 5, L"화살표 키: 이동, 점프 / Ctrl: 물리 공격 / Alt: 마법 공격")
 		->Draw(0, 25, L"B: 바운딩 박스 토글");
 }

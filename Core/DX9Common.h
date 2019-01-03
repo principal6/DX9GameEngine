@@ -35,6 +35,12 @@ public:
 		Debug,
 	};
 
+	enum class MapMode
+	{
+		TileMode,
+		MoveMode,
+	};
+
 	enum class EffectType
 	{
 		Still,

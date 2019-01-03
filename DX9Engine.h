@@ -1,8 +1,9 @@
 #pragma once
 
+//#include "Core\\DX9Image.h"
 #include "DX9Base.h"
+#include "DX9Background.h"
 #include "DX9Input.h"
-#include "Core\\DX9Image.h"
 #include "DX9Sprite.h"
 #include "DX9Monsters.h"
 #include "DX9Effect.h"
@@ -31,7 +32,7 @@ private:
 	void(*m_pfKeyboard)(DWORD DIK_KeyCode);
 
 	DX9Input* m_Input;
-	DX9Image* m_ImageBackGround;
+	DX9Background* m_Background;
 	DX9Map* m_Map;
 	DX9Sprite* m_Sprite;
 	DX9MonsterManager* m_MonsterManager;

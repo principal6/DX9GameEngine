@@ -46,7 +46,6 @@ private:
 	D3DCOLOR m_BGColor;
 
 protected:
-	
 	MSG m_MSG;
 
 private:

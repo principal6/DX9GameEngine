@@ -36,7 +36,7 @@ protected:
 	};
 
 protected:
-	static LPDIRECT3DDEVICE9 m_pDevice;
+	LPDIRECT3DDEVICE9 m_pDevice;
 	LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
 	LPDIRECT3DTEXTURE9 m_pTexture;

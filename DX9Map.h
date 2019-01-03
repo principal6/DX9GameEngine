@@ -6,12 +6,6 @@
 class DX9Map final : protected DX9Image
 {
 private:
-	enum class Mode
-	{
-		TileMode,
-		MoveMode,
-	};
-
 	struct MapData
 	{
 		int TileID;
@@ -37,7 +31,7 @@ private:
 	static const int TILE_H;
 	static const int MOVE_ALPHA;
 
-	Mode m_CurrMapMode; // For Map Editor
+	MapMode m_CurrMapMode; // For Map Editor
 	bool m_bMapCreated;
 	int m_MapCols;
 	int m_MapRows;
@@ -92,7 +86,7 @@ public:
 
 	void DX9Map::Draw() override;
 
-	void DX9Map::SetMode(Mode Mode);
+	void DX9Map::SetMode(MapMode Mode);
 	void DX9Map::SetPosition(D3DXVECTOR2 Offset);
 	void DX9Map::SetMapFragmentTile(int TileID, int X, int Y);
 	void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y);

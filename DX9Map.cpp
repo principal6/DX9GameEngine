@@ -10,7 +10,7 @@ const int DX9Map::MOVE_ALPHA = 100;
 
 DX9Map::DX9Map()
 {
-	m_CurrMapMode = Mode::TileMode;
+	m_CurrMapMode = MapMode::TileMode;
 	m_bMapCreated = false;
 	m_MapCols = 0;
 	m_MapRows = 0;
@@ -461,14 +461,14 @@ D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp) con
 	return Result;
 }
 
-void DX9Map::SetMode(Mode Mode)
+void DX9Map::SetMode(MapMode Mode)
 {
 	switch (Mode)
 	{
-	case Mode::TileMode:
+	case MapMode::TileMode:
 		m_CurrMapMode = Mode;
 		return;
-	case Mode::MoveMode:
+	case MapMode::MoveMode:
 		if (m_bMoveTextureLoaded)
 		{
 			m_CurrMapMode = Mode;
@@ -625,7 +625,7 @@ void DX9Map::Draw()
 		m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, static_cast<int>(m_Vertices.size()), 0, static_cast<int>(m_Indices.size()));
 	}
 
-	if ((m_CurrMapMode == Mode::MoveMode) && m_pTextureMove)
+	if ((m_CurrMapMode == MapMode::MoveMode) && m_pTextureMove)
 	{
 		m_pDevice->SetTexture(0, m_pTextureMove);
 

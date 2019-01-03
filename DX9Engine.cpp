@@ -37,9 +37,9 @@ DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 	}
 
 	// Create image object
-	if (m_ImageBackGround = new DX9Image)
+	if (m_Background = new DX9Background)
 	{
-		if (DX_FAILED(m_ImageBackGround->Create(GetDevice())))
+		if (DX_FAILED(m_Background->Create(GetDevice())))
 			return ReturnValue::IMAGE_NOT_CREATED;
 	}
 	
@@ -229,7 +229,7 @@ void DX9Engine::Destroy()
 	m_MonsterManager->Destroy();
 	m_Sprite->Destroy();
 	m_Map->Destroy();
-	m_ImageBackGround->Destroy();
+	m_Background->Destroy();
 	m_Input->Destroy();
 
 	delete m_FontManager;
@@ -237,7 +237,7 @@ void DX9Engine::Destroy()
 	delete m_MonsterManager;
 	delete m_Sprite;
 	delete m_Map;
-	delete m_ImageBackGround;
+	delete m_Background;
 	delete m_Input;
 
 	m_FontManager = nullptr;
@@ -245,7 +245,7 @@ void DX9Engine::Destroy()
 	m_MonsterManager = nullptr;
 	m_Sprite = nullptr;
 	m_Map = nullptr;
-	m_ImageBackGround = nullptr;
+	m_Background = nullptr;
 	m_Input = nullptr;
 
 	DX9Base::Destroy();
@@ -253,8 +253,8 @@ void DX9Engine::Destroy()
 
 void DX9Engine::SetBackground(WSTRING TextureFN)
 {
-	assert(m_ImageBackGround);
-	m_ImageBackGround->SetTexture(TextureFN);
+	assert(m_Background);
+	m_Background->SetTexture(TextureFN);
 }
 
 DX9Sprite* DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)
@@ -321,8 +321,8 @@ DX9Effect* DX9Engine::GetEffectManagerObject()
 
 void DX9Engine::DrawBackground()
 {
-	assert(m_ImageBackGround);
-	m_ImageBackGround->Draw();
+	assert(m_Background);
+	m_Background->Draw();
 }
 
 void DX9Engine::DrawMap()

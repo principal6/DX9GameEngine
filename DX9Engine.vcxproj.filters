@@ -57,6 +57,9 @@
     <ClInclude Include="Core\DX9Line.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="DX9Background.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -100,6 +103,9 @@
     </ClCompile>
     <ClCompile Include="Core\DX9Line.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9Background.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,8 +1,5 @@
 #include "DX9Image.h"
 
-// Static member variable declaration
-LPDIRECT3DDEVICE9 DX9Image::m_pDevice;
-
 DX9Image::DX9Image()
 {
 	m_pDevice = nullptr;
