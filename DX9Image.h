@@ -68,7 +68,7 @@ public:
 	DX9Image();
 	virtual ~DX9Image() {};
 
-	virtual void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice);
+	virtual ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice);
 	virtual void DX9Image::Destroy() override;
 
 	virtual void DX9Image::Draw();

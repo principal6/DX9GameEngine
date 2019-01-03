@@ -9,9 +9,14 @@ DX9Font::DX9Font()
 	m_FontColor = 0xFF000000;
 }
 
-void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)
 {
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
 	m_pDevice = pDevice;
+
+	return ReturnValue::OK;
 }
 
 void DX9Font::Destroy()

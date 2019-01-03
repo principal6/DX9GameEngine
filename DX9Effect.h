@@ -93,7 +93,7 @@ public:
 	DX9Effect();
 	~DX9Effect() {};
 
-	void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
+	ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
 	void DX9Effect::Destroy() override;
 
 	DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows);

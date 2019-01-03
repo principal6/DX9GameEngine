@@ -59,7 +59,7 @@ public:
 	DX9Base();
 	~DX9Base() {};
 
-	bool DX9Base::Create(CINT X, CINT Y);
+	ReturnValue DX9Base::Create(CINT X, CINT Y);
 	void DX9Base::CreateOnWindow(HWND hWnd);
 	virtual void DX9Base::Run() = 0;
 	virtual int DX9Base::RunWithAccel(HACCEL hAccel) = 0;

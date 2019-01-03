@@ -12,6 +12,7 @@
 class DX9Engine final : public DX9Base
 {
 private:
+	static const int ANIM_TICK = 70;
 	static const int WINDOW_X;
 	static const int WINDOW_Y;
 	static const int KEY_PRESS_INTERVAL;
@@ -35,7 +36,7 @@ private:
 	DX9Sprite* m_Sprite;
 	DX9MonsterManager* m_MonsterManager;
 	DX9Effect* m_EffectManager;
-	DX9Font* m_Font;
+	DX9Font* m_FontManager;
 
 private:
 	void DX9Engine::Destroy() override;

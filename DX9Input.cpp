@@ -14,7 +14,7 @@ DX9Input::DX9Input()
 	m_MouseY = 0;
 }
 
-bool DX9Input::Create()
+DX9Common::ReturnValue DX9Input::Create()
 {
 	memset(m_MouseBtnDown, false, sizeof(m_MouseBtnDown));
 	memset(m_MouseBtnUp, false, sizeof(m_MouseBtnUp));
@@ -22,15 +22,15 @@ bool DX9Input::Create()
 
 	if(FAILED(DirectInput8Create(DX9Common::m_hInstance, DIRECTINPUT_VERSION,
 		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
-		return false;
+		return ReturnValue::OBJECT_NOT_CREATED;
 
 	if (FAILED(CreateMouseDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
-		return false;
+		return ReturnValue::OBJECT_NOT_CREATED;
 
 	if (FAILED(CreateKeyboardDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
-		return false;
+		return ReturnValue::OBJECT_NOT_CREATED;
 
-	return true;
+	return ReturnValue::OK;
 }
 
 bool DX9Input::CreateMouseDevice(DWORD dwFlags)

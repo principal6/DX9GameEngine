@@ -30,9 +30,15 @@ DX9Monster::DX9Monster()
 	m_HPBar = nullptr;
 }
 
-void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
-	DX9Life::Create(pDevice);
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
+	if (pMap == nullptr)
+		return ReturnValue::MAP_NULL;
+
+	ReturnValue Result = DX9Life::Create(pDevice);
 	DX9Life::SetMapPointer(pMap);
 
 	m_HPFrame = new DX9Image;
@@ -44,6 +50,8 @@ void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 	m_HPBar->SetTexture(L"hpbar.png");
 
 	m_bUILoaded = true;
+
+	return Result;
 }
 
 void DX9Monster::Destroy()
@@ -142,10 +150,18 @@ void DX9Monster::Draw()
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 
-void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
+	if (pMap == nullptr)
+		return ReturnValue::MAP_NULL;
+
 	m_pDevice = pDevice;
 	m_pMap = pMap;
+
+	return ReturnValue::OK;
 }
 
 void DX9MonsterManager::Destroy()

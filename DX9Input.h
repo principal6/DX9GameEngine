@@ -35,7 +35,7 @@ public:
 	DX9Input();
 	~DX9Input() {};
 
-	bool DX9Input::Create();
+	ReturnValue DX9Input::Create();
 	void DX9Input::Destroy() override;
 
 	bool DX9Input::OnKeyDown(DWORD DIK_KeyCode);

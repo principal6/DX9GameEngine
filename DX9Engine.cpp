@@ -26,49 +26,55 @@ DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 	GetCurrentDirectoryW(255, m_WindowData.AppDir);
 	
 	// Create window and initialize Direct3D9
-	if (!DX9Base::Create(WINDOW_X, WINDOW_Y))
-		return ReturnValue::CREATION_FAILED;
+	if (DX_FAILED(DX9Base::Create(WINDOW_X, WINDOW_Y)))
+		return ReturnValue::BASE_NOT_CREATED;
 
 	// Create input device
 	if (m_Input = new DX9Input)
 	{
-		if (!m_Input->Create())
-			return ReturnValue::CREATION_FAILED;
+		if (DX_FAILED(m_Input->Create()))
+			return ReturnValue::INPUT_NOT_CREATED;
 	}
 
 	// Create image object
 	if (m_ImageBackGround = new DX9Image)
 	{
-		m_ImageBackGround->Create(GetDevice());
+		if (DX_FAILED(m_ImageBackGround->Create(GetDevice())))
+			return ReturnValue::IMAGE_NOT_CREATED;
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
-		m_Map->Create(GetDevice());
+		if (DX_FAILED(m_Map->Create(GetDevice())))
+			return ReturnValue::MAP_NOT_CREATED;
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
-		m_Sprite->Create(GetDevice(), m_Map);
+		if (DX_FAILED(m_Sprite->Create(GetDevice(), m_Map)))
+			return ReturnValue::SPRITE_NOT_CREATED;
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
-		m_MonsterManager->Create(GetDevice(), m_Map);
+		if (DX_FAILED(m_MonsterManager->Create(GetDevice(), m_Map)))
+			return ReturnValue::MONSTERMANAGER_NOT_CREATED;
 	}
 
 	// Create effect object
 	if (m_EffectManager = new DX9Effect)
 	{
-		m_EffectManager->Create(GetDevice(), m_Map);
+		if (DX_FAILED(m_EffectManager->Create(GetDevice(), m_Map)))
+			return ReturnValue::EFFECTMANAGER_NOT_CREATED;
 	}
 
-	if (m_Font = new DX9Font)
+	if (m_FontManager = new DX9Font)
 	{
-		m_Font->Create(GetDevice());
+		if (DX_FAILED(m_FontManager->Create(GetDevice())))
+			return ReturnValue::FONTMANAGER_NOT_CREATED;
 	}
 
 	return ReturnValue::OK;
@@ -154,7 +160,7 @@ void DX9Engine::MainLoop()
 	}
 
 	// Timer for steady animations
-	if (GetTickCount64() >= m_TimerAnim + 80)
+	if (GetTickCount64() >= m_TimerAnim + ANIM_TICK)
 	{
 		m_TimerAnim = GetTickCount64();
 		m_MonsterManager->Animate();
@@ -218,7 +224,7 @@ void DX9Engine::DetectInput()
 
 void DX9Engine::Destroy()
 {
-	m_Font->Destroy();
+	m_FontManager->Destroy();
 	m_EffectManager->Destroy();
 	m_MonsterManager->Destroy();
 	m_Sprite->Destroy();
@@ -226,7 +232,7 @@ void DX9Engine::Destroy()
 	m_ImageBackGround->Destroy();
 	m_Input->Destroy();
 
-	delete m_Font;
+	delete m_FontManager;
 	delete m_EffectManager;
 	delete m_MonsterManager;
 	delete m_Sprite;
@@ -234,7 +240,7 @@ void DX9Engine::Destroy()
 	delete m_ImageBackGround;
 	delete m_Input;
 
-	m_Font = nullptr;
+	m_FontManager = nullptr;
 	m_EffectManager = nullptr;
 	m_MonsterManager = nullptr;
 	m_Sprite = nullptr;
@@ -291,8 +297,8 @@ DX9Monster* DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosit
 
 DX9Font* DX9Engine::GetFontObject()
 {
-	assert(m_Font);
-	return m_Font;
+	assert(m_FontManager);
+	return m_FontManager;
 }
 
 DX9Sprite* DX9Engine::GetSpriteObject()

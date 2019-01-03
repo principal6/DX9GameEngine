@@ -9,9 +9,15 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
-	DX9Image::Create(pDevice);
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
+	if (pMap == nullptr)
+		return ReturnValue::MAP_NULL;
+
+	ReturnValue Result = DX9Image::Create(pDevice);
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();
@@ -20,6 +26,8 @@ void DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 	m_BBLine.CreateMax(m_pDevice);
 
 	m_pMap = pMap;
+
+	return Result;
 }
 
 void DX9Effect::CreateVertexBuffer()

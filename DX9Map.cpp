@@ -27,13 +27,18 @@ DX9Map::DX9Map()
 	m_OffsetZeroY = 0;
 }
 
-void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice)
 {
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
 	m_pDevice = pDevice;
 
 	ClearAllData();
 	m_Vertices.clear();
 	m_Indices.clear();
+
+	return ReturnValue::OK;
 }
 
 void DX9Map::ClearAllData()

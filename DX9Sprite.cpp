@@ -1,9 +1,16 @@
 #include "DX9Sprite.h"
 
-void DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
-	DX9Life::Create(pDevice);
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
+	if (pMap == nullptr)
+		return ReturnValue::MAP_NULL;
+
+	ReturnValue Result = DX9Life::Create(pDevice);
 	DX9Life::SetMapPointer(pMap);
+	return Result;
 }
 
 DX9Sprite* DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)

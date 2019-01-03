@@ -24,7 +24,7 @@ public:
 	DX9Font();
 	~DX9Font() {};
 
-	void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice);
+	ReturnValue DX9Font::Create(LPDIRECT3DDEVICE9 pDevice);
 	void DX9Font::Destroy();
 
 	void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold);

@@ -25,18 +25,18 @@ DX9Base::DX9Base()
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-bool DX9Base::Create(CINT X, CINT Y)
+DX9Common::ReturnValue DX9Base::Create(CINT X, CINT Y)
 {
 	RGBInt rBGColor = RGBInt(255, 0, 255);
 
 	if (CreateWND(L"Game", X, Y, m_WindowData.WindowWidth, m_WindowData.WindowHeight, WindowStyle::OverlappedWindow, rBGColor)
 		== nullptr)
-		return false;
+		return ReturnValue::WINDOW_NOT_CREATED;
 
 	if (InitD3D() == -1)
-		return false;
+		return ReturnValue::DIRECTX_NOT_CREATED;
 
-	return true;
+	return ReturnValue::OK;
 }
 
 void DX9Base::CreateOnWindow(HWND hWnd)

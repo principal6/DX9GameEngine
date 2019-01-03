@@ -81,7 +81,7 @@ public:
 	DX9Map();
 	virtual ~DX9Map() {};
 
-	void DX9Map::Create(LPDIRECT3DDEVICE9 pDevice);
+	ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice);
 	void DX9Map::Destroy() override;
 	
 	void DX9Map::CreateNewMap(WSTRING Name, int MapCols, int MapRows);

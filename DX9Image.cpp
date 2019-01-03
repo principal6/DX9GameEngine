@@ -22,8 +22,11 @@ DX9Image::DX9Image()
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 }
 
-void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
 {
+	if (pDevice == nullptr)
+		return ReturnValue::DEVICE_NULL;
+
 	m_pDevice = pDevice;
 
 	ClearVertexAndIndexData();
@@ -35,6 +38,8 @@ void DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
 	m_BBLine.Create(m_pDevice);
 	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
 	m_BBLine.AddEnd();
+
+	return ReturnValue::OK;
 }
 
 void DX9Image::Destroy()
