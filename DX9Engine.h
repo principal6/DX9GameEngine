@@ -2,7 +2,7 @@
 
 #include "DX9Base.h"
 #include "DX9Input.h"
-#include "DX9Image.h"
+#include "Core\\DX9Image.h"
 #include "DX9Sprite.h"
 #include "DX9Monsters.h"
 #include "DX9Effect.h"

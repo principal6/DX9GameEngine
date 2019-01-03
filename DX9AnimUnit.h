@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DX9Image.h"
+#include "Core\\DX9Image.h"
 
 class DX9AnimUnit : protected DX9Image
 {

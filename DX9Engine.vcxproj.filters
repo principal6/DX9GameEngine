@@ -13,15 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{a6f244a0-dffc-4090-9594-be8964ddb2d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DX9Common.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="DX9Base.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Image.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DX9Input.h">
@@ -31,9 +28,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DX9Map.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Line.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DX9Effect.h">
@@ -54,15 +48,21 @@
     <ClInclude Include="DX9Engine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Core\DX9Common.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DX9Image.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\DX9Line.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DX9Base.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Image.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DX9Input.cpp">
@@ -72,9 +72,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DX9Map.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Line.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DX9Effect.cpp">
@@ -95,8 +92,14 @@
     <ClCompile Include="DX9Engine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="DX9Common.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Core\DX9Common.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DX9Image.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\DX9Line.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
