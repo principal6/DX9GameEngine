@@ -1,52 +1,60 @@
 #include "DX9Font.h"
 
+// Static member variable declaration
+LPDIRECT3DDEVICE9 DX9Font::m_pDevice;
+
 DX9Font::DX9Font()
 {
-	for (int i = 0; i < MAX_FONT_NUM; i++)
-	{
-		m_pFonts[i] = nullptr;
-	}
-
-	m_FontCount = 0;
-	m_CurrFontID = 0;
-
+	m_CurrFontInstanceID = 0;
 	m_FontColor = 0xFF000000;
 }
 
-void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
+void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)
 {
 	m_pDevice = pDevice;
-	m_pShareData = pData;
 }
 
 void DX9Font::Destroy()
 {
 	m_pDevice = nullptr;
 
-	for (int i = 0; i < MAX_FONT_NUM; i++)
+	for (FontInstance& iterator : m_Fonts)
 	{
-		if (m_pFonts[i])
+		if (iterator.pFont)
 		{
-			m_pFonts[i]->Release();
-			m_pFonts[i] = nullptr;
+			iterator.pFont->Release();
+			iterator.pFont = nullptr;
 		}
 	}
 }
 
-void DX9Font::MakeFont(DX9FONT_ID ID, WSTRING FontName, int FontSize, bool IsBold)
+void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold)
 {
 	UINT Weight = FW_NORMAL;
 	if (IsBold)
 		Weight = FW_BOLD;
 
+	LPD3DXFONT tpFont;
 	D3DXCreateFont(m_pDevice, FontSize, 0, Weight, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-		ANTIALIASED_QUALITY, DEFAULT_PITCH|FF_DONTCARE, FontName.c_str(), &m_pFonts[(int)ID]);
+		ANTIALIASED_QUALITY, DEFAULT_PITCH|FF_DONTCARE, FontName.c_str(), &tpFont);
+
+	m_Fonts.emplace_back(ID, tpFont);
 }
 
-DX9Font* DX9Font::SelectFont(DX9FONT_ID ID)
+DX9Font* DX9Font::SelectFont(FontID ID)
 {
-	m_CurrFontID = (int)ID;
-	return this;
+	int iterator_n = 0;
+	for (FontInstance& iterator : m_Fonts)
+	{
+		if (iterator.ID == ID)
+		{
+			m_CurrFontInstanceID = iterator_n;
+			return this;
+		}
+		iterator_n++;
+	}
+
+	return nullptr;
 }
 
 DX9Font* DX9Font::SetFontColor(DWORD Color)
@@ -58,7 +66,7 @@ DX9Font* DX9Font::SetFontColor(DWORD Color)
 DX9Font* DX9Font::Draw(int X, int Y, WSTRING String)
 {
 	RECT Rect_Font;
-	SetRect(&Rect_Font, X, Y, m_pShareData->WindowWidth, m_pShareData->WindowHeight);
-	m_pFonts[m_CurrFontID]->DrawText(nullptr, String.c_str(), -1, &Rect_Font, DT_LEFT|DT_NOCLIP, m_FontColor);
+	SetRect(&Rect_Font, X, Y, m_WindowData.WindowWidth, m_WindowData.WindowHeight);
+	m_Fonts[m_CurrFontInstanceID].pFont->DrawText(nullptr, String.c_str(), -1, &Rect_Font, DT_LEFT|DT_NOCLIP, m_FontColor);
 	return this;
 }

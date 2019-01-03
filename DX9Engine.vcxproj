@@ -181,6 +181,7 @@
     <ClCompile Include="DX9Line.cpp" />
     <ClCompile Include="DX9Monsters.cpp" />
     <ClCompile Include="DX9Sprite.cpp" />
+    <ClCompile Include="DX9Common.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

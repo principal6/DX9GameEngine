@@ -3,13 +3,13 @@
 #include "DX9AnimUnit.h"
 #include "DX9Map.h"
 
-const D3DXVECTOR2 JUMP_POWER = D3DXVECTOR2(0.0f, -14.0f);
-const D3DXVECTOR2 GRAVITY = D3DXVECTOR2(0.0f, 0.5f);
-const float STRIDE = 5.0f;
-
 class DX9Life : public DX9AnimUnit
 {
 protected:
+	static const D3DXVECTOR2 JUMP_POWER;
+	static const D3DXVECTOR2 GRAVITY;
+	static const float STRIDE;
+
 	const DX9Map* m_pMap;
 	D3DXVECTOR2 m_GlobalPos;
 	D3DXVECTOR2 m_GlobalPosInverse;
@@ -25,7 +25,8 @@ public:
 	DX9Life();
 	virtual ~DX9Life() {};
 
-	void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData) override;
+	void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice) override;
+	void DX9Life::Destroy() override;
 	virtual DX9Life* DX9Life::SetGlobalPosition(D3DXVECTOR2 Position) = 0;
 
 	D3DXVECTOR2 DX9Life::GetGlobalPosition() const;
@@ -39,7 +40,7 @@ public:
 	void DX9Life::MoveWithVelocity();
 	void DX9Life::MoveConst(D3DXVECTOR2 dXY);
 
-	void DX9Life::Walk(DX9ANIMDIR Direction);
+	void DX9Life::Walk(AnimationDir Direction);
 	void DX9Life::Jump();
 	void DX9Life::Gravitate();
 };

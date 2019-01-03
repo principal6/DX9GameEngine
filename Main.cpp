@@ -13,37 +13,38 @@ int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	if (g_Engine.Create(800, 600) != DX9ERROR_CHECK::OK)
+	if (DX_FAILED(g_Engine.Create(800, 600)))
 		return -1;
 
 	g_Engine.SetBackground(L"bg_forest_evening.png");
 	g_Engine.LoadMap(L"map01.jwm");
 	g_Engine.SpriteCreate(L"advnt_full.png", 10, 10, 1.5f)
-		->AddAnimation(DX9ANIMID::Idle, 0, 0)
-		->AddAnimation(DX9ANIMID::Walk, 1, 5)
-		->AddAnimation(DX9ANIMID::Jumping, 17, 17)
-		->AddAnimation(DX9ANIMID::Falling, 18, 18)
-		->AddAnimation(DX9ANIMID::Landing, 19, 19)
-		->AddAnimation(DX9ANIMID::Attack1, 27, 28) // Punch
-		->AddAnimation(DX9ANIMID::Attack2, 24, 26) // HorzAttack
+		->AddAnimation(DX9Common::AnimationID::Idle, 0, 0)
+		->AddAnimation(DX9Common::AnimationID::Walk, 1, 5)
+		->AddAnimation(DX9Common::AnimationID::Jumping, 17, 17)
+		->AddAnimation(DX9Common::AnimationID::Falling, 18, 18)
+		->AddAnimation(DX9Common::AnimationID::Landing, 19, 19)
+		->AddAnimation(DX9Common::AnimationID::Attack1, 27, 28) // Punch
+		->AddAnimation(DX9Common::AnimationID::Attack2, 24, 26) // HorzAttack
 		->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f))
 		->SetBoundingnBox(D3DXVECTOR2(-24, -18));
 
 	g_Engine.GetMonsterManagerObject()
 		->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
-		->AddAnimation(DX9MONANIMDATA(DX9ANIMID::Idle, 0, 7));
+		->AddAnimation(DX9Common::AnimationData(DX9Common::AnimationID::Idle, 0, 7));
 
 	g_Engine.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 60.0f))
-		->SetAnimation(DX9ANIMID::Idle);
+		->SetAnimation(DX9Common::AnimationID::Idle);
 	g_Engine.SpawnMonster(L"Mage", D3DXVECTOR2(400.0f, 300.0f))
-		->SetAnimation(DX9ANIMID::Idle);
+		->SetAnimation(DX9Common::AnimationID::Idle);
 
 	g_Engine.GetEffectManagerObject()
 		->SetTextureAtlas(L"particlefx_14.png", 8, 8)
-		->AddEffectType(DX9EFF_TYPE::Still, DX9ANIMDATA(0, 63), D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f), 20);
+		->AddEffectType(DX9Common::EffectType::Still, DX9Common::AnimationData(DX9Common::AnimationID::Effect, 0, 63),
+			D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f), 20);
 
 	g_Engine.GetFontObject()
-		->MakeFont(DX9FONT_ID::Debug, L"굴림", 14, true);
+		->MakeFont(DX9Common::FontID::Debug, L"굴림", 14, true);
 
 	g_Engine.SetRenderFunction(Render);
 	g_Engine.SetKeyboardFunction(Keyboard);
@@ -56,7 +57,7 @@ int main()
 void Render()
 {
 	g_Engine.GetFontObject()
-		->SelectFont(DX9FONT_ID::Debug)
+		->SelectFont(DX9Common::FontID::Debug)
 		->SetFontColor(D3DCOLOR_ARGB(255, 0, 255, 120))
 		->Draw(0, 5, L"화살표 키: 이동, 점프 / Ctrl: 물리 공격 / Alt: 마법 공격")
 		->Draw(0, 25, L"B: 바운딩 박스 토글");
@@ -67,13 +68,13 @@ void Keyboard(DWORD Key)
 	switch (Key)
 	{
 	case DIK_RIGHTARROW:
-		g_Engine.SpriteWalk(DX9ANIMDIR::Right);
+		g_Engine.SpriteWalk(DX9Common::AnimationDir::Right);
 		break;
 	case DIK_LEFTARROW:
-		g_Engine.SpriteWalk(DX9ANIMDIR::Left);
+		g_Engine.SpriteWalk(DX9Common::AnimationDir::Left);
 		break;
 	case DIK_LCONTROL:
-		g_Engine.SpriteSetAnimation(DX9ANIMID::Attack1);
+		g_Engine.SpriteSetAnimation(DX9Common::AnimationID::Attack1);
 		break;
 	case DIK_LALT:
 		g_Engine.SpawnEffect(0, 30);
@@ -82,7 +83,7 @@ void Keyboard(DWORD Key)
 		g_Engine.SpriteJump();
 		break;
 	case DIK_ESCAPE:
-		g_Engine.Halt();
+		g_Engine.Shutdown();
 		break;
 	case DIK_B:
 		g_Engine.ToggleBoundingBox();

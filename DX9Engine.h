@@ -12,9 +12,9 @@
 class DX9Engine final : public DX9Base
 {
 private:
-	static const int WINDOW_X = 50;
-	static const int WINDOW_Y = 50;
-	static const int KEY_PRESS_INTERVAL = 20;
+	static const int WINDOW_X;
+	static const int WINDOW_Y;
+	static const int KEY_PRESS_INTERVAL;
 
 	bool m_Keys[NUM_KEYS];
 
@@ -28,7 +28,6 @@ private:
 
 	void(*m_pfRender)();
 	void(*m_pfKeyboard)(DWORD DIK_KeyCode);
-	DX9SHARE_DATA m_ShareData;
 
 	DX9Input* m_Input;
 	DX9Image* m_ImageBackGround;
@@ -53,24 +52,25 @@ public:
 	DX9Engine();
 	~DX9Engine() {};
 
-	DX9ERROR_CHECK DX9Engine::Create(int Width, int Height);
+	DX9Common::ReturnValue DX9Engine::Create(int Width, int Height);
 	void DX9Engine::SetRenderFunction(void(*Render)());
 	void DX9Engine::SetKeyboardFunction(void(*Keyboard)(DWORD DIK_KeyCode));
 	void DX9Engine::ToggleBoundingBox();
-	DX9ERROR_CHECK DX9Engine::LoadMap(WSTRING FileName);
+	DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName);
 
 	void DX9Engine::Run() override;
 	int DX9Engine::RunWithAccel(HACCEL hAccel) override;
-	void DX9Engine::Halt() override;
+	void DX9Engine::Shutdown() override;
 
 	void DX9Engine::MainLoop();
 	void DX9Engine::DetectInput();
 
 	void DX9Engine::SetBackground(WSTRING TextureFN);
+
 	DX9Sprite* DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f);
-	void DX9Engine::SpriteWalk(DX9ANIMDIR Direction);
+	void DX9Engine::SpriteWalk(AnimationDir Direction);
 	void DX9Engine::SpriteJump();
-	void DX9Engine::SpriteSetAnimation(DX9ANIMID AnimationID);
+	void DX9Engine::SpriteSetAnimation(AnimationID AnimationID);
 
 	DX9Monster* DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
 	DX9Effect* DX9Engine::SpawnEffect(int EffectID, int Damage);

@@ -2,20 +2,15 @@
 
 #define DIRECTINPUT_VERSION 0x0800
 
-const int NUM_KEYS = 256;
-
 #pragma comment (lib, "dinput8.lib")
 #pragma comment (lib, "dxguid.lib")
 
 #include "DX9Common.h"
 #include <dinput.h>
 
-class DX9Input final
+class DX9Input final : protected DX9Common
 {
 private:
-	HINSTANCE m_hInstance;
-	HWND  m_hWnd;
-
 	LPDIRECTINPUT8 m_DI8;
 	LPDIRECTINPUTDEVICE8 m_DIDevKeyboard;
 	LPDIRECTINPUTDEVICE8 m_DIDevMouse;
@@ -40,8 +35,8 @@ public:
 	DX9Input();
 	~DX9Input() {};
 
-	bool DX9Input::Create(HINSTANCE hInstance, HWND hWnd);
-	bool DX9Input::Destroy();
+	bool DX9Input::Create();
+	void DX9Input::Destroy() override;
 
 	bool DX9Input::OnKeyDown(DWORD DIK_KeyCode);
 	bool DX9Input::OnKeyUp(DWORD DIK_KeyCode);

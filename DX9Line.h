@@ -2,18 +2,35 @@
 
 #include "DX9Common.h"
 
-class DX9Line
+class DX9Line final : protected DX9Common
 {
+private:
+	struct VertexLine
+	{
+		FLOAT x, y, z, rhw;
+		DWORD color;
+
+		VertexLine() : x(0), y(0), z(0), rhw(1), color(0xffffffff) {};
+		VertexLine(float _x, float _y, DWORD _color) : x(_x), y(_y), z(0), rhw(1), color(_color) {};
+		VertexLine(float _x, float _y, float _z, float _rhw, DWORD _color) :
+			x(_x), y(_y), z(_z), rhw(_rhw), color(_color) {};
+	};
+
+	struct Index2
+	{
+		WORD _0, _1;
+
+		Index2() : _0(0), _1(0) {};
+		Index2(int ID0, int ID1) : _0(ID0), _1(ID1) {};
+	};
+
 private:
 	static LPDIRECT3DDEVICE9 m_pDevice;
 	LPDIRECT3DVERTEXBUFFER9 m_pVB;
 	LPDIRECT3DINDEXBUFFER9 m_pIB;
 
-	std::vector<DX9VERTEX_LINE> m_Vert;
-	int m_VertCount;
-
-	std::vector<DX9INDEX2> m_Ind;
-	int m_IndCount;
+	std::vector<VertexLine> m_Vertices;
+	std::vector<Index2> m_Indices;
 
 protected:
 	void DX9Line::CreateVB();

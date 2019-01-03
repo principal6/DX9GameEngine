@@ -1,8 +1,8 @@
 #include "DX9Sprite.h"
 
-void DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap)
+void DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
 {
-	DX9Life::Create(pDevice, pData);
+	DX9Life::Create(pDevice);
 	DX9Life::SetMapPointer(pMap);
 }
 
@@ -11,11 +11,11 @@ DX9Sprite* DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x > m_pShareData->m_WindowHalfW)
-		m_GlobalPosInverse.x = m_pShareData->m_WindowHalfW;
+	if (m_GlobalPosInverse.x > m_WindowData.WindowHalfWidth)
+		m_GlobalPosInverse.x = m_WindowData.WindowHalfWidth;
 
-	if (m_GlobalPosInverse.y < m_pShareData->m_WindowHalfH)
-		m_GlobalPosInverse.y = m_pShareData->m_WindowHalfH;
+	if (m_GlobalPosInverse.y < m_WindowData.WindowHalfHeight)
+		m_GlobalPosInverse.y = m_WindowData.WindowHalfHeight;
 
 	SetPosition(m_GlobalPosInverse);
 
@@ -28,9 +28,9 @@ DX9Sprite* DX9Sprite::MakeUnit(WSTRING TextureFN, int numCols, int numRows, floa
 	return this;
 }
 
-DX9Sprite* DX9Sprite::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
+DX9Sprite* DX9Sprite::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)
 {
-	DX9AnimUnit::AddAnimation(AnimID, StartFrame, EndFrame, HFlip);
+	DX9AnimUnit::AddAnimation(AnimID, StartFrame, EndFrame);
 	return this;
 }
 

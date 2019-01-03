@@ -1,5 +1,10 @@
 #include "DX9Life.h"
 
+// Static member variables declaration
+const D3DXVECTOR2 DX9Life::JUMP_POWER = D3DXVECTOR2(0.0f, -14.0f);
+const D3DXVECTOR2 DX9Life::GRAVITY = D3DXVECTOR2(0.0f, 0.5f);
+const float DX9Life::STRIDE = 5.0f;
+
 DX9Life::DX9Life()
 {
 	m_GlobalPos = D3DXVECTOR2(0.0f, 0.0f);
@@ -8,10 +13,15 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
+void DX9Life::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9AnimUnit::Create(pDevice, pData);
+	DX9AnimUnit::Create(pDevice);
 	SetGlobalPosition(m_GlobalPos);
+}
+
+void DX9Life::Destroy()
+{
+	DX9AnimUnit::Destroy();
 }
 
 void DX9Life::SetMapPointer(DX9Map* pMap)
@@ -23,13 +33,13 @@ void DX9Life::SetMapPointer(DX9Map* pMap)
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_pShareData->WindowHeight - m_ScaledH - m_GlobalPos.y;
+	m_GlobalPosInverse.y = m_WindowData.WindowHeight - m_ScaledHeight - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_pShareData->WindowHeight - m_ScaledH - m_GlobalPosInverse.y;
+	m_GlobalPos.y = m_WindowData.WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
 }
 
 D3DXVECTOR2 DX9Life::GetGlobalPosition() const
@@ -50,8 +60,8 @@ D3DXVECTOR2 DX9Life::GetVelocity() const
 D3DXVECTOR2 DX9Life::GetOffsetForMapMove() const
 {
 	D3DXVECTOR2 Result;
-	Result.x = m_GlobalPos.x - m_pShareData->m_WindowHalfW;
-	Result.y = m_GlobalPosInverse.y - m_pShareData->m_WindowHalfH;
+	Result.x = m_GlobalPos.x - m_WindowData.WindowHalfWidth;
+	Result.y = m_GlobalPosInverse.y - m_WindowData.WindowHalfHeight;
 
 	if (Result.x < 0)
 		Result.x = 0;
@@ -84,11 +94,11 @@ void DX9Life::MoveWithVelocity()
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_pShareData->m_WindowHalfW)
+	if (m_GlobalPosInverse.x < m_WindowData.WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
-	if (m_GlobalPosInverse.y > m_pShareData->m_WindowHalfH)
+	if (m_GlobalPosInverse.y > m_WindowData.WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
@@ -103,45 +113,45 @@ void DX9Life::MoveConst(D3DXVECTOR2 dXY)
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_pShareData->m_WindowHalfW)
+	if (m_GlobalPosInverse.x < m_WindowData.WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
 	else
 	{
-		if (m_Position.x != m_pShareData->m_WindowHalfW)
-			m_Position.x = m_pShareData->m_WindowHalfW;
+		if (m_Position.x != m_WindowData.WindowHalfWidth)
+			m_Position.x = m_WindowData.WindowHalfWidth;
 	}
 
-	if (m_GlobalPosInverse.y > m_pShareData->m_WindowHalfH)
+	if (m_GlobalPosInverse.y > m_WindowData.WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
 	else
 	{
-		if (m_Position.y != m_pShareData->m_WindowHalfH)
-			m_Position.y = m_pShareData->m_WindowHalfH;
+		if (m_Position.y != m_WindowData.WindowHalfHeight)
+			m_Position.y = m_WindowData.WindowHalfHeight;
 	}
 
 	SetPosition(m_Position);
 }
 
-void DX9Life::Walk(DX9ANIMDIR Direction)
+void DX9Life::Walk(AnimationDir Direction)
 {
 	D3DXVECTOR2 Velocity;
 	switch (Direction)
 	{
-	case DX9ANIMDIR::Left:
+	case AnimationDir::Left:
 		Velocity = D3DXVECTOR2(-STRIDE, 0);
 		break;
-	case DX9ANIMDIR::Right:
+	case AnimationDir::Right:
 		Velocity = D3DXVECTOR2(STRIDE, 0);
 		break;
 	default:
 		break;
 	}
 
-	SetAnimation(DX9ANIMID::Walk, true);
+	SetAnimation(AnimationID::Walk, true);
 	SetDirection(Direction);
 
 	D3DXVECTOR2 tNewVel = m_pMap->GetVelocityAfterCollision(GetBoundingBox(), Velocity);
@@ -173,17 +183,17 @@ void DX9Life::Gravitate()
 		else
 		{
 			m_bHitGround = true;
-			//SetAnimation(DX9ANIMID::Landing, true, true); // This is only for main Sprite
-			SetAnimation(DX9ANIMID::Idle, true, true);
+			//SetAnimation(AnimationID::Landing, true, true); // This is only for main Sprite
+			SetAnimation(AnimationID::Idle, true, true);
 		}
 	}
 	else
 	{
 		if (m_Velocity.y < 0)
-			SetAnimation(DX9ANIMID::Jumping, true, true);
+			SetAnimation(AnimationID::Jumping, true, true);
 
 		if (m_Velocity.y > 0)
-			SetAnimation(DX9ANIMID::Falling, true, true);
+			SetAnimation(AnimationID::Falling, true, true);
 
 		m_bHitGround = false;
 	}

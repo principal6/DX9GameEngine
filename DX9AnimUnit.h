@@ -2,25 +2,23 @@
 
 #include "DX9Image.h"
 
-constexpr auto MAX_ANIM_COUNT = 30;
-
 class DX9AnimUnit : protected DX9Image
 {
 private:
-	int m_nRows;
-	int m_nCols;
+	int m_NumRows;
+	int m_NumCols;
 
-	DX9ANIMDIR m_nAnimDir;
-	DX9ANIMID m_nCurrAnimID;
-	int m_nCurrFrameID;
-	DX9ANIMDATA m_Anims[MAX_ANIM_COUNT];
-	int m_nAnimCount;
+	AnimationDir m_AnimDir;
+	AnimationID m_CurrAnimID;
+	int m_CurrFrameID;
+	std::vector<AnimationData> m_AnimData;
+	int m_AnimCount;
 	bool m_bBeingAnimated;
 	bool m_bRepeating;
 
 protected:
-	int m_UnitW;
-	int m_UnitH;
+	int m_UnitWidth;
+	int m_UnitHeight;
 
 private:
 	void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows);
@@ -34,27 +32,27 @@ public:
 	DX9AnimUnit();
 	virtual ~DX9AnimUnit() {};
 
-	virtual void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData) override;
+	virtual void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice) override;
 	virtual void DX9AnimUnit::Destroy() override;
 	virtual DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f);
 
 	void DX9AnimUnit::SetScale(D3DXVECTOR2 Scale) override;
 	void DX9AnimUnit::SetAlpha(int Alpha) override;
 
-	virtual DX9AnimUnit* DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip = false);
+	virtual DX9AnimUnit* DX9AnimUnit::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame);
 	void DX9AnimUnit::Animate();
 	void DX9AnimUnit::SetFrame(int FrameID);
-	void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
-	void DX9AnimUnit::SetDirection(DX9ANIMDIR Direction);
+	void DX9AnimUnit::SetAnimation(AnimationID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
+	void DX9AnimUnit::SetDirection(AnimationDir Direction);
 	virtual DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size) override;
 
 	bool DX9AnimUnit::IsBeingAnimated() const;
 	int DX9AnimUnit::GetScaledUnitWidth() const;
 	int DX9AnimUnit::GetScaledUnitHeight() const;
-	DX9ANIMDIR DX9AnimUnit::GetDirection() const;
+	DX9Common::AnimationDir DX9AnimUnit::GetDirection() const;
 	D3DXVECTOR2 DX9AnimUnit::GetCenterPosition() const override;
-	DX9BOUNDINGBOX DX9AnimUnit::GetBoundingBox() const override;
+	DX9Image::BoundingBox DX9AnimUnit::GetBoundingBox() const override;
 
-	virtual void DX9AnimUnit::Draw() const override;
+	virtual void DX9AnimUnit::Draw() override;
 	virtual void DX9AnimUnit::DrawBoundingBox() override;
 };

@@ -2,23 +2,11 @@
 
 #include "DX9Life.h"
 
-const float OFFSET_Y_HPBAR = 16.0f;
-
-struct DX9MONANIMDATA
-{
-	DX9ANIMID AnimID;
-	int FrameS;
-	int FrameE;
-	
-	DX9MONANIMDATA() : FrameS(0), FrameE(0) {};
-	DX9MONANIMDATA(DX9ANIMID _AnimID, int StartFrame, int EndFrame) : AnimID(_AnimID), FrameS(StartFrame), FrameE(EndFrame) {};
-};
-
 /*-----------------------------------------------------------------------------
 	DX9MonsterType Class
 -----------------------------------------------------------------------------*/
 
-class DX9MonsterType
+class DX9MonsterType : protected DX9Common
 {
 public:
 	WSTRING m_Name;
@@ -26,7 +14,7 @@ public:
 	int m_TextureNumCols;
 	int m_TextureNumRows;
 	int m_HPMax;
-	std::vector<DX9MONANIMDATA> m_AnimData;
+	std::vector<AnimationData> m_AnimData;
 
 public:
 	DX9MonsterType() {};
@@ -35,7 +23,8 @@ public:
 		m_HPMax(HP) {};
 	~DX9MonsterType() {};
 
-	DX9MonsterType* DX9MonsterType::AddAnimation(DX9MONANIMDATA Value);
+	DX9MonsterType* DX9MonsterType::AddAnimation(AnimationData Value);
+	void DX9MonsterType::Destroy() override;
 };
 
 /*-----------------------------------------------------------------------------
@@ -45,6 +34,8 @@ public:
 class DX9Monster final : public DX9Life
 {
 private:
+	static const float OFFSET_Y_HPBAR;
+
 	DX9MonsterType m_Type;
 	int m_HPCurr;
 	bool m_bUILoaded;
@@ -60,7 +51,7 @@ public:
 	DX9Monster();
 	~DX9Monster() {};
 
-	void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap);
+	void DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
 	void DX9Monster::Destroy() override;
 
 	void DX9Monster::SetMonsterType(DX9MonsterType Type);
@@ -74,22 +65,20 @@ public:
 	DX9MonsterManager Class
 -----------------------------------------------------------------------------*/
 
-class DX9MonsterManager
+class DX9MonsterManager : protected DX9Common
 {
 private:
-	LPDIRECT3DDEVICE9 m_pDevice;
-	DX9SHARE_DATA* m_pShareData;
+	static LPDIRECT3DDEVICE9 m_pDevice;
 	DX9Map* m_pMap;
 
 	std::vector<DX9MonsterType> m_Types;
-
 	std::vector<DX9Monster> m_Instances;
 
 public:
 	DX9MonsterManager() {};
 	~DX9MonsterManager() {};
 
-	void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData, DX9Map* pMap);
+	void DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
 	void DX9MonsterManager::Destroy();
 
 	DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);

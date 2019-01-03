@@ -1,28 +1,34 @@
 #include "DX9Common.h"
 
-const int MAX_FONT_NUM = 10;
-
-class DX9Font final
+class DX9Font final : protected DX9Common
 {
 private:
-	LPDIRECT3DDEVICE9 m_pDevice;
-	DX9SHARE_DATA* m_pShareData;
-	LPD3DXFONT	m_pFonts[MAX_FONT_NUM];
+	struct FontInstance
+	{
+		FontID ID;
+		LPD3DXFONT pFont;
 
-	int	m_FontCount;
-	int	m_CurrFontID;
+		FontInstance() : pFont(nullptr) {};
+		FontInstance(FontID _ID, LPD3DXFONT _pFont) : ID(_ID), pFont(_pFont) {};
+	};
 
+private:
+	static LPDIRECT3DDEVICE9 m_pDevice;
+
+	std::vector<FontInstance> m_Fonts;
+
+	int	m_CurrFontInstanceID;
 	DWORD m_FontColor;
 
 public:
 	DX9Font();
 	~DX9Font() {};
 
-	void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData);
+	void DX9Font::Create(LPDIRECT3DDEVICE9 pDevice);
 	void DX9Font::Destroy();
 
-	void DX9Font::MakeFont(DX9FONT_ID ID, WSTRING FontName, int FontSize, bool IsBold);
-	DX9Font* DX9Font::SelectFont(DX9FONT_ID ID);
+	void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold);
+	DX9Font* DX9Font::SelectFont(FontID ID);
 	DX9Font* DX9Font::SetFontColor(DWORD Color);
 
 	DX9Font* DX9Font::Draw(int X, int Y, WSTRING String);

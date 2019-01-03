@@ -2,23 +2,23 @@
 
 DX9AnimUnit::DX9AnimUnit()
 {
-	m_nRows = 0;
-	m_nCols = 0;
+	m_NumRows = 0;
+	m_NumCols = 0;
 
-	m_nAnimDir = DX9ANIMDIR::Right;
-	m_nCurrAnimID = DX9ANIMID::Idle;
-	m_nCurrFrameID = 0;
-	m_nAnimCount = 0;
+	m_AnimDir = AnimationDir::Right;
+	m_CurrAnimID = AnimationID::Idle;
+	m_CurrFrameID = 0;
+	m_AnimCount = 0;
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_UnitW = 0;
-	m_UnitH = 0;
+	m_UnitWidth = 0;
+	m_UnitHeight = 0;
 }
 
-void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, DX9SHARE_DATA* pData)
+void DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice)
 {
-	DX9Image::Create(pDevice, pData);
+	DX9Image::Create(pDevice);
 }
 
 void DX9AnimUnit::Destroy()
@@ -30,9 +30,9 @@ DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, 
 {
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
-	SetNumRowsAndCols(numCols, numRows); // m_UnitW & m_UnitH are set here
-	m_ScaledW = (int)(m_UnitW * Scale);
-	m_ScaledH = (int)(m_UnitH * Scale);
+	SetNumRowsAndCols(numCols, numRows); // m_UnitWidth & m_UnitHeight are set here
+	m_ScaledWidth = static_cast<int>(m_UnitWidth * Scale);
+	m_ScaledHeight = static_cast<int>(m_UnitHeight * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
@@ -42,13 +42,13 @@ DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, 
 
 void DX9AnimUnit::SetNumRowsAndCols(int numCols, int numRows)
 {
-	m_nCols = numCols;
-	m_nRows = numRows;
+	m_NumCols = numCols;
+	m_NumRows = numRows;
 
-	m_UnitW = (int)(m_Width / numCols);
-	m_UnitH = (int)(m_Height / numRows);
+	m_UnitWidth = static_cast<int>(m_Width / numCols);
+	m_UnitHeight = static_cast<int>(m_Height / numRows);
 	
-	SetSize(m_UnitW, m_UnitH);
+	SetSize(m_UnitWidth, m_UnitHeight);
 	SetFrame(0);
 }
 
@@ -69,74 +69,73 @@ void DX9AnimUnit::SetAlpha(int Alpha)
 
 void DX9AnimUnit::SetFrame(int FrameID)
 {
-	if ((m_nRows == 0) || (m_nCols == 0))
+	if ((m_NumRows == 0) || (m_NumCols == 0))
 		return;
 	
-	int FrameX = (FrameID % m_nCols);
-	int FrameY = (FrameID / m_nCols);
+	FloatUV tUV;
+	DX9Common::ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
 
-	float u1 = ((float)FrameX / (float)m_nCols);
-	float u2 = ((float)(FrameX + 1) / (float)m_nCols);
-	float v1 = ((float)FrameY / (float)m_nRows);
-	float v2 = ((float)(FrameY + 1) / (float)m_nRows);
+	//@warning: FloatUV offset is done in order to make sure the image borders do not invade contiguous images
+	tUV.u1 += UV_OFFSET;
+	tUV.v1 += UV_OFFSET;
 
-	//@warning: UV offset is done in order to make sure the image borders do not invade contiguous images
-	u1 += UV_OFFSET;
-	v1 += UV_OFFSET;
-
-	switch (m_nAnimDir)
+	switch (m_AnimDir)
 	{
-	case DX9ANIMDIR::Left:
-		UpdateVertexData(u2, v1, u1, v2);
+	case AnimationDir::Left:
+		UpdateVertexData(tUV.u2, tUV.v1, tUV.u1, tUV.v2);
 		break;
-	case DX9ANIMDIR::Right:
-		UpdateVertexData(u1, v1, u2, v2);
+	case AnimationDir::Right:
+		UpdateVertexData(tUV.u1, tUV.v1, tUV.u2, tUV.v2);
 		break;
 	default:
 		break;
 	}
 }
 
-DX9AnimUnit* DX9AnimUnit::AddAnimation(DX9ANIMID AnimID, int StartFrame, int EndFrame, bool HFlip)
+DX9AnimUnit* DX9AnimUnit::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)
 {
-	m_Anims[(int)AnimID].FrameS = StartFrame;
-	m_Anims[(int)AnimID].FrameE = EndFrame;
+	m_AnimData.push_back(DX9Common::AnimationData(AnimID, StartFrame, EndFrame));
 
 	return this;
 }
 
-void DX9AnimUnit::SetAnimation(DX9ANIMID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
+void DX9AnimUnit::SetAnimation(AnimationID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
 {
-	if ((m_nCurrAnimID != AnimID) || (bForcedSet))
+	int AnimIDInt = static_cast<int>(AnimID);
+
+	if (AnimIDInt > m_AnimData.size())
+		return;
+
+	if ((m_CurrAnimID != AnimID) || (bForcedSet))
 	{
-		m_nCurrAnimID = AnimID;
-		m_nCurrFrameID = m_Anims[(int)AnimID].FrameS;
+		m_CurrAnimID = AnimID;
+		m_CurrFrameID = m_AnimData[AnimIDInt].FrameS;
 		m_bRepeating = bRepeating;
 		m_bBeingAnimated = !bCanInterrupt;
 
-		SetFrame(m_nCurrFrameID);
+		SetFrame(m_CurrFrameID);
 	}
 }
 
 void DX9AnimUnit::Animate()
 {	
-	if (m_nCurrFrameID < m_Anims[(int)m_nCurrAnimID].FrameE)
+	if (m_CurrFrameID < m_AnimData[static_cast<int>(m_CurrAnimID)].FrameE)
 	{
-		m_nCurrFrameID++;
+		m_CurrFrameID++;
 	}
 	else
 	{
-		m_nCurrFrameID = m_Anims[(int)m_nCurrAnimID].FrameS;
+		m_CurrFrameID = m_AnimData[static_cast<int>(m_CurrAnimID)].FrameS;
 		if (!m_bRepeating)
 			m_bBeingAnimated = false;
 	}
 	
-	SetFrame(m_nCurrFrameID);
+	SetFrame(m_CurrFrameID);
 }
 
-void DX9AnimUnit::SetDirection(DX9ANIMDIR Direction)
+void DX9AnimUnit::SetDirection(AnimationDir Direction)
 {
-	m_nAnimDir = Direction;
+	m_AnimDir = Direction;
 }
 
 DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size)
@@ -162,17 +161,17 @@ bool DX9AnimUnit::IsBeingAnimated() const
 
 int DX9AnimUnit::GetScaledUnitWidth() const
 {
-	return m_ScaledW;
+	return m_ScaledWidth;
 }
 
 int DX9AnimUnit::GetScaledUnitHeight() const
 {
-	return m_ScaledH;
+	return m_ScaledHeight;
 }
 
-DX9ANIMDIR DX9AnimUnit::GetDirection() const
+DX9Common::AnimationDir DX9AnimUnit::GetDirection() const
 {
-	return m_nAnimDir;
+	return m_AnimDir;
 }
 
 D3DXVECTOR2 DX9AnimUnit::GetCenterPosition() const
@@ -180,12 +179,12 @@ D3DXVECTOR2 DX9AnimUnit::GetCenterPosition() const
 	return DX9Image::GetCenterPosition();
 }
 
-DX9BOUNDINGBOX DX9AnimUnit::GetBoundingBox() const
+DX9Image::BoundingBox DX9AnimUnit::GetBoundingBox() const
 {
 	return DX9Image::GetBoundingBox();
 }
 
-void DX9AnimUnit::Draw() const
+void DX9AnimUnit::Draw()
 {
 	DX9Image::Draw();
 }

@@ -1,5 +1,10 @@
 #include "DX9Engine.h"
 
+// Static member variables declaration
+const int DX9Engine::WINDOW_X = 50;
+const int DX9Engine::WINDOW_Y = 50;
+const int DX9Engine::KEY_PRESS_INTERVAL = 20;
+
 DX9Engine::DX9Engine()
 {
 	m_TimerStart = 0;
@@ -11,62 +16,62 @@ DX9Engine::DX9Engine()
 	m_bDrawBoundingBoxes = false;
 }
 
-DX9ERROR_CHECK DX9Engine::Create(int Width, int Height)
+DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 {
 	// Set data that will be shared in many sub-classes
-	m_ShareData.WindowWidth = Width;
-	m_ShareData.WindowHeight = Height;
-	m_ShareData.m_WindowHalfW = static_cast<float>(Width / 2.0f);
-	m_ShareData.m_WindowHalfH = static_cast<float>(Height / 2.0f);
-	GetCurrentDirectoryW(255, m_ShareData.AppDir);
+	m_WindowData.WindowWidth = Width;
+	m_WindowData.WindowHeight = Height;
+	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
+	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
+	GetCurrentDirectoryW(255, m_WindowData.AppDir);
 	
 	// Create window and initialize Direct3D9
-	if (!DX9Base::Create(WINDOW_X, WINDOW_Y, &m_ShareData))
-		return DX9ERROR_CHECK::CREATION_FAILED;
+	if (!DX9Base::Create(WINDOW_X, WINDOW_Y))
+		return ReturnValue::CREATION_FAILED;
 
 	// Create input device
 	if (m_Input = new DX9Input)
 	{
-		if (!m_Input->Create(GetInstance(), GetHWND()))
-			return DX9ERROR_CHECK::CREATION_FAILED;
+		if (!m_Input->Create())
+			return ReturnValue::CREATION_FAILED;
 	}
 
 	// Create image object
 	if (m_ImageBackGround = new DX9Image)
 	{
-		m_ImageBackGround->Create(GetDevice(), &m_ShareData);
+		m_ImageBackGround->Create(GetDevice());
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
-		m_Map->Create(GetDevice(), &m_ShareData);
+		m_Map->Create(GetDevice());
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
-		m_Sprite->Create(GetDevice(), &m_ShareData, m_Map);
+		m_Sprite->Create(GetDevice(), m_Map);
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
-		m_MonsterManager->Create(GetDevice(), &m_ShareData, m_Map);
+		m_MonsterManager->Create(GetDevice(), m_Map);
 	}
 
 	// Create effect object
 	if (m_EffectManager = new DX9Effect)
 	{
-		m_EffectManager->Create(GetDevice(), &m_ShareData, m_Map);
+		m_EffectManager->Create(GetDevice(), m_Map);
 	}
 
 	if (m_Font = new DX9Font)
 	{
-		m_Font->Create(GetDevice(), &m_ShareData);
+		m_Font->Create(GetDevice());
 	}
 
-	return DX9ERROR_CHECK::OK;
+	return ReturnValue::OK;
 }
 
 void DX9Engine::SetRenderFunction(void(*Render)())
@@ -84,14 +89,14 @@ void DX9Engine::ToggleBoundingBox()
 	m_bDrawBoundingBoxes = !m_bDrawBoundingBoxes;
 }
 
-DX9ERROR_CHECK DX9Engine::LoadMap(WSTRING FileName)
+DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName)
 {
 	if (m_Map)
 	{
 		m_Map->LoadMapFromFile(FileName);
-		return DX9ERROR_CHECK::OK;
+		return ReturnValue::OK;
 	}
-	return DX9ERROR_CHECK::OBJECT_NOT_CREATED;
+	return ReturnValue::OBJECT_NOT_CREATED;
 }
 
 void DX9Engine::Run()
@@ -127,12 +132,12 @@ int DX9Engine::RunWithAccel(HACCEL hAccel)
 		}
 	}
 
-	return (int)m_MSG.wParam;
+	return static_cast<int>(m_MSG.wParam);
 }
 
-void DX9Engine::Halt()
+void DX9Engine::Shutdown()
 {
-	DX9Base::Halt();
+	DX9Base::Shutdown();
 }
 
 void DX9Engine::MainLoop()
@@ -207,7 +212,7 @@ void DX9Engine::DetectInput()
 
 	if ((!m_bSpriteWalking) && (!m_Sprite->IsBeingAnimated()))
 	{
-		m_Sprite->SetAnimation(DX9ANIMID::Idle);
+		m_Sprite->SetAnimation(AnimationID::Idle);
 	}
 }
 
@@ -252,7 +257,7 @@ DX9Sprite* DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, 
 	return m_Sprite->MakeUnit(TextureFN, numCols, numRows, Scale);
 }
 
-void DX9Engine::SpriteWalk(DX9ANIMDIR Direction)
+void DX9Engine::SpriteWalk(AnimationDir Direction)
 {
 	assert(m_Sprite);
 
@@ -266,7 +271,7 @@ void DX9Engine::SpriteJump()
 	m_Sprite->Jump();
 }
 
-void DX9Engine::SpriteSetAnimation(DX9ANIMID AnimationID)
+void DX9Engine::SpriteSetAnimation(AnimationID AnimationID)
 {
 	assert(m_Sprite);
 	m_Sprite->SetAnimation(AnimationID);

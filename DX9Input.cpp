@@ -2,9 +2,6 @@
 
 DX9Input::DX9Input()
 {
-	m_hInstance = nullptr;
-	m_hWnd = nullptr;
-
 	m_DI8 = nullptr;
 	m_DIDevKeyboard = nullptr;
 	m_DIDevMouse = nullptr;
@@ -15,19 +12,15 @@ DX9Input::DX9Input()
 
 	m_MouseX = 0;
 	m_MouseY = 0;
-	
 }
 
-bool DX9Input::Create(HINSTANCE hInstance, HWND hWnd)
+bool DX9Input::Create()
 {
-	m_hInstance = hInstance;
-	m_hWnd = hWnd;
-
 	memset(m_MouseBtnDown, false, sizeof(m_MouseBtnDown));
 	memset(m_MouseBtnUp, false, sizeof(m_MouseBtnUp));
 	memset(m_MouseBtnIdle, true, sizeof(m_MouseBtnIdle));
 
-	if(FAILED(DirectInput8Create(m_hInstance, DIRECTINPUT_VERSION,
+	if(FAILED(DirectInput8Create(DX9Common::m_hInstance, DIRECTINPUT_VERSION,
 		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
 		return false;
 
@@ -74,7 +67,7 @@ bool DX9Input::CreateKeyboardDevice(DWORD dwFlags)
 	return true;
 }
 
-bool DX9Input::Destroy()
+void DX9Input::Destroy()
 {
 	if (m_DIDevMouse)
 	{
@@ -93,8 +86,6 @@ bool DX9Input::Destroy()
 		m_DI8->Release();
 		m_DI8 = nullptr;
 	}
-	
-	return true;
 }
 
 bool DX9Input::OnKeyDown(DWORD DIK_KeyCode)
