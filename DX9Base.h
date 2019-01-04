@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core\\DX9Common.h"
+#include "Core/DX9Common.h"
 
 class DX9Base : protected DX9Common
 {

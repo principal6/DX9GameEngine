@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core\\DX9Image.h"
+#include "Core/DX9Image.h"
 
 class DX9Background : public DX9Image
 {

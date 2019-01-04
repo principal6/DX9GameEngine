@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "Core\\DX9Image.h"
 #include "DX9Base.h"
 #include "DX9Background.h"
 #include "DX9Input.h"

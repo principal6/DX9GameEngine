@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fstream>
-#include "Core\\DX9Image.h"
+#include "Core/DX9Image.h"
 
 class DX9Map final : protected DX9Image
 {

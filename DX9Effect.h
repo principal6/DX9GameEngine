@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core\\DX9Image.h"
+#include "Core/DX9Common.h"
 #include "DX9Monsters.h"
 
 class DX9Effect final : protected DX9Image

@@ -5,7 +5,7 @@
 #pragma comment (lib, "dinput8.lib")
 #pragma comment (lib, "dxguid.lib")
 
-#include "Core\\DX9Common.h"
+#include "Core/DX9Common.h"
 #include <dinput.h>
 
 class DX9Input final : protected DX9Common
