@@ -117,10 +117,9 @@ protected:
 	static const float UV_OFFSET;
 	static const wchar_t ASSET_DIR[];
 
-	static HINSTANCE m_hInstance;
-	static HWND m_hWnd;
-
-	static WindowData m_WindowData;
+	static HINSTANCE ms_hInstance;
+	HWND m_hWnd;
+	WindowData m_WindowData;
 
 protected:
 	static void DX9Common::ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, FloatUV* UV);
@@ -132,4 +131,7 @@ public:
 	~DX9Common() {};
 
 	virtual void Destroy() = 0;
+
+	virtual void DX9Common::SethWnd(HWND hWnd);
+	virtual HWND DX9Common::GethWnd() const;
 };

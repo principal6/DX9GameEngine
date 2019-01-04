@@ -17,7 +17,7 @@ LRESULT CALLBACK WndProcBase(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lPar
 
 DX9Base::DX9Base()
 {
-	m_hInstance = nullptr;
+	ms_hInstance = nullptr;
 	m_hWnd = nullptr;
 
 	m_pD3D = nullptr;
@@ -25,11 +25,11 @@ DX9Base::DX9Base()
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-DX9Common::ReturnValue DX9Base::Create(CINT X, CINT Y)
+DX9Common::ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)
 {
 	RGBInt rBGColor = RGBInt(255, 0, 255);
 
-	if (CreateWND(L"Game", X, Y, m_WindowData.WindowWidth, m_WindowData.WindowHeight, WindowStyle::OverlappedWindow, rBGColor)
+	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor)
 		== nullptr)
 		return ReturnValue::WINDOW_NOT_CREATED;
 
@@ -39,15 +39,27 @@ DX9Common::ReturnValue DX9Base::Create(CINT X, CINT Y)
 	return ReturnValue::OK;
 }
 
-void DX9Base::CreateOnWindow(HWND hWnd)
+DX9Common::ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height)
 {
 	RGBInt rBGColor = RGBInt(255, 0, 255);
 
-	m_hWnd = hWnd;
-	m_hInstance = GetModuleHandle(nullptr);
+	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor)
+		== nullptr)
+		return ReturnValue::WINDOW_NOT_CREATED;
+
+	return ReturnValue::OK;
+
+}
+DX9Common::ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color)
+{
+	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color)
+		== nullptr)
+		return ReturnValue::WINDOW_NOT_CREATED;
 
 	if (InitD3D() == -1)
-		return;
+		return ReturnValue::DIRECTX_NOT_CREATED;
+
+	return ReturnValue::OK;
 }
 
 void DX9Base::Destroy()
@@ -68,7 +80,7 @@ void DX9Base::Destroy()
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
 	WindowStyle WindowStyle, RGBInt BackColor)
 {
-	m_hInstance = GetModuleHandle(nullptr);
+	ms_hInstance = GetModuleHandle(nullptr);
 
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
@@ -76,7 +88,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	r_WndClass.hbrBackground = CreateSolidBrush(RGB(BackColor.Red, BackColor.Green, BackColor.Blue));
 	r_WndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	r_WndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-	r_WndClass.hInstance = m_hInstance;
+	r_WndClass.hInstance = ms_hInstance;
 	r_WndClass.lpfnWndProc = WndProcBase;
 	r_WndClass.lpszClassName = Name;
 	r_WndClass.lpszMenuName = nullptr;
@@ -87,11 +99,11 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	AdjustWindowRect(&rWndRect, (DWORD)WindowStyle, false);
 
 	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle, rWndRect.left, rWndRect.top,
-		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, nullptr, (HMENU)nullptr, m_hInstance, nullptr);
+		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, nullptr, (HMENU)nullptr, ms_hInstance, nullptr);
 
 	ShowWindow(m_hWnd, SW_SHOW);
 
-	UnregisterClass(Name, m_hInstance);
+	UnregisterClass(Name, ms_hInstance);
 	
 	return m_hWnd;
 }
@@ -99,11 +111,6 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 void DX9Base::SetBackgroundColor(D3DCOLOR color)
 {
 	m_BGColor = color;
-}
-
-void DX9Base::Shutdown()
-{
-	DestroyWindow(m_hWnd);
 }
 
 int DX9Base::InitD3D()

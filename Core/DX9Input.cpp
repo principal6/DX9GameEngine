@@ -14,13 +14,15 @@ DX9Input::DX9Input()
 	m_MouseY = 0;
 }
 
-DX9Common::ReturnValue DX9Input::Create()
+DX9Common::ReturnValue DX9Input::Create(HWND hWnd)
 {
+	m_hWnd = hWnd;
+
 	memset(m_MouseBtnDown, false, sizeof(m_MouseBtnDown));
 	memset(m_MouseBtnUp, false, sizeof(m_MouseBtnUp));
 	memset(m_MouseBtnIdle, true, sizeof(m_MouseBtnIdle));
 
-	if(FAILED(DirectInput8Create(DX9Common::m_hInstance, DIRECTINPUT_VERSION,
+	if(FAILED(DirectInput8Create(DX9Common::ms_hInstance, DIRECTINPUT_VERSION,
 		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
 		return ReturnValue::OBJECT_NOT_CREATED;
 

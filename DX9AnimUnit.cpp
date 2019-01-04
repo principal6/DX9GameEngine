@@ -16,12 +16,12 @@ DX9AnimUnit::DX9AnimUnit()
 	m_UnitHeight = 0;
 }
 
-DX9Common::ReturnValue DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
 
-	return DX9Image::Create(pDevice);
+	return DX9Image::Create(pDevice, refData);
 }
 
 void DX9AnimUnit::Destroy()

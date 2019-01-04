@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/DX9Common.h"
+#include "DX9Common.h"
 
-class DX9Base : protected DX9Common
+class DX9Base final : public DX9Common
 {
-private:
+protected:
 	enum class WindowStyle : DWORD
 	{
 		Overlapped = WS_OVERLAPPED,
@@ -30,6 +30,7 @@ private:
 		OverlappedWindow = WS_OVERLAPPEDWINDOW, // = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
 		PopupWindow = WS_POPUPWINDOW, // = WS_POPUP | WS_BORDER | WS_SYSMENU
 		ChildWindow = WS_CHILDWINDOW, // = WS_CHILD
+		ChildWindow2 =  WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN,
 	};
 
 	struct RGBInt
@@ -45,9 +46,6 @@ private:
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
 	D3DCOLOR m_BGColor;
 
-protected:
-	MSG m_MSG;
-
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
 		WindowStyle WindowStyle, RGBInt BackColor);
@@ -58,12 +56,10 @@ public:
 	DX9Base();
 	~DX9Base() {};
 
-	ReturnValue DX9Base::Create(CINT X, CINT Y);
-	void DX9Base::CreateOnWindow(HWND hWnd);
-	virtual void DX9Base::Run() = 0;
-	virtual int DX9Base::RunWithAccel(HACCEL hAccel) = 0;
+	ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height);
+	ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height);
+	ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color);
 	virtual void DX9Base::Destroy() override;
-	virtual void DX9Base::Shutdown();
 	
 	void DX9Base::SetBackgroundColor(D3DCOLOR color);
 	void DX9Base::Resize(HWND hWnd);

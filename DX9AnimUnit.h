@@ -32,7 +32,7 @@ public:
 	DX9AnimUnit();
 	virtual ~DX9AnimUnit() {};
 
-	virtual ReturnValue DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice) override;
+	virtual ReturnValue DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData) override;
 	virtual void DX9AnimUnit::Destroy() override;
 	virtual DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f);
 

@@ -18,63 +18,71 @@ DX9Engine::DX9Engine()
 
 DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 {
+	// Create base (window and initialize Direct3D9)
+	if (m_Base = new DX9Base)
+	{
+		if (DX_FAILED(m_Base->CreateGameWindow(WINDOW_X, WINDOW_Y, Width, Height)))
+			return ReturnValue::BASE_NOT_CREATED;
+
+		// Set main window handle
+		m_hWnd = m_Base->GethWnd();
+	}
+
+	// Create input device
+	if (m_Input = new DX9Input)
+	{
+		// Pass main window's handle to DX9Input
+		if (DX_FAILED(m_Input->Create(m_hWnd)))
+			return ReturnValue::INPUT_NOT_CREATED;
+	}
+
+	// Create font manager object
+	if (m_FontManager = new DX9Font)
+	{
+		if (DX_FAILED(m_FontManager->Create(m_Base->GetDevice())))
+			return ReturnValue::FONTMANAGER_NOT_CREATED;
+	}
+
 	// Set data that will be shared in many sub-classes
 	m_WindowData.WindowWidth = Width;
 	m_WindowData.WindowHeight = Height;
 	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
 	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
 	GetCurrentDirectoryW(255, m_WindowData.AppDir);
-	
-	// Create window and initialize Direct3D9
-	if (DX_FAILED(DX9Base::Create(WINDOW_X, WINDOW_Y)))
-		return ReturnValue::BASE_NOT_CREATED;
-
-	// Create input device
-	if (m_Input = new DX9Input)
-	{
-		if (DX_FAILED(m_Input->Create()))
-			return ReturnValue::INPUT_NOT_CREATED;
-	}
 
 	// Create image object
 	if (m_Background = new DX9Background)
 	{
-		if (DX_FAILED(m_Background->Create(GetDevice())))
+		if (DX_FAILED(m_Background->Create(m_Base->GetDevice(), m_WindowData)))
 			return ReturnValue::IMAGE_NOT_CREATED;
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
-		if (DX_FAILED(m_Map->Create(GetDevice())))
+		if (DX_FAILED(m_Map->Create(m_Base->GetDevice(), m_WindowData)))
 			return ReturnValue::MAP_NOT_CREATED;
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
-		if (DX_FAILED(m_Sprite->Create(GetDevice(), m_Map)))
+		if (DX_FAILED(m_Sprite->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
 			return ReturnValue::SPRITE_NOT_CREATED;
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
-		if (DX_FAILED(m_MonsterManager->Create(GetDevice(), m_Map)))
+		if (DX_FAILED(m_MonsterManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
 			return ReturnValue::MONSTERMANAGER_NOT_CREATED;
 	}
 
-	// Create effect object
+	// Create effect manager object
 	if (m_EffectManager = new DX9Effect)
 	{
-		if (DX_FAILED(m_EffectManager->Create(GetDevice(), m_Map)))
+		if (DX_FAILED(m_EffectManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
 			return ReturnValue::EFFECTMANAGER_NOT_CREATED;
-	}
-
-	if (m_FontManager = new DX9Font)
-	{
-		if (DX_FAILED(m_FontManager->Create(GetDevice())))
-			return ReturnValue::FONTMANAGER_NOT_CREATED;
 	}
 
 	return ReturnValue::OK;
@@ -126,13 +134,7 @@ void DX9Engine::Run()
 		}
 	}
 
-	Destroy();
-}
-
-int DX9Engine::RunWithAccel(HACCEL hAccel)
-{
-	m_TimerStart = GetTickCount64();
-
+	/*
 	while (GetMessage(&m_MSG, 0, 0, 0)) {
 		if (!TranslateAccelerator(m_hWnd, hAccel, &m_MSG)) {
 			TranslateMessage(&m_MSG);
@@ -141,13 +143,18 @@ int DX9Engine::RunWithAccel(HACCEL hAccel)
 			MainLoop();
 		}
 	}
-
 	return static_cast<int>(m_MSG.wParam);
+	*/
+
+	Destroy();
 }
 
 void DX9Engine::Shutdown()
 {
-	DX9Base::Shutdown();
+	if (m_hWnd)
+	{
+		DestroyWindow(m_hWnd);
+	}
 }
 
 void DX9Engine::MainLoop()
@@ -179,7 +186,7 @@ void DX9Engine::MainLoop()
 			m_KeyToggleCount = 0;
 	}
 
-	DX9Base::BeginRender();
+	m_Base->BeginRender();
 
 	// Apply gravity
 	m_MonsterManager->Gravitate();
@@ -201,7 +208,7 @@ void DX9Engine::MainLoop()
 	if (m_pfRender)
 		m_pfRender();
 
-	DX9Base::EndRender();
+	m_Base->EndRender();
 	m_FPS++;
 }
 
@@ -235,6 +242,7 @@ void DX9Engine::Destroy()
 	m_Map->Destroy();
 	m_Background->Destroy();
 	m_Input->Destroy();
+	m_Base->Destroy();
 
 	delete m_FontManager;
 	delete m_EffectManager;
@@ -243,6 +251,7 @@ void DX9Engine::Destroy()
 	delete m_Map;
 	delete m_Background;
 	delete m_Input;
+	delete m_Base;
 
 	m_FontManager = nullptr;
 	m_EffectManager = nullptr;
@@ -251,8 +260,7 @@ void DX9Engine::Destroy()
 	m_Map = nullptr;
 	m_Background = nullptr;
 	m_Input = nullptr;
-
-	DX9Base::Destroy();
+	m_Base = nullptr;
 }
 
 void DX9Engine::SetBackground(WSTRING TextureFN)

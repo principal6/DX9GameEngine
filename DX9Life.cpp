@@ -13,12 +13,12 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-DX9Common::ReturnValue DX9Life::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
 
-	ReturnValue Result = DX9AnimUnit::Create(pDevice);
+	ReturnValue Result = DX9AnimUnit::Create(pDevice, refData);
 	SetGlobalPosition(m_GlobalPos);
 
 	return Result;

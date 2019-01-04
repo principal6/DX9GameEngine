@@ -9,7 +9,7 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
@@ -17,7 +17,7 @@ DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap
 	if (pMap == nullptr)
 		return ReturnValue::MAP_NULL;
 
-	ReturnValue Result = DX9Image::Create(pDevice);
+	ReturnValue Result = DX9Image::Create(pDevice, refData);
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();

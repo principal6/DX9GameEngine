@@ -30,7 +30,7 @@ DX9Monster::DX9Monster()
 	m_HPBar = nullptr;
 }
 
-DX9Common::ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
@@ -38,15 +38,15 @@ DX9Common::ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMa
 	if (pMap == nullptr)
 		return ReturnValue::MAP_NULL;
 
-	ReturnValue Result = DX9Life::Create(pDevice);
+	ReturnValue Result = DX9Life::Create(pDevice, refData);
 	DX9Life::SetMapPointer(pMap);
 
 	m_HPFrame = new DX9Image;
-	m_HPFrame->Create(pDevice);
+	m_HPFrame->Create(pDevice, refData);
 	m_HPFrame->SetTexture(L"hpbarbg.png");
 
 	m_HPBar = new DX9Image;
-	m_HPBar->Create(pDevice);
+	m_HPBar->Create(pDevice, refData);
 	m_HPBar->SetTexture(L"hpbar.png");
 
 	m_bUILoaded = true;
@@ -150,7 +150,7 @@ void DX9Monster::Draw()
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 
-DX9Common::ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
@@ -159,6 +159,7 @@ DX9Common::ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9M
 		return ReturnValue::MAP_NULL;
 
 	m_pDevice = pDevice;
+	m_WindowData = refData;
 	m_pMap = pMap;
 
 	return ReturnValue::OK;
@@ -188,7 +189,7 @@ DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosi
 		if (TypeIterator.m_Name == MonsterName)
 		{
 			DX9Monster Temp;
-			Temp.Create(m_pDevice, m_pMap);
+			Temp.Create(m_pDevice, m_WindowData, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
 			Temp.MakeUnit(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 

@@ -2,7 +2,7 @@
 
 #include "DX9Common.h"
 
-class DX9Line final : protected DX9Common
+class DX9Line final : public DX9Common
 {
 private:
 	struct VertexLine

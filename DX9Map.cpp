@@ -91,12 +91,13 @@ DX9Map::DX9Map()
 	m_OffsetZeroY = 0;
 }
 
-DX9Common::ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
 
 	m_pDevice = pDevice;
+	m_WindowData = refData;
 
 	ClearAllData();
 	m_Vertices.clear();
@@ -639,6 +640,8 @@ void DX9Map::Draw()
 		m_pDevice->SetIndices(m_pIndexBuffer);
 		m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, static_cast<int>(m_VertMove.size()), 0, static_cast<int>(m_Indices.size()));
 	}
+
+	m_pDevice->SetTexture(0, nullptr);
 }
 
 void DX9Map::GetMapData(WSTRING *pStr) const

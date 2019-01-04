@@ -1,6 +1,6 @@
 #include "DX9Sprite.h"
 
-DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap)
+DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
@@ -8,7 +8,7 @@ DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap
 	if (pMap == nullptr)
 		return ReturnValue::MAP_NULL;
 
-	ReturnValue Result = DX9Life::Create(pDevice);
+	ReturnValue Result = DX9Life::Create(pDevice, refData);
 	DX9Life::SetMapPointer(pMap);
 	return Result;
 }

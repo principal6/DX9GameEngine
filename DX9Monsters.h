@@ -51,7 +51,7 @@ public:
 	DX9Monster();
 	~DX9Monster() {};
 
-	ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
+	ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
 	void DX9Monster::Destroy() override;
 
 	void DX9Monster::SetMonsterType(DX9MonsterType Type);
@@ -65,7 +65,7 @@ public:
 	DX9MonsterManager Class
 -----------------------------------------------------------------------------*/
 
-class DX9MonsterManager : protected DX9Common
+class DX9MonsterManager : public DX9Common
 {
 private:
 	static LPDIRECT3DDEVICE9 m_pDevice;
@@ -78,7 +78,7 @@ public:
 	DX9MonsterManager() {};
 	~DX9MonsterManager() {};
 
-	ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap);
+	ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
 	void DX9MonsterManager::Destroy();
 
 	DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);

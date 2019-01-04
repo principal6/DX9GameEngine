@@ -3,7 +3,7 @@
 #include "DX9Common.h"
 #include "DX9Line.h"
 
-class DX9Image : protected DX9Common
+class DX9Image : public DX9Common
 {
 protected:
 	struct VertexImage
@@ -72,7 +72,7 @@ public:
 	DX9Image();
 	virtual ~DX9Image() {};
 
-	virtual ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice);
+	virtual ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData);
 	virtual void DX9Image::Destroy() override;
 
 	virtual void DX9Image::Draw();

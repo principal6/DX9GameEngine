@@ -24,12 +24,13 @@ DX9Image::DX9Image()
 	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
-DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
+DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
 {
 	if (pDevice == nullptr)
 		return ReturnValue::DEVICE_NULL;
 
 	m_pDevice = pDevice;
+	m_WindowData = refData;
 
 	ClearVertexAndIndexData();
 	CreateVertexBuffer();
@@ -157,6 +158,8 @@ void DX9Image::Draw()
 	m_pDevice->SetFVF(D3DFVF_TEXTURE);
 	m_pDevice->SetIndices(m_pIndexBuffer);
 	m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, static_cast<int>(m_Vertices.size()), 0, static_cast<int>(m_Indices.size()));
+
+	m_pDevice->SetTexture(0, nullptr);
 }
 
 void DX9Image::DrawBoundingBox()

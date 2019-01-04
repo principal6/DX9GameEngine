@@ -5,7 +5,7 @@
 #pragma comment (lib, "dinput8.lib")
 #pragma comment (lib, "dxguid.lib")
 
-#include "Core/DX9Common.h"
+#include "DX9Common.h"
 #include <dinput.h>
 
 class DX9Input final : protected DX9Common
@@ -35,7 +35,7 @@ public:
 	DX9Input();
 	~DX9Input() {};
 
-	ReturnValue DX9Input::Create();
+	ReturnValue DX9Input::Create(HWND hWnd);
 	void DX9Input::Destroy() override;
 
 	bool DX9Input::OnKeyDown(DWORD DIK_KeyCode);

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "DX9Base.h"
+#include "Core/DX9Base.h"
+#include "Core/DX9Input.h"
 #include "DX9Background.h"
-#include "DX9Input.h"
 #include "DX9Sprite.h"
 #include "DX9Monsters.h"
 #include "DX9Effect.h"
 #include "DX9Map.h"
 #include "DX9Font.h"
 
-class DX9Engine final : public DX9Base
+class DX9Engine final : DX9Common
 {
 private:
 	static const int ANIM_TICK = 70;
@@ -31,6 +31,7 @@ private:
 	void(*m_pfRender)();
 	void(*m_pfKeyboard)(DWORD DIK_KeyCode);
 
+	DX9Base* m_Base;
 	DX9Input* m_Input;
 	DX9Background* m_Background;
 	DX9Map* m_Map;
@@ -38,6 +39,8 @@ private:
 	DX9MonsterManager* m_MonsterManager;
 	DX9Effect* m_EffectManager;
 	DX9Font* m_FontManager;
+
+	MSG m_MSG;
 
 private:
 	void DX9Engine::Destroy() override;
@@ -60,9 +63,8 @@ public:
 	void DX9Engine::ToggleBoundingBox();
 	DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName);
 
-	void DX9Engine::Run() override;
-	int DX9Engine::RunWithAccel(HACCEL hAccel) override;
-	void DX9Engine::Shutdown() override;
+	void DX9Engine::Run();
+	void DX9Engine::Shutdown();
 
 	void DX9Engine::MainLoop();
 	void DX9Engine::DetectInput();

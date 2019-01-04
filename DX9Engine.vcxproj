@@ -154,32 +154,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\DX9Base.h" />
     <ClInclude Include="Core\DX9Common.h" />
     <ClInclude Include="Core\DX9Image.h" />
+    <ClInclude Include="Core\DX9Input.h" />
     <ClInclude Include="Core\DX9Line.h" />
     <ClInclude Include="DX9AnimUnit.h" />
     <ClInclude Include="DX9Background.h" />
-    <ClInclude Include="DX9Base.h" />
     <ClInclude Include="DX9Effect.h" />
     <ClInclude Include="DX9Engine.h" />
     <ClInclude Include="DX9Font.h" />
-    <ClInclude Include="DX9Input.h" />
     <ClInclude Include="DX9Life.h" />
     <ClInclude Include="DX9Map.h" />
     <ClInclude Include="DX9Monsters.h" />
     <ClInclude Include="DX9Sprite.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\DX9Base.cpp" />
     <ClCompile Include="Core\DX9Common.cpp" />
     <ClCompile Include="Core\DX9Image.cpp" />
+    <ClCompile Include="Core\DX9Input.cpp" />
     <ClCompile Include="Core\DX9Line.cpp" />
     <ClCompile Include="DX9AnimUnit.cpp" />
     <ClCompile Include="DX9Background.cpp" />
-    <ClCompile Include="DX9Base.cpp" />
     <ClCompile Include="DX9Effect.cpp" />
     <ClCompile Include="DX9Engine.cpp" />
     <ClCompile Include="DX9Font.cpp" />
-    <ClCompile Include="DX9Input.cpp" />
     <ClCompile Include="DX9Life.cpp" />
     <ClCompile Include="DX9Map.cpp" />
     <ClCompile Include="DX9Monsters.cpp" />

@@ -2,9 +2,7 @@
 
 const float DX9Common::UV_OFFSET = 0.002f;
 const wchar_t DX9Common::ASSET_DIR[] = L"\\Asset\\";
-HINSTANCE DX9Common::m_hInstance = nullptr;
-HWND DX9Common::m_hWnd = nullptr;
-WindowData DX9Common::m_WindowData;
+HINSTANCE DX9Common::ms_hInstance = nullptr;
 
 void DX9Common::ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, FloatUV* UV)
 {
@@ -22,4 +20,14 @@ void DX9Common::GetTileCols(int SheetWidth, int TileWidth, int* TileCols)
 void DX9Common::GetTileRows(int SheetHeight, int TileHeight, int* TileRows)
 {
 	*TileRows = static_cast<int>(SheetHeight / TileHeight);
+}
+
+void DX9Common::SethWnd(HWND hWnd)
+{
+	m_hWnd = hWnd;
+}
+
+HWND DX9Common::GethWnd() const
+{
+	return m_hWnd;
 }
