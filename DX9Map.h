@@ -27,12 +27,12 @@ private:
 	static const int MAX_LINE_LEN;
 	static const int MAX_TILEID_LEN;
 	static const int MAX_MOVEID_LEN;
-	static const int TILE_W;
-	static const int TILE_H;
 	static const int MOVE_ALPHA;
+	static const int DEF_TILE_SIZE;
 
 	MapMode m_CurrMapMode; // For Map Editor
 	bool m_bMapCreated;
+	int m_TileSize;
 	int m_MapCols;
 	int m_MapRows;
 	int	m_TileSheetWidth;
@@ -41,7 +41,6 @@ private:
 	int	m_MoveSheetHeight;
 	WSTRING m_MapName;
 	WSTRING m_TileName;
-	WSTRING m_MapDataInString;
 	std::vector<MapData> m_MapData;
 
 	bool m_bMoveTextureLoaded;
@@ -53,23 +52,28 @@ private:
 	int m_OffsetZeroY; // For map movement (& inversed Y values)
 
 private:
+	static DX9Common::FloatUV DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH);
+	static D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID, int MapCols);
+	static int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols);
+	static D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset,
+		int TileSize, bool YRoundUp = false);
+
 	void DX9Map::ClearAllData();
 
-	void DX9Map::CreateLoadedMap();
+	void DX9Map::ParseMapData(WSTRING Str); // For loading maps
+	void DX9Map::CreateLoadedMap(WSTRING Data); // For loading maps
+	void DX9Map::GetMapData(WSTRING *pOutputString) const; // For saving maps
+	void DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const; // For saving maps
+
 	void DX9Map::AddMapFragmentTile(int TileID, int X, int Y);
 	void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y);
 	void DX9Map::AddEnd();
+
 	void DX9Map::CreateVertexBufferMove(); // IndexBuffer is not needed because they are the same
 	void DX9Map::UpdateVertexBufferMove();
-	void DX9Map::SetMapData(WSTRING Str); // For loading maps
 
-	int DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const;
 	bool DX9Map::IsMovableTile(int MapID, Direction Direction) const;
 	float DX9Map::GetMapTileBoundary(int MapID, Direction Direction) const;
-	DX9Common::FloatUV DX9Map::ConvertIDtoUV(int ID, int SheetW, int SheetH) const;
-	D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID) const;
-	int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY) const;
-	D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, bool YRoundUp = false) const;
 
 public:
 	DX9Map();
@@ -78,11 +82,11 @@ public:
 	ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice);
 	void DX9Map::Destroy() override;
 	
-	void DX9Map::CreateNewMap(WSTRING Name, int MapCols, int MapRows);
+	void DX9Map::CreateMap(WSTRING Name, int MapCols, int MapRows);
+	void DX9Map::LoadMap(WSTRING FileName);
+	void DX9Map::SaveMap(WSTRING FileName);
 	void DX9Map::SetTileTexture(WSTRING FileName);
 	void DX9Map::SetMoveTexture(WSTRING FileName);
-	void DX9Map::LoadMapFromFile(WSTRING FileName);
-	void DX9Map::GetMapData(WSTRING *pOutputString) const; // For saving the map
 
 	void DX9Map::Draw() override;
 

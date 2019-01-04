@@ -38,7 +38,7 @@ DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, 
 	m_ScaledHeight = static_cast<int>(m_UnitHeight * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
-	SetBoundingnBox(D3DXVECTOR2(0.0f, 0.0f));
+	SetBoundingBox(D3DXVECTOR2(0.0f, 0.0f));
 
 	return this;
 }
@@ -141,9 +141,9 @@ void DX9AnimUnit::SetDirection(AnimationDir Direction)
 	m_AnimDir = Direction;
 }
 
-DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size)
+DX9AnimUnit* DX9AnimUnit::SetBoundingBox(D3DXVECTOR2 Size)
 {
-	DX9Image::SetBoundingnBox(Size);
+	DX9Image::SetBoundingBox(Size);
 	return this;
 }
 

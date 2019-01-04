@@ -36,6 +36,8 @@ protected:
 	};
 
 protected:
+	static const DWORD DEF_BOUNDINGBOX_COLOR;
+
 	LPDIRECT3DDEVICE9 m_pDevice;
 	LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
 	LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
@@ -52,8 +54,10 @@ protected:
 	int m_VisibleHeight;
 	D3DXVECTOR2 m_Position;
 	D3DXVECTOR2 m_Scale;
-	BoundingBox m_BB;
-	DX9Line m_BBLine;
+
+	BoundingBox m_BoundingBox;
+	DX9Line m_BoundingBoxLine;
+	DWORD m_BoundingBoxColor;
 
 protected:
 	virtual void DX9Image::ClearVertexAndIndexData();
@@ -85,7 +89,8 @@ public:
 	virtual void DX9Image::SetVisibleRange(int Width, int Height);
 	virtual void DX9Image::SetUVRange(float u1, float u2, float v1, float v2);
 	virtual void DX9Image::SetAlpha(int Alpha);
-	virtual DX9Image* DX9Image::SetBoundingnBox(D3DXVECTOR2 Size);
+	virtual DX9Image* DX9Image::SetBoundingBox(D3DXVECTOR2 Size);
+	virtual void DX9Image::SetBoundingBoxColor(DWORD Color);
 
 	virtual int DX9Image::GetWidth() const;
 	virtual int DX9Image::GetHeight() const;

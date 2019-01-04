@@ -13,5 +13,5 @@ public:
 
 	DX9Sprite* DX9Sprite::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f) override;
 	DX9Sprite* DX9Sprite::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame) override;
-	DX9Sprite* DX9Sprite::SetBoundingnBox(D3DXVECTOR2 Size) override;
+	DX9Sprite* DX9Sprite::SetBoundingBox(D3DXVECTOR2 Size) override;
 };

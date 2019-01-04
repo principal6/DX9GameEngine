@@ -27,7 +27,7 @@ int main()
 		->AddAnimation(DX9Common::AnimationID::Attack1, 27, 28) // Punch
 		->AddAnimation(DX9Common::AnimationID::Attack2, 24, 26) // HorzAttack
 		->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f))
-		->SetBoundingnBox(D3DXVECTOR2(-24, -18));
+		->SetBoundingBox(D3DXVECTOR2(-24, -18));
 
 	g_Engine.GetMonsterManagerObject()
 		->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))

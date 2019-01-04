@@ -41,8 +41,8 @@ DX9Sprite* DX9Sprite::AddAnimation(AnimationID AnimID, int StartFrame, int EndFr
 	return this;
 }
 
-DX9Sprite* DX9Sprite::SetBoundingnBox(D3DXVECTOR2 Size)
+DX9Sprite* DX9Sprite::SetBoundingBox(D3DXVECTOR2 Size)
 {
-	DX9AnimUnit::SetBoundingnBox(Size);
+	DX9AnimUnit::SetBoundingBox(Size);
 	return this;
 }

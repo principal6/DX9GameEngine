@@ -3,7 +3,6 @@
 // Static member variables declaration
 const int DX9Engine::WINDOW_X = 50;
 const int DX9Engine::WINDOW_Y = 50;
-const int DX9Engine::KEY_PRESS_INTERVAL = 20;
 
 DX9Engine::DX9Engine()
 {
@@ -12,6 +11,7 @@ DX9Engine::DX9Engine()
 	m_TimerAnim = 0;
 	m_FPS = 0;
 	m_KeyPressCount = 0;
+	m_KeyToggleCount = 0;
 	m_bSpriteWalking = false;
 	m_bDrawBoundingBoxes = false;
 }
@@ -92,14 +92,18 @@ void DX9Engine::SetKeyboardFunction(void(*Keyboard)(DWORD DIK_KeyCode))
 
 void DX9Engine::ToggleBoundingBox()
 {
-	m_bDrawBoundingBoxes = !m_bDrawBoundingBoxes;
+	if (m_KeyToggleCount == 0)
+	{
+		m_bDrawBoundingBoxes = !m_bDrawBoundingBoxes;
+		m_KeyToggleCount++;
+	}
 }
 
 DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName)
 {
 	if (m_Map)
 	{
-		m_Map->LoadMapFromFile(FileName);
+		m_Map->LoadMap(FileName);
 		return ReturnValue::OK;
 	}
 	return ReturnValue::OBJECT_NOT_CREATED;
@@ -167,12 +171,12 @@ void DX9Engine::MainLoop()
 		m_Sprite->Animate();
 	}
 
-	if (m_KeyPressCount > 0)
+	if (m_KeyToggleCount > 0)
 	{
-		m_KeyPressCount++;
+		m_KeyToggleCount++;
 
-		if (m_KeyPressCount > KEY_PRESS_INTERVAL)
-			m_KeyPressCount = 0;
+		if (m_KeyToggleCount > KEY_TOGGLE_INTERVAL)
+			m_KeyToggleCount = 0;
 	}
 
 	DX9Base::BeginRender();

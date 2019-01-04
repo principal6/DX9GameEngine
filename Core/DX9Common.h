@@ -10,6 +10,8 @@
 #pragma comment (lib, "d3d9.lib")
 
 using WSTRING = std::wstring;
+using WIFSTREAM = std::wifstream;
+using WOFSTREAM = std::wofstream;
 using CINT = const int;
 
 #define DX_FAILED(func) (func != DX9Common::ReturnValue::OK)

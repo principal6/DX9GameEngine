@@ -23,7 +23,7 @@ DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, DX9Map* pMap
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
-	m_BBLine.CreateMax(m_pDevice);
+	m_BoundingBoxLine.CreateMax(m_pDevice);
 
 	m_pMap = pMap;
 
@@ -148,7 +148,7 @@ void DX9Effect::Update()
 {
 	D3DXVECTOR2 MapOffset = m_pMap->GetMapOffset();
 	DX9Image::ClearVertexAndIndexData();
-	m_BBLine.Clear();
+	m_BoundingBoxLine.Clear();
 
 	EffectInstanceData* iterator = m_pFisrtInstance;
 	int iterator_n = 0;
@@ -225,15 +225,15 @@ void DX9Effect::Update()
 			tBB.PositionOffset.x += -SpawnOffset.x + MapOffset.x;
 			tBB.PositionOffset.y -= SpawnOffset.y - MapOffset.y;
 
-			m_BBLine.AddBox(tBB.PositionOffset, tBB.Size, 0xFFFFFFFF);
+			m_BoundingBoxLine.AddBox(tBB.PositionOffset, tBB.Size, m_BoundingBoxColor);
 
 			iterator = iterator->GetNext();
 			iterator_n++;
 		}
 	}
 
-	m_BBLine.UpdateVB();
-	m_BBLine.UpdateIB();
+	m_BoundingBoxLine.UpdateVB();
+	m_BoundingBoxLine.UpdateIB();
 
 	DX9Image::UpdateVertexBuffer();
 	DX9Image::UpdateIndexBuffer();
@@ -261,7 +261,7 @@ void DX9Effect::DrawBoundingBox()
 {
 	if (m_pFisrtInstance)
 	{
-		m_BBLine.Draw();
+		m_BoundingBoxLine.Draw();
 	}
 }
 

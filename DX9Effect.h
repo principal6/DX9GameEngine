@@ -42,23 +42,23 @@ private:
 		int m_CurrFrame;
 		int m_MaxRepeatCount;
 		int m_CurrRepeatCount;
-		BoundingBox m_BB;
+		BoundingBox m_BoundingBox;
 		int m_Damage;
 
 	public:
 		EffectInstanceData() : m_pNext(nullptr), m_Position(D3DXVECTOR2(0, 0)) {};
 		EffectInstanceData(int TypeDataID, D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int CurrFrame, BoundingBox BB,
 			int Damage, int RepeatCount) :
-			m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Position(Position), m_Offset(Offset), m_CurrFrame(CurrFrame), m_BB(BB),
+			m_pNext(nullptr), m_TypeDataID(TypeDataID), m_Position(Position), m_Offset(Offset), m_CurrFrame(CurrFrame), m_BoundingBox(BB),
 			m_Damage(Damage), m_MaxRepeatCount(RepeatCount) {};
 
 		void SetNext(EffectInstanceData* Next) { m_pNext = Next; };
 		void SetCurrFrame(int FrameID) { m_CurrFrame = FrameID; };
 		void SetCurrRepeatCount(int Value) { m_CurrRepeatCount = Value; };
 		void SetDamage(int Damage) { m_Damage = Damage; };
-		void SetBoundingBox(BoundingBox NewBB) { m_BB = NewBB; };
+		void SetBoundingBox(BoundingBox NewBB) { m_BoundingBox = NewBB; };
 
-		auto GetBoundingBox() const { return m_BB; };
+		auto GetBoundingBox() const { return m_BoundingBox; };
 		auto GetNext() const { return m_pNext; };
 		auto GetType() const { return m_Type; };
 		auto GetPos() const { return m_Position; };

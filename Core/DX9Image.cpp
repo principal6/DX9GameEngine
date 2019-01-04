@@ -1,5 +1,8 @@
 #include "DX9Image.h"
 
+// Static member variable declaration
+const DWORD DX9Image::DEF_BOUNDINGBOX_COLOR = D3DCOLOR_ARGB(255, 0, 150, 50);
+
 DX9Image::DX9Image()
 {
 	m_pDevice = nullptr;
@@ -17,6 +20,8 @@ DX9Image::DX9Image()
 	m_VisibleHeight = -1;
 	m_Position = D3DXVECTOR2(0.0f, 0.0f);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
+
+	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
 DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
@@ -32,9 +37,9 @@ DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice)
 	UpdateVertexBuffer();
 	UpdateIndexBuffer();
 
-	m_BBLine.Create(m_pDevice);
-	m_BBLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), D3DCOLOR_ARGB(255, 255, 255, 255));
-	m_BBLine.AddEnd();
+	m_BoundingBoxLine.Create(m_pDevice);
+	m_BoundingBoxLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), m_BoundingBoxColor);
+	m_BoundingBoxLine.AddEnd();
 
 	return ReturnValue::OK;
 }
@@ -156,8 +161,8 @@ void DX9Image::Draw()
 
 void DX9Image::DrawBoundingBox()
 {
-	m_BBLine.SetBoxPosition(m_Position + m_BB.PositionOffset, m_BB.Size);
-	m_BBLine.Draw();
+	m_BoundingBoxLine.SetBoxPosition(m_Position + m_BoundingBox.PositionOffset, m_BoundingBox.Size);
+	m_BoundingBoxLine.Draw();
 }
 
 void DX9Image::FlipHorizontal()
@@ -277,15 +282,20 @@ void DX9Image::SetAlpha(int Alpha)
 	}
 }
 
-DX9Image* DX9Image::SetBoundingnBox(D3DXVECTOR2 Size)
+DX9Image* DX9Image::SetBoundingBox(D3DXVECTOR2 Size)
 {
-	m_BB.PositionOffset.x = -Size.x / 2.0f;
-	m_BB.PositionOffset.y = -Size.y;
+	m_BoundingBox.PositionOffset.x = -Size.x / 2.0f;
+	m_BoundingBox.PositionOffset.y = -Size.y;
 
-	m_BB.Size.x = static_cast<float>(m_ScaledWidth) + Size.x;
-	m_BB.Size.y = static_cast<float>(m_ScaledHeight) + Size.y;
+	m_BoundingBox.Size.x = static_cast<float>(m_ScaledWidth) + Size.x;
+	m_BoundingBox.Size.y = static_cast<float>(m_ScaledHeight) + Size.y;
 
 	return this;
+}
+
+void DX9Image::SetBoundingBoxColor(DWORD Color)
+{
+	DX9Image::m_BoundingBoxColor = Color;
 }
 
 void DX9Image::UpdateVertexData()
@@ -367,8 +377,8 @@ D3DXVECTOR2 DX9Image::GetCenterPosition() const
 DX9Image::BoundingBox DX9Image::GetBoundingBox() const
 {
 	BoundingBox Result;
-	Result.PositionOffset = m_Position + m_BB.PositionOffset;
-	Result.Size = m_BB.Size;
+	Result.PositionOffset = m_Position + m_BoundingBox.PositionOffset;
+	Result.Size = m_BoundingBox.Size;
 
 	return Result;
 }

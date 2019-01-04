@@ -14,9 +14,9 @@ class DX9Engine final : public DX9Base
 {
 private:
 	static const int ANIM_TICK = 70;
+	static const int KEY_TOGGLE_INTERVAL = 15;
 	static const int WINDOW_X;
 	static const int WINDOW_Y;
-	static const int KEY_PRESS_INTERVAL;
 
 	bool m_Keys[NUM_KEYS];
 
@@ -25,6 +25,7 @@ private:
 	ULONGLONG m_TimerAnim;
 	int m_FPS;
 	int m_KeyPressCount;
+	int m_KeyToggleCount;
 	bool m_bSpriteWalking;
 	bool m_bDrawBoundingBoxes;
 

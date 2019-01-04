@@ -44,7 +44,7 @@ public:
 	void DX9AnimUnit::SetFrame(int FrameID);
 	void DX9AnimUnit::SetAnimation(AnimationID AnimID, bool CanInterrupt = false, bool ForcedSet = false, bool Repeating = false);
 	void DX9AnimUnit::SetDirection(AnimationDir Direction);
-	virtual DX9AnimUnit* DX9AnimUnit::SetBoundingnBox(D3DXVECTOR2 Size) override;
+	virtual DX9AnimUnit* DX9AnimUnit::SetBoundingBox(D3DXVECTOR2 Size) override;
 
 	bool DX9AnimUnit::IsBeingAnimated() const;
 	int DX9AnimUnit::GetScaledUnitWidth() const;
