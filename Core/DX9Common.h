@@ -29,6 +29,14 @@ struct WindowData
 class DX9Common
 {
 public:
+	struct RGBInt
+	{
+		int Red, Green, Blue;
+
+		RGBInt() : Red(0), Green(0), Blue(0) {};
+		RGBInt(int _Red, int _Green, int _Blue) : Red(_Red), Green(_Green), Blue(_Blue) {};
+	};
+
 	enum class FontID
 	{
 		Title,

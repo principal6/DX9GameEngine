@@ -52,7 +52,7 @@ DX9Common::ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, C
 }
 DX9Common::ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color)
 {
-	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color)
+	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color, hWndParent)
 		== nullptr)
 		return ReturnValue::WINDOW_NOT_CREATED;
 
@@ -78,7 +78,7 @@ void DX9Base::Destroy()
 }
 
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-	WindowStyle WindowStyle, RGBInt BackColor)
+	WindowStyle WindowStyle, RGBInt BackColor, HWND hWndParent)
 {
 	ms_hInstance = GetModuleHandle(nullptr);
 
@@ -99,7 +99,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	AdjustWindowRect(&rWndRect, (DWORD)WindowStyle, false);
 
 	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle, rWndRect.left, rWndRect.top,
-		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, nullptr, (HMENU)nullptr, ms_hInstance, nullptr);
+		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, hWndParent, (HMENU)nullptr, ms_hInstance, nullptr);
 
 	ShowWindow(m_hWnd, SW_SHOW);
 

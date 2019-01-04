@@ -33,14 +33,6 @@ protected:
 		ChildWindow2 =  WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN,
 	};
 
-	struct RGBInt
-	{
-		int Red, Green, Blue;
-
-		RGBInt() : Red(0), Green(0), Blue(0) {};
-		RGBInt(int _Red, int _Green, int _Blue) : Red(_Red), Green(_Green), Blue(_Blue) {};
-	};
-
 private:
 	LPDIRECT3D9 m_pD3D;
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
@@ -48,7 +40,7 @@ private:
 
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-		WindowStyle WindowStyle, RGBInt BackColor);
+		WindowStyle WindowStyle, RGBInt BackColor, HWND hWndParent = nullptr);
 	int DX9Base::InitD3D();
 	friend LRESULT CALLBACK WndProcBase(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
