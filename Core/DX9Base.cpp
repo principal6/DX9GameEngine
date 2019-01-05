@@ -1,6 +1,7 @@
 #include "DX9Base.h"
 
-LRESULT CALLBACK WndProcBase(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+// Window procedure for Game Window
+LRESULT CALLBACK GameWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	switch (Message)
 	{
@@ -29,7 +30,7 @@ DX9Common::ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CIN
 {
 	RGBInt rBGColor = RGBInt(255, 0, 255);
 
-	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor)
+	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor, GameWindowProc)
 		== nullptr)
 		return ReturnValue::WINDOW_NOT_CREATED;
 
@@ -39,20 +40,22 @@ DX9Common::ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CIN
 	return ReturnValue::OK;
 }
 
-DX9Common::ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height)
+DX9Common::ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc)
 {
-	RGBInt rBGColor = RGBInt(255, 0, 255);
-
-	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor)
+	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::OverlappedWindow, Color, Proc)
 		== nullptr)
 		return ReturnValue::WINDOW_NOT_CREATED;
 
 	return ReturnValue::OK;
 
 }
-DX9Common::ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color)
+DX9Common::ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
+	RGBInt Color, WNDPROC Proc)
 {
-	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color, hWndParent)
+	// Set DirectX clear color
+	m_BGColor = D3DCOLOR_XRGB(Color.Red, Color.Green, Color.Blue);
+
+	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color, Proc, hWndParent)
 		== nullptr)
 		return ReturnValue::WINDOW_NOT_CREATED;
 
@@ -78,10 +81,10 @@ void DX9Base::Destroy()
 }
 
 HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-	WindowStyle WindowStyle, RGBInt BackColor, HWND hWndParent)
+	WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent)
 {
 	ms_hInstance = GetModuleHandle(nullptr);
-
+	
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
 	r_WndClass.cbWndExtra = 0;
@@ -89,7 +92,7 @@ HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	r_WndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	r_WndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
 	r_WndClass.hInstance = ms_hInstance;
-	r_WndClass.lpfnWndProc = WndProcBase;
+	r_WndClass.lpfnWndProc = Proc;
 	r_WndClass.lpszClassName = Name;
 	r_WndClass.lpszMenuName = nullptr;
 	r_WndClass.style = CS_HREDRAW | CS_VREDRAW;

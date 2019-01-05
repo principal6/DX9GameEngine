@@ -38,19 +38,25 @@ private:
 	LPDIRECT3DDEVICE9 m_pD3DDevice;
 	D3DCOLOR m_BGColor;
 
+protected:
+	static HWND s_hWnd;
+	static UINT s_Message;
+	static WPARAM s_wParam;
+	static LPARAM s_lParam;
+
 private:
 	HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-		WindowStyle WindowStyle, RGBInt BackColor, HWND hWndParent = nullptr);
+		WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent = nullptr);
 	int DX9Base::InitD3D();
-	friend LRESULT CALLBACK WndProcBase(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 
 public:
 	DX9Base();
 	~DX9Base() {};
 
 	ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height);
-	ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height);
-	ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color);
+	ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc);
+	ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
+		RGBInt Color, WNDPROC Proc);
 	virtual void DX9Base::Destroy() override;
 	
 	void DX9Base::SetBackgroundColor(D3DCOLOR color);
