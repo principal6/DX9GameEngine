@@ -46,44 +46,44 @@ auto DX9Engine::Create(int Width, int Height)->Error
 	}
 
 	// Set data that will be shared in many sub-classes
-	m_WindowData.WindowWidth = Width;
-	m_WindowData.WindowHeight = Height;
-	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
-	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
-	GetCurrentDirectoryW(255, m_WindowData.AppDir);
+	ms_MainWindowData.WindowWidth = Width;
+	ms_MainWindowData.WindowHeight = Height;
+	ms_MainWindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
+	ms_MainWindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
+	GetCurrentDirectoryW(255, ms_MainWindowData.AppDir);
 
 	// Create image object
 	if (m_Background = new DX9Background)
 	{
-		if (DX_FAILED(m_Background->Create(m_Base->GetDevice(), m_WindowData)))
+		if (DX_FAILED(m_Background->Create(m_Base->GetDevice(), ms_MainWindowData)))
 			return Error::IMAGE_NOT_CREATED;
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
-		if (DX_FAILED(m_Map->Create(m_Base->GetDevice(), m_WindowData)))
+		if (DX_FAILED(m_Map->Create(m_Base->GetDevice(), ms_MainWindowData)))
 			return Error::MAP_NOT_CREATED;
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
-		if (DX_FAILED(m_Sprite->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
+		if (DX_FAILED(m_Sprite->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
 			return Error::SPRITE_NOT_CREATED;
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
-		if (DX_FAILED(m_MonsterManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
+		if (DX_FAILED(m_MonsterManager->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
 			return Error::MONSTERMANAGER_NOT_CREATED;
 	}
 
 	// Create effect manager object
 	if (m_EffectManager = new DX9Effect)
 	{
-		if (DX_FAILED(m_EffectManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
+		if (DX_FAILED(m_EffectManager->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
 			return Error::EFFECTMANAGER_NOT_CREATED;
 	}
 

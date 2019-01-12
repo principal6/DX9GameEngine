@@ -73,7 +73,7 @@ auto DX9Font::SetFontColor(DWORD Color)->DX9Font*
 auto DX9Font::Draw(int X, int Y, WSTRING String)->DX9Font*
 {
 	RECT Rect_Font;
-	SetRect(&Rect_Font, X, Y, m_WindowData.WindowWidth, m_WindowData.WindowHeight);
+	SetRect(&Rect_Font, X, Y, ms_MainWindowData.WindowWidth, ms_MainWindowData.WindowHeight);
 	m_Fonts[m_CurrFontInstanceID].pFont->DrawText(nullptr, String.c_str(), -1, &Rect_Font, DT_LEFT|DT_NOCLIP, m_FontColor);
 	return this;
 }

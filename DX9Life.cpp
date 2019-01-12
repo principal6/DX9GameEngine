@@ -40,13 +40,13 @@ void DX9Life::SetMapPointer(DX9Map* pMap)
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_WindowData.WindowHeight - m_ScaledHeight - m_GlobalPos.y;
+	m_GlobalPosInverse.y = ms_MainWindowData.WindowHeight - m_ScaledHeight - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_WindowData.WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
+	m_GlobalPos.y = ms_MainWindowData.WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
 }
 
 auto DX9Life::GetGlobalPosition() const->D3DXVECTOR2
@@ -67,8 +67,8 @@ auto DX9Life::GetVelocity() const->D3DXVECTOR2
 auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result;
-	Result.x = m_GlobalPos.x - m_WindowData.WindowHalfWidth;
-	Result.y = m_GlobalPosInverse.y - m_WindowData.WindowHalfHeight;
+	Result.x = m_GlobalPos.x - ms_MainWindowData.WindowHalfWidth;
+	Result.y = m_GlobalPosInverse.y - ms_MainWindowData.WindowHalfHeight;
 
 	if (Result.x < 0)
 		Result.x = 0;
@@ -101,11 +101,11 @@ void DX9Life::MoveWithVelocity()
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_WindowData.WindowHalfWidth)
+	if (m_GlobalPosInverse.x < ms_MainWindowData.WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
-	if (m_GlobalPosInverse.y > m_WindowData.WindowHalfHeight)
+	if (m_GlobalPosInverse.y > ms_MainWindowData.WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
@@ -120,24 +120,24 @@ void DX9Life::MoveConst(D3DXVECTOR2 dXY)
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_WindowData.WindowHalfWidth)
+	if (m_GlobalPosInverse.x < ms_MainWindowData.WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
 	else
 	{
-		if (m_Position.x != m_WindowData.WindowHalfWidth)
-			m_Position.x = m_WindowData.WindowHalfWidth;
+		if (m_Position.x != ms_MainWindowData.WindowHalfWidth)
+			m_Position.x = ms_MainWindowData.WindowHalfWidth;
 	}
 
-	if (m_GlobalPosInverse.y > m_WindowData.WindowHalfHeight)
+	if (m_GlobalPosInverse.y > ms_MainWindowData.WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
 	else
 	{
-		if (m_Position.y != m_WindowData.WindowHalfHeight)
-			m_Position.y = m_WindowData.WindowHalfHeight;
+		if (m_Position.y != ms_MainWindowData.WindowHalfHeight)
+			m_Position.y = ms_MainWindowData.WindowHalfHeight;
 	}
 
 	SetPosition(m_Position);

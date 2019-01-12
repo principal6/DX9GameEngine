@@ -20,11 +20,11 @@ auto DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Sprite*
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x > m_WindowData.WindowHalfWidth)
-		m_GlobalPosInverse.x = m_WindowData.WindowHalfWidth;
+	if (m_GlobalPosInverse.x > ms_MainWindowData.WindowHalfWidth)
+		m_GlobalPosInverse.x = ms_MainWindowData.WindowHalfWidth;
 
-	if (m_GlobalPosInverse.y < m_WindowData.WindowHalfHeight)
-		m_GlobalPosInverse.y = m_WindowData.WindowHalfHeight;
+	if (m_GlobalPosInverse.y < ms_MainWindowData.WindowHalfHeight)
+		m_GlobalPosInverse.y = ms_MainWindowData.WindowHalfHeight;
 
 	SetPosition(m_GlobalPosInverse);
 

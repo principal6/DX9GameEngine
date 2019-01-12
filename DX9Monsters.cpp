@@ -161,7 +161,7 @@ auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, D
 		return Error::MAP_NULL;
 
 	m_pDevice = pDevice;
-	m_WindowData = refData;
+	ms_MainWindowData = refData;
 	m_pMap = pMap;
 
 	return Error::OK;
@@ -191,7 +191,7 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 		if (TypeIterator.m_Name == MonsterName)
 		{
 			DX9Monster Temp;
-			Temp.Create(m_pDevice, m_WindowData, m_pMap);
+			Temp.Create(m_pDevice, ms_MainWindowData, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
 			Temp.MakeUnit(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 

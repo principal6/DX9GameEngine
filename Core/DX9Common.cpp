@@ -8,6 +8,7 @@ const wchar_t DX9Common::ASSET_DIR[] = L"\\Asset\\";
 
 // Static member variable
 HINSTANCE DX9Common::ms_hInstance = nullptr;
+WindowData DX9Common::ms_MainWindowData;
 
 void DX9Common::ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, FloatUV* UV)
 {

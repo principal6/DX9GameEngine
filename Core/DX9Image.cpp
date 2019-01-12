@@ -32,7 +32,7 @@ auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 		return Error::DEVICE_NULL;
 
 	m_pDevice = pDevice;
-	m_WindowData = refData;
+	ms_MainWindowData = refData;
 
 	ClearVertexAndIndexData();
 	CreateVertexBuffer();
@@ -212,7 +212,7 @@ void DX9Image::SetTexture(WSTRING FileName)
 	}
 
 	WSTRING NewFileName;
-	NewFileName = m_WindowData.AppDir;
+	NewFileName = ms_MainWindowData.AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 

@@ -36,13 +36,18 @@ namespace DX9ENGINE
 		};
 
 	private:
-		LPDIRECT3D9 m_pD3D;
+		static int ms_ChildWindowCount;
+		static LPDIRECT3D9 ms_pD3D;
+
 		LPDIRECT3DDEVICE9 m_pD3DDevice;
 		D3DCOLOR m_BGColor;
 
+		int m_CurrWindowWidth;
+		int m_CurrWindowHeight;
+
 	private:
 		auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-			WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent = nullptr)->HWND;
+			WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, LPCWSTR MenuName = nullptr, HWND hWndParent = nullptr)->HWND;
 		auto DX9Base::InitD3D()->int;
 
 	public:
@@ -50,13 +55,14 @@ namespace DX9ENGINE
 		~DX9Base() {};
 
 		auto DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->Error;
-		auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc)->Error;
+		auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color,
+			WNDPROC Proc, LPCWSTR MenuName)->Error;
 		auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
 			RGBInt Color, WNDPROC Proc)->Error;
 		void DX9Base::Destroy() override;
 
 		void DX9Base::SetBackgroundColor(D3DCOLOR color);
-		void DX9Base::Resize(HWND hWnd);
+		void DX9Base::Resize();
 
 		void DX9Base::BeginRender() const;
 		void DX9Base::EndRender() const;

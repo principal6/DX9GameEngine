@@ -39,7 +39,7 @@ namespace DX9ENGINE
 
 	struct WindowData
 	{
-		static const int MAX_FILE_LEN = 255;
+		static const int MAX_FILE_LEN = 260;
 		int WindowWidth;
 		int WindowHeight;
 		float WindowHalfWidth;
@@ -152,8 +152,9 @@ namespace DX9ENGINE
 		static const wchar_t ASSET_DIR[];
 
 		static HINSTANCE ms_hInstance;
+		static WindowData ms_MainWindowData;
+
 		HWND m_hWnd;
-		WindowData m_WindowData;
 
 	protected:
 		static void DX9Common::ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, FloatUV* UV);

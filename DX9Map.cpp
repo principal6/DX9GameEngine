@@ -100,7 +100,7 @@ auto DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 		return Error::DEVICE_NULL;
 
 	m_pDevice = pDevice;
-	m_WindowData = refData;
+	ms_MainWindowData = refData;
 
 	ClearAllData();
 	m_Vertices.clear();
@@ -157,7 +157,7 @@ void DX9Map::SetMoveTexture(WSTRING FileName)
 	}
 
 	WSTRING NewFileName;
-	NewFileName = m_WindowData.AppDir;
+	NewFileName = ms_MainWindowData.AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 
@@ -174,7 +174,7 @@ void DX9Map::SetMoveTexture(WSTRING FileName)
 void DX9Map::LoadMap(WSTRING FileName)
 {
 	WSTRING NewFileName;
-	NewFileName = m_WindowData.AppDir;
+	NewFileName = ms_MainWindowData.AppDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 
@@ -327,7 +327,7 @@ void DX9Map::AddEnd()
 	}
 
 	m_bMapCreated = true;
-	m_OffsetZeroY = m_WindowData.WindowHeight - (m_MapRows * m_TileSize);
+	m_OffsetZeroY = ms_MainWindowData.WindowHeight - (m_MapRows * m_TileSize);
 
 	SetGlobalPosition(D3DXVECTOR2(0, 0));
 }
@@ -534,7 +534,7 @@ void DX9Map::SetPosition(D3DXVECTOR2 Offset)
 void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset)
 {
 	float MapH = static_cast<float>(m_MapRows * m_TileSize);
-	float NewOffsetY = m_WindowData.WindowHeight - MapH + Offset.y;
+	float NewOffsetY = ms_MainWindowData.WindowHeight - MapH + Offset.y;
 
 	SetPosition(D3DXVECTOR2(Offset.x, NewOffsetY));
 }
