@@ -1,5 +1,7 @@
 #include "DX9Map.h"
 
+using namespace DX9ENGINE;
+
 // Static member variables declaration
 const int DX9Map::MAX_LINE_LEN = 1024;
 const int DX9Map::MAX_TILEID_LEN = 3;

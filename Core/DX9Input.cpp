@@ -1,5 +1,7 @@
 #include "DX9Input.h"
 
+using namespace DX9ENGINE;
+
 DX9Input::DX9Input()
 {
 	m_DI8 = nullptr;

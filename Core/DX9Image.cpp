@@ -1,5 +1,7 @@
 #include "DX9Image.h"
 
+using namespace DX9ENGINE;
+
 // Static member variable declaration
 const DWORD DX9Image::DEF_BOUNDINGBOX_COLOR = D3DCOLOR_ARGB(255, 0, 150, 50);
 

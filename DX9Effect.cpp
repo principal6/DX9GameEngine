@@ -1,5 +1,7 @@
 #include "DX9Effect.h"
 
+using namespace DX9ENGINE;
+
 DX9Effect::DX9Effect()
 {
 	m_TextureAtlasCols = 0;

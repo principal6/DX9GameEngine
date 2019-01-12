@@ -1,5 +1,7 @@
 #include "DX9Font.h"
 
+using namespace DX9ENGINE;
+
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9Font::m_pDevice;
 

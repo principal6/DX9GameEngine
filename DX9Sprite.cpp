@@ -1,5 +1,7 @@
 #include "DX9Sprite.h"
 
+using namespace DX9ENGINE;
+
 DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
 {
 	if (pDevice == nullptr)

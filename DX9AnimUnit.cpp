@@ -1,5 +1,7 @@
 #include "DX9AnimUnit.h"
 
+using namespace DX9ENGINE;
+
 DX9AnimUnit::DX9AnimUnit()
 {
 	m_NumRows = 0;

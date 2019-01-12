@@ -5,6 +5,8 @@
 #define new new( _CLIENT_BLOCK, __FILE__, __LINE__)
 #endif
 
+using namespace DX9ENGINE;
+
 void Render();
 void Keyboard(DWORD Key);
 static DX9Engine g_Engine;

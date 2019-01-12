@@ -1,5 +1,7 @@
 #include "DX9Engine.h"
 
+using namespace DX9ENGINE;
+
 // Static member variables declaration
 const int DX9Engine::WINDOW_X = 50;
 const int DX9Engine::WINDOW_Y = 50;

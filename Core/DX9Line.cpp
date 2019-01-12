@@ -1,5 +1,7 @@
 #include "DX9Line.h"
 
+using namespace DX9ENGINE;
+
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9Line::m_pDevice;
 

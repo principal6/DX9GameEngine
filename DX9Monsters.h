@@ -2,92 +2,95 @@
 
 #include "DX9Life.h"
 
-/*-----------------------------------------------------------------------------
-	DX9MonsterType Class
------------------------------------------------------------------------------*/
-
-class DX9MonsterType : protected DX9Common
+namespace DX9ENGINE
 {
-public:
-	WSTRING m_Name;
-	WSTRING m_TextureFileName;
-	int m_TextureNumCols;
-	int m_TextureNumRows;
-	int m_HPMax;
-	std::vector<AnimationData> m_AnimData;
+	/*-----------------------------------------------------------------------------
+		DX9MonsterType Class
+	-----------------------------------------------------------------------------*/
 
-public:
-	DX9MonsterType() {};
-	DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP) :
-		m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols), m_TextureNumRows(TextureNumRows),
-		m_HPMax(HP) {};
-	~DX9MonsterType() {};
+	class DX9MonsterType : protected DX9Common
+	{
+	public:
+		WSTRING m_Name;
+		WSTRING m_TextureFileName;
+		int m_TextureNumCols;
+		int m_TextureNumRows;
+		int m_HPMax;
+		std::vector<AnimationData> m_AnimData;
 
-	DX9MonsterType* DX9MonsterType::AddAnimation(AnimationData Value);
-	void DX9MonsterType::Destroy() override;
-};
+	public:
+		DX9MonsterType() {};
+		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP) :
+			m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols), m_TextureNumRows(TextureNumRows),
+			m_HPMax(HP) {};
+		~DX9MonsterType() {};
 
-/*-----------------------------------------------------------------------------
-	DX9Monster Class
------------------------------------------------------------------------------*/
+		DX9MonsterType* DX9MonsterType::AddAnimation(AnimationData Value);
+		void DX9MonsterType::Destroy() override;
+	};
 
-class DX9Monster final : public DX9Life
-{
-private:
-	static const float OFFSET_Y_HPBAR;
+	/*-----------------------------------------------------------------------------
+		DX9Monster Class
+	-----------------------------------------------------------------------------*/
 
-	DX9MonsterType m_Type;
-	int m_HPCurr;
-	bool m_bUILoaded;
-	DX9Image *m_HPFrame;
-	DX9Image *m_HPBar;
+	class DX9Monster final : public DX9Life
+	{
+	private:
+		static const float OFFSET_Y_HPBAR;
 
-private:
-	void DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
-	void DX9Monster::CalculateHP();
-	void DX9Monster::UpdateGlobalPosition();
+		DX9MonsterType m_Type;
+		int m_HPCurr;
+		bool m_bUILoaded;
+		DX9Image *m_HPFrame;
+		DX9Image *m_HPBar;
 
-public:
-	DX9Monster();
-	~DX9Monster() {};
+	private:
+		void DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
+		void DX9Monster::CalculateHP();
+		void DX9Monster::UpdateGlobalPosition();
 
-	ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
-	void DX9Monster::Destroy() override;
+	public:
+		DX9Monster();
+		~DX9Monster() {};
 
-	void DX9Monster::SetMonsterType(DX9MonsterType Type);
-	DX9Monster* DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position) override;
-	void DX9Monster::Damage(int Damage);
+		ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
+		void DX9Monster::Destroy() override;
 
-	void DX9Monster::Draw();
-};
+		void DX9Monster::SetMonsterType(DX9MonsterType Type);
+		DX9Monster* DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position) override;
+		void DX9Monster::Damage(int Damage);
 
-/*-----------------------------------------------------------------------------
-	DX9MonsterManager Class
------------------------------------------------------------------------------*/
+		void DX9Monster::Draw();
+	};
 
-class DX9MonsterManager : public DX9Common
-{
-private:
-	static LPDIRECT3DDEVICE9 m_pDevice;
-	DX9Map* m_pMap;
+	/*-----------------------------------------------------------------------------
+		DX9MonsterManager Class
+	-----------------------------------------------------------------------------*/
 
-	std::vector<DX9MonsterType> m_Types;
-	std::vector<DX9Monster> m_Instances;
+	class DX9MonsterManager : public DX9Common
+	{
+	private:
+		static LPDIRECT3DDEVICE9 m_pDevice;
+		DX9Map* m_pMap;
 
-public:
-	DX9MonsterManager() {};
-	~DX9MonsterManager() {};
+		std::vector<DX9MonsterType> m_Types;
+		std::vector<DX9Monster> m_Instances;
 
-	ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
-	void DX9MonsterManager::Destroy();
+	public:
+		DX9MonsterManager() {};
+		~DX9MonsterManager() {};
 
-	DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);
-	DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
+		ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
+		void DX9MonsterManager::Destroy();
 
-	void DX9MonsterManager::Animate();
-	void DX9MonsterManager::Gravitate();
-	void DX9MonsterManager::Draw();
-	void DX9MonsterManager::DrawBoundingBox();
+		DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);
+		DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
 
-	std::vector<DX9Monster>* DX9MonsterManager::GetInstancePointer();
+		void DX9MonsterManager::Animate();
+		void DX9MonsterManager::Gravitate();
+		void DX9MonsterManager::Draw();
+		void DX9MonsterManager::DrawBoundingBox();
+
+		std::vector<DX9Monster>* DX9MonsterManager::GetInstancePointer();
+	};
 };

@@ -1,5 +1,7 @@
 #include "DX9Base.h"
 
+using namespace DX9ENGINE;
+
 // Window procedure for Game Window
 LRESULT CALLBACK GameWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {

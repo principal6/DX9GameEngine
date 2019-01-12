@@ -1,5 +1,7 @@
 #include "DX9Life.h"
 
+using namespace DX9ENGINE;
+
 // Static member variables declaration
 const D3DXVECTOR2 DX9Life::JUMP_POWER = D3DXVECTOR2(0.0f, -14.0f);
 const D3DXVECTOR2 DX9Life::GRAVITY = D3DXVECTOR2(0.0f, 0.5f);
