@@ -37,10 +37,10 @@ namespace DX9ENGINE
 		int m_TileSize;
 		int m_MapCols;
 		int m_MapRows;
-		int	m_TileSheetWidth;
-		int	m_TileSheetHeight;
-		int	m_MoveSheetWidth;
-		int	m_MoveSheetHeight;
+		int m_TileSheetWidth;
+		int m_TileSheetHeight;
+		int m_MoveSheetWidth;
+		int m_MoveSheetHeight;
 		WSTRING m_MapName;
 		WSTRING m_TileName;
 		VECTOR<MapData> m_MapData;

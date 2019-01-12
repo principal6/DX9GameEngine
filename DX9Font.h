@@ -19,7 +19,7 @@ namespace DX9ENGINE
 
 		VECTOR<FontInstance> m_Fonts;
 
-		int	m_CurrFontInstanceID;
+		int m_CurrFontInstanceID;
 		DWORD m_FontColor;
 
 	public:
