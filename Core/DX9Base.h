@@ -6,7 +6,7 @@ namespace DX9ENGINE
 {
 	class DX9Base final : public DX9Common
 	{
-	protected:
+	private:
 		enum class WindowStyle : DWORD
 		{
 			Overlapped = WS_OVERLAPPED,
@@ -40,26 +40,20 @@ namespace DX9ENGINE
 		LPDIRECT3DDEVICE9 m_pD3DDevice;
 		D3DCOLOR m_BGColor;
 
-	protected:
-		static HWND s_hWnd;
-		static UINT s_Message;
-		static WPARAM s_wParam;
-		static LPARAM s_lParam;
-
 	private:
-		HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-			WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent = nullptr);
-		int DX9Base::InitD3D();
+		auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
+			WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent = nullptr)->HWND;
+		auto DX9Base::InitD3D()->int;
 
 	public:
 		DX9Base();
 		~DX9Base() {};
 
-		ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height);
-		ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc);
-		ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
-			RGBInt Color, WNDPROC Proc);
-		virtual void DX9Base::Destroy() override;
+		auto DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->Error;
+		auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc)->Error;
+		auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
+			RGBInt Color, WNDPROC Proc)->Error;
+		void DX9Base::Destroy() override;
 
 		void DX9Base::SetBackgroundColor(D3DCOLOR color);
 		void DX9Base::Resize(HWND hWnd);
@@ -67,6 +61,6 @@ namespace DX9ENGINE
 		void DX9Base::BeginRender() const;
 		void DX9Base::EndRender() const;
 
-		LPDIRECT3DDEVICE9 DX9Base::GetDevice() const;
+		auto DX9Base::GetDevice()->LPDIRECT3DDEVICE9 const;
 	};
 };

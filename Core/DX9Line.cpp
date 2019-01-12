@@ -3,11 +3,11 @@
 using namespace DX9ENGINE;
 
 // Static member variable declaration
-LPDIRECT3DDEVICE9 DX9Line::m_pDevice;
+LPDIRECT3DDEVICE9 DX9Line::ms_pDevice;
 
 void DX9Line::Create(LPDIRECT3DDEVICE9 pD3DDev)
 {
-	m_pDevice = pD3DDev;
+	ms_pDevice = pD3DDev;
 	m_pVB = nullptr;
 	m_pIB = nullptr;
 	Clear();
@@ -28,7 +28,7 @@ void DX9Line::CreateMax(LPDIRECT3DDEVICE9 pD3DDev)
 
 void DX9Line::Destroy()
 {
-	m_pDevice = nullptr; // Just set to nullptr cuz it's newed in <DX9Base> class
+	ms_pDevice = nullptr; // Just set to nullptr cuz it's newed in <DX9Base> class
 
 	m_Vertices.clear();
 	m_Indices.clear();
@@ -104,7 +104,7 @@ void DX9Line::CreateVB()
 		m_pVB = nullptr;
 	}
 	int rVertSize = sizeof(VertexLine) * static_cast<int>(m_Vertices.size());
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
+	if (FAILED(ms_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 		return;
 }
 
@@ -116,7 +116,7 @@ void DX9Line::CreateIB()
 		m_pIB = nullptr;
 	}
 	int rIndSize = sizeof(Index2) * static_cast<int>(m_Indices.size());
-	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
+	if (FAILED(ms_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 		return;
 }
 
@@ -128,7 +128,7 @@ void DX9Line::CreateVBMax()
 		m_pVB = nullptr;
 	}
 	int rVertSize = sizeof(VertexLine) * MAX_UNIT_COUNT * 8;
-	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
+	if (FAILED(ms_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVB, nullptr)))
 		return;
 }
 
@@ -140,7 +140,7 @@ void DX9Line::CreateIBMax()
 		m_pIB = nullptr;
 	}
 	int rIndSize = sizeof(Index2) * MAX_UNIT_COUNT * 4;
-	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
+	if (FAILED(ms_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIB, nullptr)))
 		return;
 }
 
@@ -172,11 +172,11 @@ void DX9Line::UpdateIB()
 
 void DX9Line::Draw() const
 {
-	m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
-	m_pDevice->SetTexture(0, nullptr);
+	ms_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	ms_pDevice->SetTexture(0, nullptr);
 
-	m_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(VertexLine));
-	m_pDevice->SetFVF(D3DFVF_LINE);
-	m_pDevice->SetIndices(m_pIB);
-	m_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, static_cast<int>(m_Vertices.size()), 0, static_cast<int>(m_Indices.size()));
+	ms_pDevice->SetStreamSource(0, m_pVB, 0, sizeof(VertexLine));
+	ms_pDevice->SetFVF(D3DFVF_LINE);
+	ms_pDevice->SetIndices(m_pIB);
+	ms_pDevice->DrawIndexedPrimitive(D3DPT_LINELIST, 0, 0, static_cast<int>(m_Vertices.size()), 0, static_cast<int>(m_Indices.size()));
 }

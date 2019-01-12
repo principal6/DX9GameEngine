@@ -18,13 +18,13 @@ DX9Engine::DX9Engine()
 	m_bDrawBoundingBoxes = false;
 }
 
-DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
+auto DX9Engine::Create(int Width, int Height)->Error
 {
 	// Create base (window and initialize Direct3D9)
 	if (m_Base = new DX9Base)
 	{
 		if (DX_FAILED(m_Base->CreateGameWindow(WINDOW_X, WINDOW_Y, Width, Height)))
-			return ReturnValue::BASE_NOT_CREATED;
+			return Error::BASE_NOT_CREATED;
 
 		// Set main window handle
 		m_hWnd = m_Base->GethWnd();
@@ -35,14 +35,14 @@ DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 	{
 		// Pass main window's handle to DX9Input
 		if (DX_FAILED(m_Input->Create(m_hWnd)))
-			return ReturnValue::INPUT_NOT_CREATED;
+			return Error::INPUT_NOT_CREATED;
 	}
 
 	// Create font manager object
 	if (m_FontManager = new DX9Font)
 	{
 		if (DX_FAILED(m_FontManager->Create(m_Base->GetDevice())))
-			return ReturnValue::FONTMANAGER_NOT_CREATED;
+			return Error::FONTMANAGER_NOT_CREATED;
 	}
 
 	// Set data that will be shared in many sub-classes
@@ -56,48 +56,48 @@ DX9Common::ReturnValue DX9Engine::Create(int Width, int Height)
 	if (m_Background = new DX9Background)
 	{
 		if (DX_FAILED(m_Background->Create(m_Base->GetDevice(), m_WindowData)))
-			return ReturnValue::IMAGE_NOT_CREATED;
+			return Error::IMAGE_NOT_CREATED;
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
 		if (DX_FAILED(m_Map->Create(m_Base->GetDevice(), m_WindowData)))
-			return ReturnValue::MAP_NOT_CREATED;
+			return Error::MAP_NOT_CREATED;
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
 		if (DX_FAILED(m_Sprite->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
-			return ReturnValue::SPRITE_NOT_CREATED;
+			return Error::SPRITE_NOT_CREATED;
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
 		if (DX_FAILED(m_MonsterManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
-			return ReturnValue::MONSTERMANAGER_NOT_CREATED;
+			return Error::MONSTERMANAGER_NOT_CREATED;
 	}
 
 	// Create effect manager object
 	if (m_EffectManager = new DX9Effect)
 	{
 		if (DX_FAILED(m_EffectManager->Create(m_Base->GetDevice(), m_WindowData, m_Map)))
-			return ReturnValue::EFFECTMANAGER_NOT_CREATED;
+			return Error::EFFECTMANAGER_NOT_CREATED;
 	}
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
-void DX9Engine::SetRenderFunction(void(*Render)())
+void DX9Engine::SetRenderFunction(PF_RENDER pfRender)
 {
-	m_pfRender = Render;
+	m_pfRender = pfRender;
 }
 
-void DX9Engine::SetKeyboardFunction(void(*Keyboard)(DWORD DIK_KeyCode))
+void DX9Engine::SetKeyboardFunction(PF_KEYBOARD pfKeyboard)
 {
-	m_pfKeyboard = Keyboard;
+	m_pfKeyboard = pfKeyboard;
 }
 
 void DX9Engine::ToggleBoundingBox()
@@ -109,14 +109,14 @@ void DX9Engine::ToggleBoundingBox()
 	}
 }
 
-DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName)
+auto DX9Engine::LoadMap(WSTRING FileName)->Error
 {
 	if (m_Map)
 	{
 		m_Map->LoadMap(FileName);
-		return ReturnValue::OK;
+		return Error::OK;
 	}
-	return ReturnValue::OBJECT_NOT_CREATED;
+	return Error::OBJECT_NOT_CREATED;
 }
 
 void DX9Engine::Run()
@@ -271,7 +271,7 @@ void DX9Engine::SetBackground(WSTRING TextureFN)
 	m_Background->SetTexture(TextureFN);
 }
 
-DX9Sprite* DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)
+auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Sprite*
 {
 	assert(m_Sprite);
 	return m_Sprite->MakeUnit(TextureFN, numCols, numRows, Scale);
@@ -297,37 +297,37 @@ void DX9Engine::SpriteSetAnimation(AnimationID AnimationID)
 	m_Sprite->SetAnimation(AnimationID);
 }
 
-DX9Effect* DX9Engine::SpawnEffect(int EffectID, int Damage)
+auto DX9Engine::SpawnEffect(int EffectID, int Damage)->DX9Effect*
 {
 	assert(m_EffectManager);
 	return m_EffectManager->Spawn(EffectID, m_Sprite->GetCenterPosition(), m_Sprite->GetDirection(), Damage);
 }
 
-DX9Monster* DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
+auto DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->DX9Monster*
 {
 	assert(m_MonsterManager);
 	return m_MonsterManager->Spawn(MonsterName, GlobalPosition);
 }
 
-DX9Font* DX9Engine::GetFontObject()
+auto DX9Engine::GetFontObject()->DX9Font*
 {
 	assert(m_FontManager);
 	return m_FontManager;
 }
 
-DX9Sprite* DX9Engine::GetSpriteObject()
+auto DX9Engine::GetSpriteObject()->DX9Sprite*
 {
 	assert(m_Sprite);
 	return m_Sprite;
 }
 
-DX9MonsterManager* DX9Engine::GetMonsterManagerObject()
+auto DX9Engine::GetMonsterManagerObject()->DX9MonsterManager*
 {
 	assert(m_MonsterManager);
 	return m_MonsterManager;
 }
 
-DX9Effect* DX9Engine::GetEffectManagerObject()
+auto DX9Engine::GetEffectManagerObject()->DX9Effect*
 {
 	assert(m_EffectManager);
 	return m_EffectManager;

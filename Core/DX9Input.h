@@ -37,17 +37,17 @@ namespace DX9ENGINE
 		DX9Input();
 		~DX9Input() {};
 
-		ReturnValue DX9Input::Create(HWND hWnd);
+		auto DX9Input::Create(HWND hWnd)->Error;
 		void DX9Input::Destroy() override;
 
-		bool DX9Input::OnKeyDown(DWORD DIK_KeyCode);
-		bool DX9Input::OnKeyUp(DWORD DIK_KeyCode);
-		DIMOUSESTATE2 DX9Input::OnMouseMove();
-		bool DX9Input::OnMouseButtonDown(int button);
-		bool DX9Input::OnMouseButtonUp(int button);
+		auto DX9Input::OnKeyDown(DWORD DIK_KeyCode)->bool;
+		auto DX9Input::OnKeyUp(DWORD DIK_KeyCode)->bool;
+		auto DX9Input::OnMouseMove()->DIMOUSESTATE2;
+		auto DX9Input::OnMouseButtonDown(int button)->bool;
+		auto DX9Input::OnMouseButtonUp(int button)->bool;
 
-		bool DX9Input::GetMouseButtonDown(int button);
-		bool DX9Input::GetKeyState(DWORD DIK_KeyCode) const;
+		auto DX9Input::GetMouseButtonDown(int button)->bool;
+		auto DX9Input::GetKeyState(DWORD DIK_KeyCode) const->bool;
 		void DX9Input::GetAllKeyState(bool* Keys);
 	};
 };

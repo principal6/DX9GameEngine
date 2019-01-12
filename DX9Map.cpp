@@ -12,7 +12,7 @@ const int DX9Map::DEF_TILE_SIZE = 32;
 /*-----------------------------------------------------------------------------
 	Static method declaration
 -----------------------------------------------------------------------------*/
-DX9Common::FloatUV DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH)
+auto DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH)->FloatUV
 {
 	FloatUV Result;
 	int tTileCols, tTileRows;
@@ -31,7 +31,7 @@ DX9Common::FloatUV DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int S
 	return Result;
 }
 
-D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID, int MapCols)
+auto DX9Map::ConvertIDToXY(int MapID, int MapCols)->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result = D3DXVECTOR2(0, 0);
 
@@ -41,12 +41,12 @@ D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID, int MapCols)
 	return Result;
 }
 
-int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols)
+auto DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols)->int
 {
 	return static_cast<int>(MapXY.x) + (static_cast<int>(MapXY.y) * MapCols);
 }
 
-D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int TileSize, bool YRoundUp)
+auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int TileSize, bool YRoundUp)->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result;
 
@@ -93,10 +93,10 @@ DX9Map::DX9Map()
 	m_OffsetZeroY = 0;
 }
 
-DX9Common::ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
+auto DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	m_pDevice = pDevice;
 	m_WindowData = refData;
@@ -105,7 +105,7 @@ DX9Common::ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& ref
 	m_Vertices.clear();
 	m_Indices.clear();
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
 void DX9Map::ClearAllData()
@@ -401,7 +401,7 @@ void DX9Map::ParseMapData(WSTRING Str)
 	CreateLoadedMap(Str);
 }
 
-float DX9Map::GetMapTileBoundary(int MapID, Direction Dir) const
+auto DX9Map::GetMapTileBoundary(int MapID, Direction Dir) const->float
 {
 	float Result = 0.0f;
 
@@ -431,7 +431,7 @@ float DX9Map::GetMapTileBoundary(int MapID, Direction Dir) const
 	return Result;
 }
 
-bool DX9Map::IsMovableTile(int MapID, Direction Dir) const
+auto DX9Map::IsMovableTile(int MapID, Direction Dir) const->bool
 {
 	if ((MapID >= (m_MapCols * m_MapRows)) || (MapID < 0))
 		return true;
@@ -725,54 +725,54 @@ void DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const
 	wcscpy_s(WC, size, tempStr.c_str());
 }
 
-bool DX9Map::IsMapCreated() const
+auto DX9Map::IsMapCreated() const->bool
 { 
 	return m_bMapCreated;
 };
 
-int DX9Map::GetMapName(WSTRING *pStr) const
+auto DX9Map::GetMapName(WSTRING *pStr) const->int
 {
 	*pStr = m_MapName;
 	return 0;
 }
 
-int DX9Map::GetTileName(WSTRING *pStr) const
+auto DX9Map::GetTileName(WSTRING *pStr) const->int
 {
 	*pStr = m_TileName;
 	return 0;
 }
 
-int DX9Map::GetMapCols() const 
+auto DX9Map::GetMapCols() const->int
 { 
 	return m_MapCols;
 }
 
-int DX9Map::GetMapRows() const
+auto DX9Map::GetMapRows() const->int
 {
 	return m_MapRows;
 }
 
-int DX9Map::GetWidth() const 
+auto DX9Map::GetWidth() const->int
 { 
 	return (m_MapCols * m_TileSize);
 }
 
-int DX9Map::GetHeight() const
+auto DX9Map::GetHeight() const->int
 { 
 	return (m_MapRows * m_TileSize);
 }
 
-D3DXVECTOR2	DX9Map::GetMapOffset() const 
+auto DX9Map::GetMapOffset() const->D3DXVECTOR2
 { 
 	return m_Offset;
 }
 
-int DX9Map::GetMapOffsetZeroY() const
+auto DX9Map::GetMapOffsetZeroY() const->int
 { 
 	return m_OffsetZeroY;
 }
 
-D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) const
+auto DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) const->D3DXVECTOR2
 {
 	D3DXVECTOR2 NewVelocity = Velocity;
 

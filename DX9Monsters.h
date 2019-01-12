@@ -8,7 +8,7 @@ namespace DX9ENGINE
 		DX9MonsterType Class
 	-----------------------------------------------------------------------------*/
 
-	class DX9MonsterType : protected DX9Common
+	class DX9MonsterType final : protected DX9Common
 	{
 	public:
 		WSTRING m_Name;
@@ -16,7 +16,7 @@ namespace DX9ENGINE
 		int m_TextureNumCols;
 		int m_TextureNumRows;
 		int m_HPMax;
-		std::vector<AnimationData> m_AnimData;
+		VECTOR<AnimationData> m_AnimData;
 
 	public:
 		DX9MonsterType() {};
@@ -25,7 +25,7 @@ namespace DX9ENGINE
 			m_HPMax(HP) {};
 		~DX9MonsterType() {};
 
-		DX9MonsterType* DX9MonsterType::AddAnimation(AnimationData Value);
+		auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*;
 		void DX9MonsterType::Destroy() override;
 	};
 
@@ -53,11 +53,11 @@ namespace DX9ENGINE
 		DX9Monster();
 		~DX9Monster() {};
 
-		ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
+		auto DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
 		void DX9Monster::Destroy() override;
 
 		void DX9Monster::SetMonsterType(DX9MonsterType Type);
-		DX9Monster* DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position) override;
+		auto DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Monster* override;
 		void DX9Monster::Damage(int Damage);
 
 		void DX9Monster::Draw();
@@ -67,30 +67,30 @@ namespace DX9ENGINE
 		DX9MonsterManager Class
 	-----------------------------------------------------------------------------*/
 
-	class DX9MonsterManager : public DX9Common
+	class DX9MonsterManager final : public DX9Common
 	{
 	private:
 		static LPDIRECT3DDEVICE9 m_pDevice;
 		DX9Map* m_pMap;
 
-		std::vector<DX9MonsterType> m_Types;
-		std::vector<DX9Monster> m_Instances;
+		VECTOR<DX9MonsterType> m_Types;
+		VECTOR<DX9Monster> m_Instances;
 
 	public:
 		DX9MonsterManager() {};
 		~DX9MonsterManager() {};
 
-		ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
+		auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
 		void DX9MonsterManager::Destroy();
 
-		DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value);
-		DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
+		auto DX9MonsterManager::AddMonsterType(DX9MonsterType Value)->DX9MonsterType*;
+		auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->DX9Monster*;
 
 		void DX9MonsterManager::Animate();
 		void DX9MonsterManager::Gravitate();
 		void DX9MonsterManager::Draw();
 		void DX9MonsterManager::DrawBoundingBox();
 
-		std::vector<DX9Monster>* DX9MonsterManager::GetInstancePointer();
+		auto DX9MonsterManager::GetInstancePointer()->VECTOR<DX9Monster>*;
 	};
 };

@@ -43,23 +43,24 @@ namespace DX9ENGINE
 		int	m_MoveSheetHeight;
 		WSTRING m_MapName;
 		WSTRING m_TileName;
-		std::vector<MapData> m_MapData;
+		VECTOR<MapData> m_MapData;
 
 		bool m_bMoveTextureLoaded;
 		LPDIRECT3DTEXTURE9 m_pTextureMove;
 		LPDIRECT3DVERTEXBUFFER9 m_pVBMove;
-		std::vector<VertexImage> m_VertMove;
+		VECTOR<VertexImage> m_VertMove;
 
 		D3DXVECTOR2 m_Offset; // For map movement
 		int m_OffsetZeroY; // For map movement (& inversed Y values)
 
 	private:
-		static DX9Common::FloatUV DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH);
-		static D3DXVECTOR2 DX9Map::ConvertIDToXY(int MapID, int MapCols);
-		static int DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols);
-		static D3DXVECTOR2 DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset,
-			int TileSize, bool YRoundUp = false);
+		static auto DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH)->FloatUV;
+		static auto DX9Map::ConvertIDToXY(int MapID, int MapCols)->D3DXVECTOR2;
+		static auto DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols)->int;
+		static auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset,
+			int TileSize, bool YRoundUp = false)->D3DXVECTOR2;
 
+	private:
 		void DX9Map::ClearAllData();
 
 		void DX9Map::ParseMapData(WSTRING Str); // For loading maps
@@ -74,14 +75,14 @@ namespace DX9ENGINE
 		void DX9Map::CreateVertexBufferMove(); // IndexBuffer is not needed because they are the same
 		void DX9Map::UpdateVertexBufferMove();
 
-		bool DX9Map::IsMovableTile(int MapID, Direction Direction) const;
-		float DX9Map::GetMapTileBoundary(int MapID, Direction Direction) const;
+		auto DX9Map::IsMovableTile(int MapID, Direction Direction) const->bool;
+		auto DX9Map::GetMapTileBoundary(int MapID, Direction Direction) const->float;
 
 	public:
 		DX9Map();
-		virtual ~DX9Map() {};
+		~DX9Map() {};
 
-		ReturnValue DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData);
+		auto DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error;
 		void DX9Map::Destroy() override;
 
 		void DX9Map::CreateMap(WSTRING Name, int MapCols, int MapRows);
@@ -98,15 +99,15 @@ namespace DX9ENGINE
 		void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y);
 		void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset); // For map movement
 
-		bool DX9Map::IsMapCreated() const;
-		int DX9Map::GetMapName(WSTRING *pStr) const;
-		int DX9Map::GetTileName(WSTRING *pStr) const;
-		int DX9Map::GetMapCols() const;
-		int DX9Map::GetMapRows() const;
-		int DX9Map::GetWidth() const override;
-		int DX9Map::GetHeight() const override;
-		D3DXVECTOR2	DX9Map::GetMapOffset() const;
-		int DX9Map::GetMapOffsetZeroY() const;
-		D3DXVECTOR2 DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) const;
+		auto DX9Map::IsMapCreated() const->bool;
+		auto DX9Map::GetMapName(WSTRING *pStr) const->int;
+		auto DX9Map::GetTileName(WSTRING *pStr) const->int;
+		auto DX9Map::GetMapCols() const->int;
+		auto DX9Map::GetMapRows() const->int;
+		auto DX9Map::GetWidth() const->int override;
+		auto DX9Map::GetHeight() const->int override;
+		auto DX9Map::GetMapOffset() const->D3DXVECTOR2;
+		auto DX9Map::GetMapOffsetZeroY() const->int;
+		auto DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) const->D3DXVECTOR2;
 	};
 };

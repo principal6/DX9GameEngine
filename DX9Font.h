@@ -17,7 +17,7 @@ namespace DX9ENGINE
 	private:
 		static LPDIRECT3DDEVICE9 m_pDevice;
 
-		std::vector<FontInstance> m_Fonts;
+		VECTOR<FontInstance> m_Fonts;
 
 		int	m_CurrFontInstanceID;
 		DWORD m_FontColor;
@@ -26,13 +26,13 @@ namespace DX9ENGINE
 		DX9Font();
 		~DX9Font() {};
 
-		ReturnValue DX9Font::Create(LPDIRECT3DDEVICE9 pDevice);
+		auto DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)->Error;
 		void DX9Font::Destroy();
 
 		void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold);
-		DX9Font* DX9Font::SelectFont(FontID ID);
-		DX9Font* DX9Font::SetFontColor(DWORD Color);
+		auto DX9Font::SelectFont(FontID ID)->DX9Font*;
+		auto DX9Font::SetFontColor(DWORD Color)->DX9Font*;
 
-		DX9Font* DX9Font::Draw(int X, int Y, WSTRING String);
+		auto DX9Font::Draw(int X, int Y, WSTRING String)->DX9Font*;
 	};
 };

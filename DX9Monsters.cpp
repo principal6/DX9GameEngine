@@ -6,7 +6,7 @@ using namespace DX9ENGINE;
 	DX9MonsterType Class
 -----------------------------------------------------------------------------*/
 
-DX9MonsterType* DX9MonsterType::AddAnimation(AnimationData Value)
+auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*
 {
 	m_AnimData.push_back(Value);
 	return this;
@@ -32,15 +32,15 @@ DX9Monster::DX9Monster()
 	m_HPBar = nullptr;
 }
 
-DX9Common::ReturnValue DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
+auto DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	if (pMap == nullptr)
-		return ReturnValue::MAP_NULL;
+		return Error::MAP_NULL;
 
-	ReturnValue Result = DX9Life::Create(pDevice, refData);
+	Error Result = DX9Life::Create(pDevice, refData);
 	DX9Life::SetMapPointer(pMap);
 
 	m_HPFrame = new DX9Image;
@@ -89,7 +89,7 @@ void DX9Monster::SetMonsterType(DX9MonsterType Type)
 	m_HPCurr = Type.m_HPMax;
 }
 
-DX9Monster* DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)
+auto DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Monster*
 {
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
@@ -152,19 +152,19 @@ void DX9Monster::Draw()
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 
-DX9Common::ReturnValue DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
+auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	if (pMap == nullptr)
-		return ReturnValue::MAP_NULL;
+		return Error::MAP_NULL;
 
 	m_pDevice = pDevice;
 	m_WindowData = refData;
 	m_pMap = pMap;
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
 void DX9MonsterManager::Destroy()
@@ -178,13 +178,13 @@ void DX9MonsterManager::Destroy()
 	}
 }
 
-DX9MonsterType* DX9MonsterManager::AddMonsterType(DX9MonsterType Value)
+auto DX9MonsterManager::AddMonsterType(DX9MonsterType Value)->DX9MonsterType*
 {
 	m_Types.push_back(Value);
 	return &m_Types[m_Types.size() - 1];
 }
 
-DX9Monster* DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)
+auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->DX9Monster*
 {
 	for (DX9MonsterType& TypeIterator : m_Types)
 	{
@@ -243,7 +243,7 @@ void DX9MonsterManager::DrawBoundingBox()
 	}
 }
 
-std::vector<DX9Monster>* DX9MonsterManager::GetInstancePointer()
+auto DX9MonsterManager::GetInstancePointer()->VECTOR<DX9Monster>*
 {
 	return &m_Instances;
 }

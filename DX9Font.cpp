@@ -11,14 +11,14 @@ DX9Font::DX9Font()
 	m_FontColor = 0xFF000000;
 }
 
-DX9Common::ReturnValue DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)
+auto DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	m_pDevice = pDevice;
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
 void DX9Font::Destroy()
@@ -48,7 +48,7 @@ void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold)
 	m_Fonts.emplace_back(ID, tpFont);
 }
 
-DX9Font* DX9Font::SelectFont(FontID ID)
+auto DX9Font::SelectFont(FontID ID)->DX9Font*
 {
 	int iterator_n = 0;
 	for (FontInstance& iterator : m_Fonts)
@@ -64,13 +64,13 @@ DX9Font* DX9Font::SelectFont(FontID ID)
 	return nullptr;
 }
 
-DX9Font* DX9Font::SetFontColor(DWORD Color)
+auto DX9Font::SetFontColor(DWORD Color)->DX9Font*
 {
 	m_FontColor = Color;
 	return this;
 }
 
-DX9Font* DX9Font::Draw(int X, int Y, WSTRING String)
+auto DX9Font::Draw(int X, int Y, WSTRING String)->DX9Font*
 {
 	RECT Rect_Font;
 	SetRect(&Rect_Font, X, Y, m_WindowData.WindowWidth, m_WindowData.WindowHeight);

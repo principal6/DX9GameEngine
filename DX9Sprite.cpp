@@ -2,20 +2,20 @@
 
 using namespace DX9ENGINE;
 
-DX9Common::ReturnValue DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
+auto DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	if (pMap == nullptr)
-		return ReturnValue::MAP_NULL;
+		return Error::MAP_NULL;
 
-	ReturnValue Result = DX9Life::Create(pDevice, refData);
+	Error Result = DX9Life::Create(pDevice, refData);
 	DX9Life::SetMapPointer(pMap);
 	return Result;
 }
 
-DX9Sprite* DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)
+auto DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Sprite*
 {
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
@@ -31,19 +31,19 @@ DX9Sprite* DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)
 	return this;
 }
 
-DX9Sprite* DX9Sprite::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)
+auto DX9Sprite::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Sprite*
 {
 	DX9AnimUnit::MakeUnit(TextureFN, numCols, numRows, Scale);
 	return this;
 }
 
-DX9Sprite* DX9Sprite::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)
+auto DX9Sprite::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)->DX9Sprite*
 {
 	DX9AnimUnit::AddAnimation(AnimID, StartFrame, EndFrame);
 	return this;
 }
 
-DX9Sprite* DX9Sprite::SetBoundingBox(D3DXVECTOR2 Size)
+auto DX9Sprite::SetBoundingBox(D3DXVECTOR2 Size)->DX9Sprite*
 {
 	DX9AnimUnit::SetBoundingBox(Size);
 	return this;

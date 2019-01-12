@@ -28,43 +28,43 @@ DX9Base::DX9Base()
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
-DX9Common::ReturnValue DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)
+auto DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->Error
 {
 	RGBInt rBGColor = RGBInt(255, 0, 255);
 
 	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor, GameWindowProc)
 		== nullptr)
-		return ReturnValue::WINDOW_NOT_CREATED;
+		return Error::WINDOW_NOT_CREATED;
 
 	if (InitD3D() == -1)
-		return ReturnValue::DIRECTX_NOT_CREATED;
+		return Error::DIRECTX_NOT_CREATED;
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
-DX9Common::ReturnValue DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc)
+auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color, WNDPROC Proc)->Error
 {
 	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::OverlappedWindow, Color, Proc)
 		== nullptr)
-		return ReturnValue::WINDOW_NOT_CREATED;
+		return Error::WINDOW_NOT_CREATED;
 
-	return ReturnValue::OK;
+	return Error::OK;
 
 }
-DX9Common::ReturnValue DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
-	RGBInt Color, WNDPROC Proc)
+auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
+	RGBInt Color, WNDPROC Proc)->Error
 {
 	// Set DirectX clear color
 	m_BGColor = D3DCOLOR_XRGB(Color.Red, Color.Green, Color.Blue);
 
 	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::ChildWindow2, Color, Proc, hWndParent)
 		== nullptr)
-		return ReturnValue::WINDOW_NOT_CREATED;
+		return Error::WINDOW_NOT_CREATED;
 
 	if (InitD3D() == -1)
-		return ReturnValue::DIRECTX_NOT_CREATED;
+		return Error::DIRECTX_NOT_CREATED;
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
 void DX9Base::Destroy()
@@ -82,8 +82,8 @@ void DX9Base::Destroy()
 	}
 }
 
-HWND DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-	WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent)
+auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
+	WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, HWND hWndParent)->HWND
 {
 	ms_hInstance = GetModuleHandle(nullptr);
 	
@@ -118,7 +118,7 @@ void DX9Base::SetBackgroundColor(D3DCOLOR color)
 	m_BGColor = color;
 }
 
-int DX9Base::InitD3D()
+auto DX9Base::InitD3D()->int
 {
 	if (nullptr == (m_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return -1;
@@ -165,7 +165,7 @@ void DX9Base::EndRender() const
 	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
 }
 
-LPDIRECT3DDEVICE9 DX9Base::GetDevice() const
+auto DX9Base::GetDevice()->LPDIRECT3DDEVICE9 const
 {
 	return m_pD3DDevice;
 }

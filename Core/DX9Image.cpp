@@ -26,10 +26,10 @@ DX9Image::DX9Image()
 	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
-DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
+auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	m_pDevice = pDevice;
 	m_WindowData = refData;
@@ -44,7 +44,7 @@ DX9Common::ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& r
 	m_BoundingBoxLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), m_BoundingBoxColor);
 	m_BoundingBoxLine.AddEnd();
 
-	return ReturnValue::OK;
+	return Error::OK;
 }
 
 void DX9Image::Destroy()
@@ -287,7 +287,7 @@ void DX9Image::SetAlpha(int Alpha)
 	}
 }
 
-DX9Image* DX9Image::SetBoundingBox(D3DXVECTOR2 Size)
+auto DX9Image::SetBoundingBox(D3DXVECTOR2 Size)->DX9Image*
 {
 	m_BoundingBox.PositionOffset.x = -Size.x / 2.0f;
 	m_BoundingBox.PositionOffset.y = -Size.y;
@@ -345,32 +345,32 @@ void DX9Image::UpdateVertexData(float u1, float v1, float u2, float v2)
 	UpdateVertexBuffer();
 }
 
-int DX9Image::GetWidth() const
+auto DX9Image::GetWidth() const->int
 {
 	return m_Width;
 }
 
-int DX9Image::GetHeight() const
+auto DX9Image::GetHeight() const->int
 {
 	return m_Height;
 }
 
-int DX9Image::GetScaledWidth() const
+auto DX9Image::GetScaledWidth() const->int
 {
 	return m_ScaledWidth;
 }
 
-int DX9Image::GetScaledHeight() const 
+auto DX9Image::GetScaledHeight() const->int
 { 
 	return m_ScaledHeight;
 }
 
-D3DXVECTOR2 DX9Image::GetPosition() const
+auto DX9Image::GetPosition() const->D3DXVECTOR2
 {
 	return m_Position;
 }
 
-D3DXVECTOR2 DX9Image::GetCenterPosition() const
+auto DX9Image::GetCenterPosition() const->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result = m_Position;
 	Result.x += static_cast<float>(m_ScaledWidth) / 2.0f;
@@ -379,7 +379,7 @@ D3DXVECTOR2 DX9Image::GetCenterPosition() const
 	return Result;
 }
 
-DX9Image::BoundingBox DX9Image::GetBoundingBox() const
+auto DX9Image::GetBoundingBox() const->BoundingBox
 {
 	BoundingBox Result;
 	Result.PositionOffset = m_Position + m_BoundingBox.PositionOffset;
@@ -388,7 +388,7 @@ DX9Image::BoundingBox DX9Image::GetBoundingBox() const
 	return Result;
 }
 
-bool DX9Image::IsTextureLoaded() const
+auto DX9Image::IsTextureLoaded() const->bool
 {
 	if (m_pTexture)
 		return true;

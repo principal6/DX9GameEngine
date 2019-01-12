@@ -27,23 +27,24 @@ namespace DX9ENGINE
 		DX9Life();
 		virtual ~DX9Life() {};
 
-		virtual ReturnValue DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData) override;
-		void DX9Life::Destroy() override;
-		virtual DX9Life* DX9Life::SetGlobalPosition(D3DXVECTOR2 Position) = 0;
+		virtual auto DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error override;
+		virtual void DX9Life::Destroy() override;
 
-		D3DXVECTOR2 DX9Life::GetGlobalPosition() const;
-		D3DXVECTOR2 DX9Life::GetGlobalPositionInverse() const;
-		D3DXVECTOR2 DX9Life::GetVelocity() const;
-		D3DXVECTOR2 DX9Life::GetOffsetForMapMove() const;
+		virtual auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life* = 0;
 
-		void DX9Life::Accelerate(D3DXVECTOR2 Accel);
-		void DX9Life::AddVelocity(D3DXVECTOR2 Vel);
-		void DX9Life::SetVelocity(D3DXVECTOR2 Vel);
-		void DX9Life::MoveWithVelocity();
-		void DX9Life::MoveConst(D3DXVECTOR2 dXY);
+		virtual auto DX9Life::GetGlobalPosition() const->D3DXVECTOR2;
+		virtual auto DX9Life::GetGlobalPositionInverse() const->D3DXVECTOR2;
+		virtual auto DX9Life::GetVelocity() const->D3DXVECTOR2;
+		virtual auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2;
 
-		void DX9Life::Walk(AnimationDir Direction);
-		void DX9Life::Jump();
-		void DX9Life::Gravitate();
+		virtual void DX9Life::Accelerate(D3DXVECTOR2 Accel);
+		virtual void DX9Life::AddVelocity(D3DXVECTOR2 Vel);
+		virtual void DX9Life::SetVelocity(D3DXVECTOR2 Vel);
+		virtual void DX9Life::MoveWithVelocity();
+		virtual void DX9Life::MoveConst(D3DXVECTOR2 dXY);
+
+		virtual void DX9Life::Walk(AnimationDir Direction);
+		virtual void DX9Life::Jump();
+		virtual void DX9Life::Gravitate();
 	};
 };

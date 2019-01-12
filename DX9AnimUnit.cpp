@@ -18,10 +18,10 @@ DX9AnimUnit::DX9AnimUnit()
 	m_UnitHeight = 0;
 }
 
-DX9Common::ReturnValue DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
+auto DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	return DX9Image::Create(pDevice, refData);
 }
@@ -31,7 +31,7 @@ void DX9AnimUnit::Destroy()
 	DX9Image::Destroy();
 }
 
-DX9AnimUnit* DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)
+auto DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9AnimUnit*
 {
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
@@ -97,7 +97,7 @@ void DX9AnimUnit::SetFrame(int FrameID)
 	}
 }
 
-DX9AnimUnit* DX9AnimUnit::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)
+auto DX9AnimUnit::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)->DX9AnimUnit*
 {
 	m_AnimData.push_back(DX9Common::AnimationData(AnimID, StartFrame, EndFrame));
 
@@ -143,7 +143,7 @@ void DX9AnimUnit::SetDirection(AnimationDir Direction)
 	m_AnimDir = Direction;
 }
 
-DX9AnimUnit* DX9AnimUnit::SetBoundingBox(D3DXVECTOR2 Size)
+auto DX9AnimUnit::SetBoundingBox(D3DXVECTOR2 Size)->DX9AnimUnit*
 {
 	DX9Image::SetBoundingBox(Size);
 	return this;
@@ -159,32 +159,32 @@ void DX9AnimUnit::SetPositionCentered(D3DXVECTOR2 Pos)
 	DX9Image::SetPositionCentered(Pos);
 }
 
-bool DX9AnimUnit::IsBeingAnimated() const
+auto DX9AnimUnit::IsBeingAnimated() const->bool
 {
 	return m_bBeingAnimated;
 }
 
-int DX9AnimUnit::GetScaledUnitWidth() const
+auto DX9AnimUnit::GetScaledUnitWidth() const->int
 {
 	return m_ScaledWidth;
 }
 
-int DX9AnimUnit::GetScaledUnitHeight() const
+auto DX9AnimUnit::GetScaledUnitHeight() const->int
 {
 	return m_ScaledHeight;
 }
 
-DX9Common::AnimationDir DX9AnimUnit::GetDirection() const
+auto DX9AnimUnit::GetDirection() const->AnimationDir
 {
 	return m_AnimDir;
 }
 
-D3DXVECTOR2 DX9AnimUnit::GetCenterPosition() const
+auto DX9AnimUnit::GetCenterPosition() const->D3DXVECTOR2
 {
 	return DX9Image::GetCenterPosition();
 }
 
-DX9Image::BoundingBox DX9AnimUnit::GetBoundingBox() const
+auto DX9AnimUnit::GetBoundingBox() const->BoundingBox
 {
 	return DX9Image::GetBoundingBox();
 }

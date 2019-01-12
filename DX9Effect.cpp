@@ -11,15 +11,15 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-DX9Common::ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)
+auto DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
 	if (pMap == nullptr)
-		return ReturnValue::MAP_NULL;
+		return Error::MAP_NULL;
 
-	ReturnValue Result = DX9Image::Create(pDevice, refData);
+	Error Result = DX9Image::Create(pDevice, refData);
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();
@@ -69,7 +69,7 @@ void DX9Effect::Destroy()
 	DX9Image::Destroy();
 }
 
-DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)
+auto DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)->DX9Effect*
 {
 	DX9Image::SetTexture(FileName);
 	m_TextureAtlasCols = numCols;
@@ -80,8 +80,8 @@ DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows
 	return this;
 }
 
-DX9Effect* DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
-	int Delay, int RepeatCount)
+auto DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
+	int Delay, int RepeatCount)->DX9Effect*
 {
 	// Add this new effect type to the vector array
 	m_TypeData.push_back(EffectTypeData(Type, Data, SpawnOffset, BBSize, Delay, RepeatCount));
@@ -93,7 +93,7 @@ DX9Effect* DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVEC
 }
 
 // Every effect is spawned at global position
-DX9Effect* DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int Damage)
+auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int Damage)->DX9Effect*
 {
 	// No more space for a new effect
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
@@ -308,7 +308,7 @@ void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters)
 
 	while (iterator)
 	{
-		std::vector<DX9Monster>* pInstances = pMonsters->GetInstancePointer();
+		VECTOR<DX9Monster>* pInstances = pMonsters->GetInstancePointer();
 
 		for (int i = 0; i < pInstances->size(); i++)
 		{

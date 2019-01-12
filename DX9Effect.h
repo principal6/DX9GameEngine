@@ -78,12 +78,12 @@ namespace DX9ENGINE
 		int m_UnitWidth;
 		int m_UnitHeight;
 
-		std::vector<EffectTypeData> m_TypeData;
+		VECTOR<EffectTypeData> m_TypeData;
 
 		EffectInstanceData* m_pFisrtInstance;
 		EffectInstanceData* m_pLastInstance;
 		int m_InstanceCount;
-		std::vector<int> m_DelayCounts;
+		VECTOR<int> m_DelayCounts;
 
 	private:
 		void DX9Effect::CreateVertexBuffer() override;
@@ -95,13 +95,13 @@ namespace DX9ENGINE
 		DX9Effect();
 		~DX9Effect() {};
 
-		ReturnValue DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap);
+		auto DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
 		void DX9Effect::Destroy() override;
 
-		DX9Effect* DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows);
-		DX9Effect* DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
-			int Delay, int RepeatCount = 1);
-		DX9Effect* DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int Damage);
+		auto DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)->DX9Effect*;
+		auto DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
+			int Delay, int RepeatCount = 1)->DX9Effect*;
+		auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int Damage)->DX9Effect*;
 
 		void DX9Effect::Draw() override;
 		void DX9Effect::DrawBoundingBox() override;

@@ -32,7 +32,7 @@ void DX9Common::SethWnd(HWND hWnd)
 	m_hWnd = hWnd;
 }
 
-HWND DX9Common::GethWnd() const
+auto DX9Common::GethWnd() const->HWND
 {
 	return m_hWnd;
 }

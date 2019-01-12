@@ -45,8 +45,8 @@ namespace DX9ENGINE
 		LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
 		LPDIRECT3DTEXTURE9 m_pTexture;
 
-		std::vector<VertexImage> m_Vertices;
-		std::vector<Index3> m_Indices;
+		VECTOR<VertexImage> m_Vertices;
+		VECTOR<Index3> m_Indices;
 
 		int m_Width;
 		int m_Height;
@@ -74,7 +74,7 @@ namespace DX9ENGINE
 		DX9Image();
 		virtual ~DX9Image() {};
 
-		virtual ReturnValue DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData);
+		virtual auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error;
 		virtual void DX9Image::Destroy() override;
 
 		virtual void DX9Image::Draw();
@@ -84,6 +84,7 @@ namespace DX9ENGINE
 
 		//@warning: SetSize() is only used in Map Editor
 		virtual void DX9Image::SetSize(int Width, int Height);
+
 		virtual void DX9Image::SetTexture(WSTRING FileName);
 		virtual void DX9Image::SetPosition(D3DXVECTOR2 Position);
 		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
@@ -91,16 +92,17 @@ namespace DX9ENGINE
 		virtual void DX9Image::SetVisibleRange(int Width, int Height);
 		virtual void DX9Image::SetUVRange(float u1, float u2, float v1, float v2);
 		virtual void DX9Image::SetAlpha(int Alpha);
-		virtual DX9Image* DX9Image::SetBoundingBox(D3DXVECTOR2 Size);
+		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 Size)->DX9Image*;
 		virtual void DX9Image::SetBoundingBoxColor(DWORD Color);
 
-		virtual int DX9Image::GetWidth() const;
-		virtual int DX9Image::GetHeight() const;
-		virtual int DX9Image::GetScaledWidth() const;
-		virtual int DX9Image::GetScaledHeight() const;
-		virtual D3DXVECTOR2 DX9Image::GetPosition() const;
-		virtual D3DXVECTOR2 DX9Image::GetCenterPosition() const;
-		virtual DX9Image::BoundingBox DX9Image::GetBoundingBox() const;
-		virtual bool DX9Image::IsTextureLoaded() const;
+		virtual auto DX9Image::GetWidth() const->int;
+		virtual auto DX9Image::GetHeight() const->int;
+		virtual auto DX9Image::GetScaledWidth() const->int;
+		virtual auto DX9Image::GetScaledHeight() const->int;
+		virtual auto DX9Image::GetPosition() const->D3DXVECTOR2;
+		virtual auto DX9Image::GetCenterPosition() const->D3DXVECTOR2;
+		virtual auto DX9Image::GetBoundingBox() const->BoundingBox;
+
+		virtual auto DX9Image::IsTextureLoaded() const->bool;
 	};
 };

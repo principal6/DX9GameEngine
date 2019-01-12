@@ -27,12 +27,12 @@ namespace DX9ENGINE
 		};
 
 	private:
-		static LPDIRECT3DDEVICE9 m_pDevice;
+		static LPDIRECT3DDEVICE9 ms_pDevice;
 		LPDIRECT3DVERTEXBUFFER9 m_pVB;
 		LPDIRECT3DINDEXBUFFER9 m_pIB;
 
-		std::vector<VertexLine> m_Vertices;
-		std::vector<Index2> m_Indices;
+		VECTOR<VertexLine> m_Vertices;
+		VECTOR<Index2> m_Indices;
 
 	protected:
 		void DX9Line::CreateVB();

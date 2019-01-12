@@ -15,12 +15,12 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-DX9Common::ReturnValue DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)
+auto DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 {
 	if (pDevice == nullptr)
-		return ReturnValue::DEVICE_NULL;
+		return Error::DEVICE_NULL;
 
-	ReturnValue Result = DX9AnimUnit::Create(pDevice, refData);
+	Error Result = DX9AnimUnit::Create(pDevice, refData);
 	SetGlobalPosition(m_GlobalPos);
 
 	return Result;
@@ -49,22 +49,22 @@ void DX9Life::CalculateGlobalPosition()
 	m_GlobalPos.y = m_WindowData.WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
 }
 
-D3DXVECTOR2 DX9Life::GetGlobalPosition() const
+auto DX9Life::GetGlobalPosition() const->D3DXVECTOR2
 {
 	return m_GlobalPos;
 }
 
-D3DXVECTOR2 DX9Life::GetGlobalPositionInverse() const
+auto DX9Life::GetGlobalPositionInverse() const->D3DXVECTOR2
 {
 	return m_GlobalPosInverse;
 }
 
-D3DXVECTOR2 DX9Life::GetVelocity() const
+auto DX9Life::GetVelocity() const->D3DXVECTOR2
 {
 	return m_Velocity;
 }
 
-D3DXVECTOR2 DX9Life::GetOffsetForMapMove() const
+auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result;
 	Result.x = m_GlobalPos.x - m_WindowData.WindowHalfWidth;

@@ -33,7 +33,7 @@
 
 namespace DX9ENGINE
 {
-	#define DX_FAILED(func) (func != DX9Common::ReturnValue::OK)
+	#define DX_FAILED(func) (func != DX9Common::Error::OK)
 
 	using CINT = const int;
 
@@ -109,9 +109,12 @@ namespace DX9ENGINE
 			AnimationData(AnimationID _AnimID, int StartFrame, int EndFrame) : AnimID(_AnimID), FrameS(StartFrame), FrameE(EndFrame) {};
 		};
 
-		enum class ReturnValue
+		enum class Error
 		{
+			// No error
 			OK,
+
+			// Creation failure
 			WINDOW_NOT_CREATED,
 			DIRECTX_NOT_CREATED,
 			BASE_NOT_CREATED,
@@ -123,7 +126,8 @@ namespace DX9ENGINE
 			EFFECTMANAGER_NOT_CREATED,
 			FONTMANAGER_NOT_CREATED,
 			OBJECT_NOT_CREATED,
-			CREATION_FAILED,
+			
+			// Null pointer
 			DEVICE_NULL,
 			MAP_NULL,
 		};
@@ -158,12 +162,12 @@ namespace DX9ENGINE
 
 	public:
 		DX9Common() {};
-		~DX9Common() {};
+		virtual ~DX9Common() {};
 
 		virtual void Destroy() = 0;
 
 		virtual void DX9Common::SethWnd(HWND hWnd);
-		virtual HWND DX9Common::GethWnd() const;
+		virtual auto DX9Common::GethWnd() const->HWND;
 	};
 };
 

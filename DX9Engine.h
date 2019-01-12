@@ -11,6 +11,9 @@
 
 namespace DX9ENGINE
 {
+	using PF_RENDER = void(*)();
+	using PF_KEYBOARD = void(*)(DWORD DIK_KeyCode);
+
 	class DX9Engine final : DX9Common
 	{
 	private:
@@ -30,8 +33,8 @@ namespace DX9ENGINE
 		bool m_bSpriteWalking;
 		bool m_bDrawBoundingBoxes;
 
-		void(*m_pfRender)();
-		void(*m_pfKeyboard)(DWORD DIK_KeyCode);
+		PF_RENDER m_pfRender;
+		PF_KEYBOARD m_pfKeyboard;
 
 		DX9Base* m_Base;
 		DX9Input* m_Input;
@@ -59,11 +62,11 @@ namespace DX9ENGINE
 		DX9Engine();
 		~DX9Engine() {};
 
-		DX9Common::ReturnValue DX9Engine::Create(int Width, int Height);
-		void DX9Engine::SetRenderFunction(void(*Render)());
-		void DX9Engine::SetKeyboardFunction(void(*Keyboard)(DWORD DIK_KeyCode));
+		auto DX9Engine::Create(int Width, int Height)->Error;
+		void DX9Engine::SetRenderFunction(PF_RENDER pfRender);
+		void DX9Engine::SetKeyboardFunction(PF_KEYBOARD pfKeyboard);
 		void DX9Engine::ToggleBoundingBox();
-		DX9Common::ReturnValue DX9Engine::LoadMap(WSTRING FileName);
+		auto DX9Engine::LoadMap(WSTRING FileName)->Error;
 
 		void DX9Engine::Run();
 		void DX9Engine::Shutdown();
@@ -73,17 +76,17 @@ namespace DX9ENGINE
 
 		void DX9Engine::SetBackground(WSTRING TextureFN);
 
-		DX9Sprite* DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f);
+		auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Sprite*;
 		void DX9Engine::SpriteWalk(AnimationDir Direction);
 		void DX9Engine::SpriteJump();
 		void DX9Engine::SpriteSetAnimation(AnimationID AnimationID);
 
-		DX9Monster* DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition);
-		DX9Effect* DX9Engine::SpawnEffect(int EffectID, int Damage);
+		auto DX9Engine::SpawnMonster(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->DX9Monster*;
+		auto DX9Engine::SpawnEffect(int EffectID, int Damage)->DX9Effect*;
 
-		DX9Font* DX9Engine::GetFontObject();
-		DX9Sprite* DX9Engine::GetSpriteObject();
-		DX9MonsterManager* DX9Engine::GetMonsterManagerObject();
-		DX9Effect* DX9Engine::GetEffectManagerObject();
+		auto DX9Engine::GetFontObject()->DX9Font*;
+		auto DX9Engine::GetSpriteObject()->DX9Sprite*;
+		auto DX9Engine::GetMonsterManagerObject()->DX9MonsterManager*;
+		auto DX9Engine::GetEffectManagerObject()->DX9Effect*;
 	};
 };
