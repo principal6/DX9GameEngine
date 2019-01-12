@@ -162,6 +162,7 @@ void DX9Life::Walk(AnimationDir Direction)
 	SetDirection(Direction);
 
 	D3DXVECTOR2 tNewVel = m_pMap->GetVelocityAfterCollision(GetBoundingBox(), Velocity);
+
 	MoveConst(tNewVel);
 
 }
@@ -206,5 +207,6 @@ void DX9Life::Gravitate()
 	}
 
 	SetVelocity(tNewVel);
+
 	MoveWithVelocity();
 }

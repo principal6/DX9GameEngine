@@ -8,6 +8,7 @@ const int DX9Map::MAX_TILEID_LEN = 3;
 const int DX9Map::MAX_MOVEID_LEN = 2;
 const int DX9Map::MOVE_ALPHA = 100;
 const int DX9Map::DEF_TILE_SIZE = 32;
+const int DX9Map::DEPTH_HELL = 10;
 
 /*-----------------------------------------------------------------------------
 	Static method declaration
@@ -827,84 +828,128 @@ auto DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) con
 	float fWall = 0.0f;
 	float fWallCmp = 0.0f;
 
-	if (Velocity.x > 0)
+	int tMapID = 0;
+
+	// Check if the life is inside the map's Y range
+	if ((tYS > m_MapRows + DEPTH_HELL) && (tYE > m_MapRows + DEPTH_HELL))
 	{
-		// Go Right
-		for (int i = tXS; i <= tXE; i++)
+		// If the life reaches the bottom of the hell, make it stop falling
+		NewVelocity.y = 0;
+	}
+
+	// Check if the life is inside the map's X range
+	// If it's outside, it should fall (= no changes in NewVelocity)
+	if (((tXS >= 0) || (tXE >= 0)) && ((tXS < m_MapCols) || (tXE < m_MapCols)))
+	{
+		if (Velocity.x > 0)
 		{
-			for (int j = tYS; j <= tYE; j++)
+			// Go Right
+			for (int i = tXS; i <= tXE; i++)
 			{
-				int tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
-				if (IsMovableTile(tMapID, Direction::Right) == false)
+				for (int j = tYS; j <= tYE; j++)
 				{
-					fWallCmp = GetMapTileBoundary(tMapID, Direction::Left);
-					if (fWall == 0)
+					tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
+					if (IsMovableTile(tMapID, Direction::Right) == false)
 					{
-						fWall = fWallCmp;
-					}
-					else if (fWall && fWallCmp)
-					{
-						fWall = min(fWall, fWallCmp);
+						fWallCmp = GetMapTileBoundary(tMapID, Direction::Left);
+						if (fWall == 0)
+						{
+							fWall = fWallCmp;
+						}
+						else if (fWall && fWallCmp)
+						{
+							fWall = min(fWall, fWallCmp);
+						}
 					}
 				}
 			}
-		}
 
-		if (fWall)
-		{
-			float fCurr = tSprPosS.x + Velocity.x;
-			float fDist = fWall - tSprPosS.x - 0.1f;
-			NewVelocity.x = fDist;
-		}
-	}
-	else if (Velocity.x < 0)
-	{
-		// Go Left
-		for (int i = tXS; i >= tXE; i--)
-		{
-			for (int j = tYS; j <= tYE; j++)
+			if (fWall)
 			{
-				int tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
-				if (IsMovableTile(tMapID, Direction::Left) == false)
+				float fCurr = tSprPosS.x + Velocity.x;
+				float fDist = fWall - tSprPosS.x - 0.1f;
+				NewVelocity.x = fDist;
+			}
+		}
+		else if (Velocity.x < 0)
+		{
+			// Go Left
+			for (int i = tXS; i >= tXE; i--)
+			{
+				for (int j = tYS; j <= tYE; j++)
 				{
-					fWallCmp = GetMapTileBoundary(tMapID, Direction::Right);
-					if (fWall == 0)
+					tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
+					if (IsMovableTile(tMapID, Direction::Left) == false)
 					{
-						fWall = fWallCmp;
-					}
-					else if (fWall && fWallCmp)
-					{
-						fWall = max(fWall, fWallCmp);
+						fWallCmp = GetMapTileBoundary(tMapID, Direction::Right);
+						if (fWall == 0)
+						{
+							fWall = fWallCmp;
+						}
+						else if (fWall && fWallCmp)
+						{
+							fWall = max(fWall, fWallCmp);
+						}
 					}
 				}
 			}
-		}
 
-		if (fWall)
-		{
-			float fCurr = tSprPosS.x + Velocity.x;
-			float fDist = fWall - tSprPosS.x;
-			NewVelocity.x = fDist;
-		}
-	}
-	else if (Velocity.y > 0)
-	{
-		// Go Down
-		for (int i = tXS; i <= tXE; i++)
-		{
-			for (int j = tYS; j <= tYE; j++)
+			if (fWall)
 			{
-				int tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
-				if (IsMovableTile(tMapID, Direction::Down) == false)
+				float fCurr = tSprPosS.x + Velocity.x;
+				float fDist = fWall - tSprPosS.x;
+				NewVelocity.x = fDist;
+			}
+		}
+		else if (Velocity.y > 0)
+		{
+			// Go Down
+			for (int i = tXS; i <= tXE; i++)
+			{
+				for (int j = tYS; j <= tYE; j++)
 				{
-					fWallCmp = GetMapTileBoundary(tMapID, Direction::Up);
-					if (fWall == 0)
+					tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
+					if (IsMovableTile(tMapID, Direction::Down) == false)
 					{
-						fWall = fWallCmp;
+						fWallCmp = GetMapTileBoundary(tMapID, Direction::Up);
+						if (fWall == 0)
+						{
+							fWall = fWallCmp;
+						}
+						else if (fWall && fWallCmp)
+						{
+							fWall = min(fWall, fWallCmp);
+						}
 					}
-					else if (fWall && fWallCmp)
+				}
+
+				if (fWall)
+				{
+					float fCurr = tSprPosS.y + Velocity.y;
+					float fDist = fWall - tSprPosS.y - 0.1f;
+					NewVelocity.y = min(NewVelocity.y, fDist);
+				}
+			}
+		}
+		else if (Velocity.y < 0)
+		{
+			// Go Up
+			for (int i = tXS; i <= tXE; i++)
+			{
+				for (int j = tYS; j >= tYE; j--)
+				{
+					tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
+					if (IsMovableTile(tMapID, Direction::Up) == false)
 					{
-						fWall = min(fWall, fWallCmp);
+						fWallCmp = GetMapTileBoundary(tMapID, Direction::Down);
+						if (fWall == 0)
+						{
+							fWall = fWallCmp;
+						}
+						else if (fWall && fWallCmp)
+						{
+							fWall = max(fWall, fWallCmp);
+						}
 					}
 				}
 			}
@@ -912,40 +957,11 @@ auto DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) con
 			if (fWall)
 			{
 				float fCurr = tSprPosS.y + Velocity.y;
-				float fDist = fWall - tSprPosS.y - 0.1f;
-				NewVelocity.y = min(NewVelocity.y, fDist);
+				float fDist = fWall - tSprPosS.y;
+				NewVelocity.y = max(NewVelocity.y, fDist);
 			}
 		}
 	}
-	else if (Velocity.y < 0)
-	{
-		// Go Up
-		for (int i = tXS; i <= tXE; i++)
-		{
-			for (int j = tYS; j >= tYE; j--)
-			{
-				int tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapCols);
-				if (IsMovableTile(tMapID, Direction::Up) == false)
-				{
-					fWallCmp = GetMapTileBoundary(tMapID, Direction::Down);
-					if (fWall == 0)
-					{
-						fWall = fWallCmp;
-					}
-					else if (fWall && fWallCmp)
-					{
-						fWall = max(fWall, fWallCmp);
-					}
-				}
-			}
-		}
-
-		if (fWall)
-		{
-			float fCurr = tSprPosS.y + Velocity.y;
-			float fDist = fWall - tSprPosS.y;
-			NewVelocity.y = max(NewVelocity.y, fDist);
-		}
-	}
+	
 	return NewVelocity;
 }

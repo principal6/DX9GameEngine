@@ -31,6 +31,7 @@ namespace DX9ENGINE
 		static const int MAX_MOVEID_LEN;
 		static const int MOVE_ALPHA;
 		static const int DEF_TILE_SIZE;
+		static const int DEPTH_HELL;
 
 		MapMode m_CurrMapMode; // For Map Editor
 		bool m_bMapCreated;
