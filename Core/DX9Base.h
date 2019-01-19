@@ -45,6 +45,10 @@ namespace DX9ENGINE
 		int m_CurrWindowWidth;
 		int m_CurrWindowHeight;
 
+		OPENFILENAME m_OFN;
+		TCHAR m_FileName[260] = { 0 };
+		TCHAR m_FileTitle[260] = { 0 };
+
 	private:
 		auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
 			WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, LPCWSTR MenuName = nullptr, HWND hWndParent = nullptr)->HWND;
@@ -68,5 +72,12 @@ namespace DX9ENGINE
 		void DX9Base::EndRender() const;
 
 		auto DX9Base::GetDevice()->LPDIRECT3DDEVICE9 const;
+
+		// Dialog
+		void DX9Base::SetDlgBase();
+		auto DX9Base::OpenFileDlg(LPCWSTR Filter)->BOOL;
+		auto DX9Base::SaveFileDlg(LPCWSTR Filter)->BOOL;
+		auto DX9Base::GetDlgFileName()->WSTRING;
+		auto DX9Base::GetDlgFileTitle()->WSTRING;
 	};
 };

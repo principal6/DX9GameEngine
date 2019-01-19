@@ -237,32 +237,14 @@ void DX9Engine::DetectInput()
 
 void DX9Engine::Destroy()
 {
-	m_FontManager->Destroy();
-	m_EffectManager->Destroy();
-	m_MonsterManager->Destroy();
-	m_Sprite->Destroy();
-	m_Map->Destroy();
-	m_Background->Destroy();
-	m_Input->Destroy();
-	m_Base->Destroy();
-
-	delete m_FontManager;
-	delete m_EffectManager;
-	delete m_MonsterManager;
-	delete m_Sprite;
-	delete m_Map;
-	delete m_Background;
-	delete m_Input;
-	delete m_Base;
-
-	m_FontManager = nullptr;
-	m_EffectManager = nullptr;
-	m_MonsterManager = nullptr;
-	m_Sprite = nullptr;
-	m_Map = nullptr;
-	m_Background = nullptr;
-	m_Input = nullptr;
-	m_Base = nullptr;
+	DX_DESTROY(m_FontManager);
+	DX_DESTROY(m_EffectManager);
+	DX_DESTROY(m_MonsterManager);
+	DX_DESTROY(m_Sprite);
+	DX_DESTROY(m_Map);
+	DX_DESTROY(m_Background);
+	DX_DESTROY(m_Input);
+	DX_DESTROY(m_Base);
 }
 
 void DX9Engine::SetBackground(WSTRING TextureFN)

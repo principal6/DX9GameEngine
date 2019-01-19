@@ -263,11 +263,6 @@ void DX9Image::SetUVRange(float u1, float u2, float v1, float v2)
 {
 	if (m_Vertices.size())
 	{
-		//@warning: FloatUV offset is done in order to make sure the image borders do not invade contiguous images
-		u1 += UV_OFFSET;
-		v1 += UV_OFFSET;
-		u2 -= UV_OFFSET;
-		v2 -= UV_OFFSET;
 		UpdateVertexData(u1, v1, u2, v2);
 	}
 }
@@ -318,12 +313,12 @@ void DX9Image::UpdateVertexData()
 
 	m_Vertices[0].x = m_Position.x;
 	m_Vertices[0].y = m_Position.y;
-	m_Vertices[1].x = m_Position.x + tW * m_Scale.x;
+	m_Vertices[1].x = m_Position.x + static_cast<float>(tW) * m_Scale.x;
 	m_Vertices[1].y = m_Position.y;
 	m_Vertices[2].x = m_Position.x;
-	m_Vertices[2].y = m_Position.y + tH * m_Scale.y;
-	m_Vertices[3].x = m_Position.x + tW * m_Scale.x;
-	m_Vertices[3].y = m_Position.y + tH * m_Scale.y;
+	m_Vertices[2].y = m_Position.y + static_cast<float>(tH) * m_Scale.y;
+	m_Vertices[3].x = m_Position.x + static_cast<float>(tW) * m_Scale.x;
+	m_Vertices[3].y = m_Position.y + static_cast<float>(tH) * m_Scale.y;
 
 	UpdateVertexBuffer();
 }

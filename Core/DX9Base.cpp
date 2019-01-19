@@ -188,3 +188,52 @@ auto DX9Base::GetDevice()->LPDIRECT3DDEVICE9 const
 {
 	return m_pD3DDevice;
 }
+
+void DX9Base::SetDlgBase()
+{
+	ZeroMemory(&m_OFN, sizeof(m_OFN));
+	m_OFN.lStructSize = sizeof(m_OFN);
+	m_OFN.hwndOwner = m_hWnd;
+	m_OFN.lpstrFile = m_FileName;
+	m_OFN.nMaxFile = sizeof(m_FileName);
+	m_OFN.lpstrFileTitle = m_FileTitle;
+	m_OFN.nMaxFileTitle = sizeof(m_FileTitle);
+	m_OFN.nFilterIndex = 1;
+	m_OFN.lpstrFileTitle = NULL;
+	m_OFN.nMaxFileTitle = 0;
+	m_OFN.lpstrInitialDir = NULL;
+	m_OFN.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+}
+
+auto DX9Base::OpenFileDlg(LPCWSTR Filter)->BOOL
+{
+	SetDlgBase();
+	m_OFN.lpstrFilter = Filter;
+
+	return GetOpenFileName(&m_OFN);
+}
+
+auto DX9Base::SaveFileDlg(LPCWSTR Filter)->BOOL
+{
+	SetDlgBase();
+	m_OFN.lpstrFilter = Filter;
+
+	return GetSaveFileName(&m_OFN);
+}
+
+auto DX9Base::GetDlgFileName()->WSTRING
+{
+	return m_FileName;
+}
+
+auto DX9Base::GetDlgFileTitle()->WSTRING
+{
+	WSTRING tempString = m_FileName;
+
+	size_t temp = tempString.find_last_of('\\');
+
+	if (temp)
+		tempString = tempString.substr(temp + 1);
+
+	return tempString;
+}

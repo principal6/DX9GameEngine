@@ -80,10 +80,6 @@ void DX9AnimUnit::SetFrame(int FrameID)
 	FloatUV tUV;
 	DX9Common::ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
 
-	//@warning: FloatUV offset is done in order to make sure the image borders do not invade contiguous images
-	tUV.u1 += UV_OFFSET;
-	tUV.v1 += UV_OFFSET;
-
 	switch (m_AnimDir)
 	{
 	case AnimationDir::Left:

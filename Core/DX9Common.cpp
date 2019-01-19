@@ -3,7 +3,6 @@
 using namespace DX9ENGINE;
 
 // Static constants
-const float DX9Common::UV_OFFSET = 0.002f;
 const wchar_t DX9Common::ASSET_DIR[] = L"\\Asset\\";
 
 // Static member variable

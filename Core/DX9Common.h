@@ -34,6 +34,7 @@
 namespace DX9ENGINE
 {
 	#define DX_FAILED(func) (func != DX9Common::Error::OK)
+	#define DX_DESTROY(obj) {obj->Destroy(); delete obj; obj = nullptr;}
 
 	using CINT = const int;
 
@@ -143,12 +144,11 @@ namespace DX9ENGINE
 
 	protected:
 		static constexpr int MAX_UNIT_COUNT = 100;
-		static constexpr int NUM_KEYS = 256;
+		static constexpr int NUM_KEYS = 256; // @warning: This value must be 256
 
 		static const DWORD D3DFVF_TEXTURE = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 		static const DWORD D3DFVF_LINE = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 
-		static const float UV_OFFSET;
 		static const wchar_t ASSET_DIR[];
 
 		static HINSTANCE ms_hInstance;
@@ -171,4 +171,3 @@ namespace DX9ENGINE
 		virtual auto DX9Common::GethWnd() const->HWND;
 	};
 };
-

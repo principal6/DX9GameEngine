@@ -20,16 +20,16 @@ int main()
 
 	g_Engine.SetBackground(L"colored_talltrees.png");
 	g_Engine.LoadMap(L"map01.jwm");
-	g_Engine.SpriteCreate(L"advnt_full.png", 10, 10, 1.5f)
+	g_Engine.SpriteCreate(L"advnt_full.png", 16, 8, 1.5f)
 		->AddAnimation(DX9Common::AnimationID::Idle, 0, 0)
-		->AddAnimation(DX9Common::AnimationID::Walk, 1, 5)
-		->AddAnimation(DX9Common::AnimationID::Jumping, 17, 17)
-		->AddAnimation(DX9Common::AnimationID::Falling, 18, 18)
-		->AddAnimation(DX9Common::AnimationID::Landing, 19, 19)
-		->AddAnimation(DX9Common::AnimationID::Attack1, 27, 28) // Punch
-		->AddAnimation(DX9Common::AnimationID::Attack2, 24, 26) // HorzAttack
+		->AddAnimation(DX9Common::AnimationID::Walk, 1, 6)
+		->AddAnimation(DX9Common::AnimationID::Jumping, 23, 23)
+		->AddAnimation(DX9Common::AnimationID::Falling, 24, 24)
+		->AddAnimation(DX9Common::AnimationID::Landing, 25, 25)
+		->AddAnimation(DX9Common::AnimationID::Attack1, 39, 40) // Punch
+		->AddAnimation(DX9Common::AnimationID::Attack2, 36, 38) // HorzAttack
 		->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f))
-		->SetBoundingBox(D3DXVECTOR2(-24, -18));
+		->SetBoundingBox(D3DXVECTOR2(-24, -24));
 
 	g_Engine.GetMonsterManagerObject()
 		->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))

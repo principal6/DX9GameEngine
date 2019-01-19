@@ -5,6 +5,25 @@
 
 namespace DX9ENGINE
 {
+	struct MapInfo
+	{
+		WSTRING MapName;
+		WSTRING TileName;
+		WSTRING MoveName;
+
+		int MapRows;
+		int MapCols;
+		int MapWidth;
+		int MapHeight;
+		int TileSize;
+		int TileSheetWidth;
+		int TileSheetHeight;
+		int MoveSheetWidth;
+		int MoveSheetHeight;
+
+		MapInfo() : MapRows(0), MapCols(0), TileSize(0) {};
+	};
+
 	class DX9Map final : protected DX9Image
 	{
 	private:
@@ -33,17 +52,13 @@ namespace DX9ENGINE
 		static const int DEF_TILE_SIZE;
 		static const int DEPTH_HELL;
 
+		static const wchar_t* MOVE_32;
+		static const wchar_t* MOVE_64;
+
 		MapMode m_CurrMapMode; // For Map Editor
 		bool m_bMapCreated;
-		int m_TileSize;
-		int m_MapCols;
-		int m_MapRows;
-		int m_TileSheetWidth;
-		int m_TileSheetHeight;
-		int m_MoveSheetWidth;
-		int m_MoveSheetHeight;
-		WSTRING m_MapName;
-		WSTRING m_TileName;
+
+		MapInfo m_MapInfo;
 		VECTOR<MapData> m_MapData;
 
 		bool m_bMoveTextureLoaded;
@@ -66,9 +81,10 @@ namespace DX9ENGINE
 
 		void DX9Map::ParseMapData(WSTRING Str); // For loading maps
 		void DX9Map::CreateLoadedMap(WSTRING Data); // For loading maps
-		void DX9Map::GetMapData(WSTRING *pOutputString) const; // For saving maps
-		void DX9Map::GetMapDataPart(int DataID, wchar_t *WC, int size) const; // For saving maps
+		void DX9Map::GetMapDataForSave(WSTRING *pOutputString) const; // For saving maps
+		void DX9Map::GetMapDataPartForSave(int DataID, wchar_t *WC, int size) const; // For saving maps
 
+		void DX9Map::CreateMapBase();
 		void DX9Map::AddMapFragmentTile(int TileID, int X, int Y);
 		void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y);
 		void DX9Map::AddEnd();
@@ -86,7 +102,7 @@ namespace DX9ENGINE
 		auto DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error;
 		void DX9Map::Destroy() override;
 
-		void DX9Map::CreateMap(WSTRING Name, int MapCols, int MapRows);
+		void DX9Map::CreateNewMap(MapInfo* Info);
 		void DX9Map::LoadMap(WSTRING FileName);
 		void DX9Map::SaveMap(WSTRING FileName);
 		void DX9Map::SetTileTexture(WSTRING FileName);
@@ -101,12 +117,8 @@ namespace DX9ENGINE
 		void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset); // For map movement
 
 		auto DX9Map::IsMapCreated() const->bool;
-		auto DX9Map::GetMapName(WSTRING *pStr) const->int;
-		auto DX9Map::GetTileName(WSTRING *pStr) const->int;
-		auto DX9Map::GetMapCols() const->int;
-		auto DX9Map::GetMapRows() const->int;
-		auto DX9Map::GetWidth() const->int override;
-		auto DX9Map::GetHeight() const->int override;
+		auto DX9Map::GetMode() const->MapMode;
+		void DX9Map::GetMapInfo(MapInfo *pInfo) const;
 		auto DX9Map::GetMapOffset() const->D3DXVECTOR2;
 		auto DX9Map::GetMapOffsetZeroY() const->int;
 		auto DX9Map::GetVelocityAfterCollision(BoundingBox BB, D3DXVECTOR2 Velocity) const->D3DXVECTOR2;
