@@ -16,7 +16,7 @@ DX9Input::DX9Input()
 	m_MouseY = 0;
 }
 
-auto DX9Input::Create(HWND hWnd, HINSTANCE hInstance)->Error
+auto DX9Input::Create(HWND hWnd, HINSTANCE hInstance)->EError
 {
 	m_hWnd = hWnd;
 
@@ -26,15 +26,15 @@ auto DX9Input::Create(HWND hWnd, HINSTANCE hInstance)->Error
 
 	if(FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION,
 		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
-		return Error::OBJECT_NOT_CREATED;
+		return EError::OBJECT_NOT_CREATED;
 
 	if (FAILED(CreateMouseDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
-		return Error::OBJECT_NOT_CREATED;
+		return EError::OBJECT_NOT_CREATED;
 
 	if (FAILED(CreateKeyboardDevice(DISCL_BACKGROUND | DISCL_NONEXCLUSIVE)))
-		return Error::OBJECT_NOT_CREATED;
+		return EError::OBJECT_NOT_CREATED;
 
-	return Error::OK;
+	return EError::OK;
 }
 
 auto DX9Input::CreateMouseDevice(DWORD dwFlags)->bool

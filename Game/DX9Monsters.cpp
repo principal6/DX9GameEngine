@@ -1,4 +1,4 @@
-#include "../Core/DX9Base.h"
+#include "../Core/DX9Window.h"
 #include "DX9Map.h"
 #include "DX9Monsters.h"
 
@@ -8,7 +8,7 @@ using namespace DX9ENGINE;
 	DX9MonsterType Class
 -----------------------------------------------------------------------------*/
 
-auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*
+auto DX9MonsterType::AddAnimation(SAnimationData Value)->DX9MonsterType*
 {
 	m_AnimData.push_back(Value);
 	return this;
@@ -29,24 +29,24 @@ DX9Monster::DX9Monster()
 	m_HPBar = nullptr;
 }
 
-auto DX9Monster::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
+auto DX9Monster::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
-	if (DX_SUCCEEDED(DX9Life::Create(pBase, BaseDir, pMap)))
+	if (DX_SUCCEEDED(DX9Life::Create(pDX9Window, BaseDir, pMap)))
 	{
 		m_HPFrame = new DX9Image;
-		m_HPFrame->Create(pBase, BaseDir);
+		m_HPFrame->Create(pDX9Window, BaseDir);
 		m_HPFrame->SetTexture(L"hpbarbg.png");
 
 		m_HPBar = new DX9Image;
-		m_HPBar->Create(pBase, BaseDir);
+		m_HPBar->Create(pDX9Window, BaseDir);
 		m_HPBar->SetTexture(L"hpbar.png");
 
 		m_bUILoaded = true;
 
-		return Error::OK;
+		return EError::OK;
 	}
 
-	return Error::LIFE_NOT_CREATED;
+	return EError::LIFE_NOT_CREATED;
 }
 
 void DX9Monster::Destroy()
@@ -134,25 +134,25 @@ void DX9Monster::Draw()
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 
-auto DX9MonsterManager::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
+auto DX9MonsterManager::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
-	if (pBase == nullptr)
-		return Error::BASE_NULL;
+	if (pDX9Window == nullptr)
+		return EError::NULLPTR_BASE;
 
 	if (pMap == nullptr)
-		return Error::MAP_NULL;
+		return EError::NULLPTR_MAP;
 
-	m_pBase = pBase;
-	m_pDevice = pBase->GetDevice();
+	m_pDX9Window = pDX9Window;
+	m_pDevice = pDX9Window->GetDevice();
 	m_BaseDir = BaseDir;
 	m_pMap = pMap;
 
-	return Error::OK;
+	return EError::OK;
 }
 
 void DX9MonsterManager::Destroy()
 {
-	m_pBase = nullptr;
+	m_pDX9Window = nullptr;
 	m_pDevice = nullptr;
 	m_pMap = nullptr;
 
@@ -175,17 +175,17 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 		if (TypeIterator.m_Name == MonsterName)
 		{
 			DX9Monster Temp;
-			Temp.Create(m_pBase, m_BaseDir, m_pMap);
+			Temp.Create(m_pDX9Window, m_BaseDir, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
 			Temp.MakeLife(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 
-			for (AnimationData& AnimIterator : TypeIterator.m_AnimData)
+			for (SAnimationData& AnimIterator : TypeIterator.m_AnimData)
 			{
 				Temp.AddAnimation(AnimIterator.AnimID, AnimIterator.FrameS, AnimIterator.FrameE);
 			}
 
 			Temp.SetGlobalPosition(GlobalPosition);
-			Temp.SetAnimation(AnimationID::Idle);
+			Temp.SetAnimation(EAnimationID::Idle);
 
 			m_Instances.push_back(Temp);
 

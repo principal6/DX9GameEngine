@@ -15,7 +15,7 @@ namespace DX9ENGINE
 		int m_TextureNumCols;
 		int m_TextureNumRows;
 		int m_HPMax;
-		VECTOR<AnimationData> m_AnimData;
+		VECTOR<SAnimationData> m_AnimData;
 
 	public:
 		DX9MonsterType() {};
@@ -24,7 +24,7 @@ namespace DX9ENGINE
 			m_TextureNumRows(TextureNumRows), m_HPMax(HP) {};
 		~DX9MonsterType() {};
 
-		auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*;
+		auto DX9MonsterType::AddAnimation(SAnimationData Value)->DX9MonsterType*;
 	};
 
 	/*-----------------------------------------------------------------------------
@@ -32,6 +32,24 @@ namespace DX9ENGINE
 	-----------------------------------------------------------------------------*/
 	class DX9Monster final : public DX9Life
 	{
+	public:
+		DX9Monster();
+		~DX9Monster() {};
+
+		auto DX9Monster::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError;
+		void DX9Monster::Destroy() override;
+
+		void DX9Monster::SetMonsterType(DX9MonsterType Type);
+		auto DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Monster* override;
+		void DX9Monster::Damage(int Damage);
+
+		void DX9Monster::Draw();
+
+	private:
+		void DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
+		void DX9Monster::CalculateHP();
+		void DX9Monster::UpdateGlobalPosition();
+
 	private:
 		static const float OFFSET_Y_HPBAR;
 
@@ -40,46 +58,18 @@ namespace DX9ENGINE
 		bool m_bUILoaded;
 		DX9Image *m_HPFrame;
 		DX9Image *m_HPBar;
-
-	private:
-		void DX9Monster::SetUIPosition(D3DXVECTOR2 Position);
-		void DX9Monster::CalculateHP();
-		void DX9Monster::UpdateGlobalPosition();
-
-	public:
-		DX9Monster();
-		~DX9Monster() {};
-
-		auto DX9Monster::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
-		void DX9Monster::Destroy() override;
-
-		void DX9Monster::SetMonsterType(DX9MonsterType Type);
-		auto DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Monster* override;
-		void DX9Monster::Damage(int Damage);
-
-		void DX9Monster::Draw();
 	};
 
 	/*-----------------------------------------------------------------------------
 		DX9MonsterManager Class
 	-----------------------------------------------------------------------------*/
-
 	class DX9MonsterManager final
 	{
-	private:
-		static LPDIRECT3DDEVICE9 m_pDevice;
-		DX9Base* m_pBase;
-		DX9Map* m_pMap;
-		WSTRING m_BaseDir;
-
-		VECTOR<DX9MonsterType> m_Types;
-		VECTOR<DX9Monster> m_Instances;
-
 	public:
 		DX9MonsterManager() {};
 		~DX9MonsterManager() {};
 
-		auto DX9MonsterManager::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
+		auto DX9MonsterManager::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError;
 		void DX9MonsterManager::Destroy();
 
 		auto DX9MonsterManager::AddMonsterType(DX9MonsterType Value)->DX9MonsterType*;
@@ -91,5 +81,14 @@ namespace DX9ENGINE
 		void DX9MonsterManager::DrawBoundingBox();
 
 		auto DX9MonsterManager::GetInstancePointer()->VECTOR<DX9Monster>*;
+
+	private:
+		static LPDIRECT3DDEVICE9 m_pDevice;
+		DX9Window* m_pDX9Window;
+		DX9Map* m_pMap;
+		WSTRING m_BaseDir;
+
+		VECTOR<DX9MonsterType> m_Types;
+		VECTOR<DX9Monster> m_Instances;
 	};
 };

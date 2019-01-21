@@ -7,67 +7,77 @@ namespace DX9ENGINE
 {
 	// ***
 	// *** Forward declaration ***
-	class DX9Base;
+	class DX9Window;
 	// ***
 
-	struct VertexImage
+	struct SVertexImage
 	{
 		FLOAT x, y, z, rhw;
 		DWORD color;
 		FLOAT u, v;
 
-		VertexImage() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
-		VertexImage(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
-		VertexImage(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
+		SVertexImage() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
+		SVertexImage(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
+		SVertexImage(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
 			x(_x), y(_y), z(_z), rhw(_rhw), color(_color), u(_u), v(_v) {};
 	};
 
-	struct Index3
+	struct SIndex3
 	{
 		WORD _0, _1, _2;
 
-		Index3() : _0(0), _1(0), _2(0) {};
-		Index3(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
+		SIndex3() : _0(0), _1(0), _2(0) {};
+		SIndex3(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
 	};
 
-	struct BoundingBox
+	struct SBoundingBox
 	{
 		D3DXVECTOR2 PositionOffset;
 		D3DXVECTOR2 Size;
 
-		BoundingBox() : PositionOffset(D3DXVECTOR2(0, 0)), Size(D3DXVECTOR2(0, 0)) {};
-		BoundingBox(D3DXVECTOR2 _POSOFFSET, D3DXVECTOR2 _SIZE) : PositionOffset(_POSOFFSET), Size(_SIZE) {};
+		SBoundingBox() : PositionOffset(D3DXVECTOR2(0, 0)), Size(D3DXVECTOR2(0, 0)) {};
+		SBoundingBox(D3DXVECTOR2 _POSOFFSET, D3DXVECTOR2 _SIZE) : PositionOffset(_POSOFFSET), Size(_SIZE) {};
 	};
 
 	class DX9Image
 	{
-	protected:
-		static const DWORD DEF_BOUNDINGBOX_COLOR;
+	public:
+		DX9Image();
+		virtual ~DX9Image() {};
 
-		DX9Base* m_pBase;
-		WSTRING m_BaseDir;
+		virtual auto DX9Image::Create(DX9Window* pDX9Window, WSTRING BaseDir)->EError;
+		virtual void DX9Image::Destroy();
 
-		LPDIRECT3DDEVICE9 m_pDevice;
+		virtual void DX9Image::Draw();
+		virtual void DX9Image::DrawBoundingBox();
 
-		LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
-		LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
-		LPDIRECT3DTEXTURE9 m_pTexture;
+		virtual void DX9Image::FlipHorizontal();
+		virtual void DX9Image::FlipVertical();
 
-		VECTOR<VertexImage> m_Vertices;
-		VECTOR<Index3> m_Indices;
+#ifdef DX9MAPEDITOR
+		// @warning: SetSize() is used publicly only in Map Editor
+		virtual void DX9Image::SetSize(int Width, int Height);
+#endif
 
-		int m_Width;
-		int m_Height;
-		int m_ScaledWidth;
-		int m_ScaledHeight;
-		int m_VisibleWidth;
-		int m_VisibleHeight;
-		D3DXVECTOR2 m_Position;
-		D3DXVECTOR2 m_Scale;
+		virtual void DX9Image::SetTexture(WSTRING FileName);
+		virtual void DX9Image::SetPosition(D3DXVECTOR2 Position);
+		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
+		virtual auto DX9Image::SetScale(D3DXVECTOR2 Scale)->DX9Image*;
+		virtual auto DX9Image::SetVisibleRange(int Width, int Height)->DX9Image*;
+		virtual auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*;
+		virtual auto DX9Image::SetAlpha(int Alpha)->DX9Image*;
+		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 ExtraSize)->DX9Image*;
+		virtual auto DX9Image::SetBoundingBoxColor(DWORD Color)->DX9Image*;
 
-		BoundingBox m_BoundingBox;
-		DX9Line m_BoundingBoxLine;
-		DWORD m_BoundingBoxColor;
+		virtual auto DX9Image::GetWidth() const->int;
+		virtual auto DX9Image::GetHeight() const->int;
+		virtual auto DX9Image::GetScaledWidth() const->int;
+		virtual auto DX9Image::GetScaledHeight() const->int;
+		virtual auto DX9Image::GetPosition() const->D3DXVECTOR2;
+		virtual auto DX9Image::GetCenterPosition() const->D3DXVECTOR2;
+		virtual auto DX9Image::GetBoundingBox() const->SBoundingBox;
+
+		virtual auto DX9Image::IsTextureLoaded() const->bool;
 
 	protected:
 		virtual void DX9Image::ClearVertexAndIndexData();
@@ -78,39 +88,38 @@ namespace DX9ENGINE
 		virtual void DX9Image::UpdateVertexData();
 		virtual void DX9Image::UpdateVertexData(float u1, float v1, float u2, float v2);
 
-	public:
-		DX9Image();
-		virtual ~DX9Image() {};
-
-		virtual auto DX9Image::Create(DX9Base* pBase, WSTRING BaseDir)->Error;
-		virtual void DX9Image::Destroy();
-
-		virtual void DX9Image::Draw();
-		virtual void DX9Image::DrawBoundingBox();
-		virtual void DX9Image::FlipHorizontal();
-		virtual void DX9Image::FlipVertical();
-
-		//@warning: SetSize() is only used in Map Editor
+#ifndef DX9MAPEDITOR
 		virtual void DX9Image::SetSize(int Width, int Height);
+#endif
 
-		virtual void DX9Image::SetTexture(WSTRING FileName);
-		virtual void DX9Image::SetPosition(D3DXVECTOR2 Position);
-		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
-		virtual void DX9Image::SetScale(D3DXVECTOR2 Scale);
-		virtual void DX9Image::SetVisibleRange(int Width, int Height);
-		virtual void DX9Image::SetUVRange(float u1, float u2, float v1, float v2);
-		virtual void DX9Image::SetAlpha(int Alpha);
-		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 Size)->DX9Image*;
-		virtual void DX9Image::SetBoundingBoxColor(DWORD Color);
+	protected:
+		static const int VISIBLE_RANGE_NOT_SET = -1;
+		static const DWORD DEF_BOUNDINGBOX_COLOR;
 
-		virtual auto DX9Image::GetWidth() const->int;
-		virtual auto DX9Image::GetHeight() const->int;
-		virtual auto DX9Image::GetScaledWidth() const->int;
-		virtual auto DX9Image::GetScaledHeight() const->int;
-		virtual auto DX9Image::GetPosition() const->D3DXVECTOR2;
-		virtual auto DX9Image::GetCenterPosition() const->D3DXVECTOR2;
-		virtual auto DX9Image::GetBoundingBox() const->BoundingBox;
+		DX9Window* m_pDX9Window;
+		WSTRING m_BaseDir;
 
-		virtual auto DX9Image::IsTextureLoaded() const->bool;
+		LPDIRECT3DDEVICE9 m_pDevice;
+
+		LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
+		LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
+		LPDIRECT3DTEXTURE9 m_pTexture;
+
+		VECTOR<SVertexImage> m_Vertices;
+		VECTOR<SIndex3> m_Indices;
+
+		int m_Width;
+		int m_Height;
+		int m_ScaledWidth;
+		int m_ScaledHeight;
+		int m_VisibleWidth;
+		int m_VisibleHeight;
+		D3DXVECTOR2 m_Position;
+		D3DXVECTOR2 m_Scale;
+
+		SBoundingBox m_BoundingBox;
+		D3DXVECTOR2 m_BoundingBoxExtraSize;
+		DX9Line m_BoundingBoxLine;
+		DWORD m_BoundingBoxColor;
 	};
 };

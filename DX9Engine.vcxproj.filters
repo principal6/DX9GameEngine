@@ -22,13 +22,9 @@
     <ClInclude Include="Core\DX9Line.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="Core\DX9Base.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="Core\DX9Input.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DX9Engine.h" />
     <ClInclude Include="Game\DX9Background.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -47,6 +43,10 @@
     <ClInclude Include="Game\DX9Monsters.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Core\DX9Window.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX9Game.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DX9Image.cpp">
@@ -55,14 +55,10 @@
     <ClCompile Include="Core\DX9Line.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Core\DX9Base.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Core\DX9Input.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="DX9Engine.cpp" />
     <ClCompile Include="Game\DX9Background.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -81,5 +77,9 @@
     <ClCompile Include="Game\DX9Monsters.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Core\DX9Window.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9Game.cpp" />
   </ItemGroup>
 </Project>

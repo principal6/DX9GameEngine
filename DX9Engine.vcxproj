@@ -154,12 +154,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Core\DX9Base.h" />
+    <ClInclude Include="Core\DX9Window.h" />
     <ClInclude Include="Core\DX9Common.h" />
     <ClInclude Include="Core\DX9Image.h" />
     <ClInclude Include="Core\DX9Input.h" />
     <ClInclude Include="Core\DX9Line.h" />
-    <ClInclude Include="DX9Engine.h" />
+    <ClInclude Include="DX9Game.h" />
     <ClInclude Include="Game\DX9Background.h" />
     <ClInclude Include="Game\DX9Effect.h" />
     <ClInclude Include="Game\DX9Font.h" />
@@ -168,11 +168,11 @@
     <ClInclude Include="Game\DX9Monsters.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\DX9Base.cpp" />
+    <ClCompile Include="Core\DX9Window.cpp" />
     <ClCompile Include="Core\DX9Image.cpp" />
     <ClCompile Include="Core\DX9Input.cpp" />
     <ClCompile Include="Core\DX9Line.cpp" />
-    <ClCompile Include="DX9Engine.cpp" />
+    <ClCompile Include="DX9Game.cpp" />
     <ClCompile Include="Game\DX9Background.cpp" />
     <ClCompile Include="Game\DX9Effect.cpp" />
     <ClCompile Include="Game\DX9Font.cpp" />

@@ -1,10 +1,7 @@
-#include "../Core/DX9Base.h"
+#include "../Core/DX9Window.h"
 #include "DX9Font.h"
 
 using namespace DX9ENGINE;
-
-// Static member variable declaration
-LPDIRECT3DDEVICE9 DX9Font::m_pDevice;
 
 DX9Font::DX9Font()
 {
@@ -12,22 +9,21 @@ DX9Font::DX9Font()
 	m_FontColor = 0xFF000000;
 }
 
-auto DX9Font::Create(DX9Base* pBase)->Error
+auto DX9Font::Create(DX9Window* pDX9Window)->EError
 {
-	if (pBase == nullptr)
-		return Error::BASE_NULL;
+	if (pDX9Window == nullptr)
+		return EError::NULLPTR_BASE;
 
-	m_pBase = pBase;
-	m_pDevice = m_pBase->GetDevice();
+	m_pDX9Window = pDX9Window;
 
-	return Error::OK;
+	return EError::OK;
 }
 
 void DX9Font::Destroy()
 {
-	m_pDevice = nullptr;
+	m_pDX9Window = nullptr;
 
-	for (FontInstance& iterator : m_Fonts)
+	for (SFontInstance& iterator : m_Fonts)
 	{
 		if (iterator.pFont)
 		{
@@ -37,23 +33,23 @@ void DX9Font::Destroy()
 	}
 }
 
-void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold)
+void DX9Font::MakeFont(EFontID ID, WSTRING FontName, int FontSize, bool IsBold)
 {
 	UINT Weight = FW_NORMAL;
 	if (IsBold)
 		Weight = FW_BOLD;
 
 	LPD3DXFONT tpFont;
-	D3DXCreateFont(m_pDevice, FontSize, 0, Weight, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+	D3DXCreateFont(m_pDX9Window->GetDevice(), FontSize, 0, Weight, 1, false, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
 		ANTIALIASED_QUALITY, DEFAULT_PITCH|FF_DONTCARE, FontName.c_str(), &tpFont);
 
 	m_Fonts.emplace_back(ID, tpFont);
 }
 
-auto DX9Font::SelectFont(FontID ID)->DX9Font*
+auto DX9Font::SelectFont(EFontID ID)->DX9Font*
 {
 	int iterator_n = 0;
-	for (FontInstance& iterator : m_Fonts)
+	for (SFontInstance& iterator : m_Fonts)
 	{
 		if (iterator.ID == ID)
 		{
@@ -75,7 +71,7 @@ auto DX9Font::SetFontColor(DWORD Color)->DX9Font*
 auto DX9Font::Draw(int X, int Y, WSTRING String)->DX9Font*
 {
 	RECT Rect_Font;
-	SetRect(&Rect_Font, X, Y, m_pBase->GetWindowData()->WindowWidth, m_pBase->GetWindowData()->WindowHeight);
+	SetRect(&Rect_Font, X, Y, m_pDX9Window->GetWindowData()->WindowWidth, m_pDX9Window->GetWindowData()->WindowHeight);
 	m_Fonts[m_CurrFontInstanceID].pFont->DrawText(nullptr, String.c_str(), -1, &Rect_Font, DT_LEFT|DT_NOCLIP, m_FontColor);
 	return this;
 }

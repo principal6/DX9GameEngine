@@ -1,5 +1,5 @@
 #include "DX9Image.h"
-#include "DX9Base.h"
+#include "DX9Window.h"
 
 using namespace DX9ENGINE;
 
@@ -19,21 +19,22 @@ DX9Image::DX9Image()
 	m_Height = 100;
 	m_ScaledWidth = m_Width;
 	m_ScaledHeight = m_Height;
-	m_VisibleWidth = -1;
-	m_VisibleHeight = -1;
+	m_VisibleWidth = VISIBLE_RANGE_NOT_SET;
+	m_VisibleHeight = VISIBLE_RANGE_NOT_SET;
 	m_Position = D3DXVECTOR2(0.0f, 0.0f);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 
+	m_BoundingBoxExtraSize = D3DXVECTOR2(0.0f, 0.0f);
 	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
-auto DX9Image::Create(DX9Base* pBase, WSTRING BaseDir)->Error
+auto DX9Image::Create(DX9Window* pDX9Window, WSTRING BaseDir)->EError
 {
-	if (pBase == nullptr)
-		return Error::BASE_NULL;
+	if (pDX9Window == nullptr)
+		return EError::NULLPTR_BASE;
 
-	m_pBase = pBase;
-	m_pDevice = pBase->GetDevice();
+	m_pDX9Window = pDX9Window;
+	m_pDevice = pDX9Window->GetDevice();
 	m_BaseDir = BaseDir;
 
 	ClearVertexAndIndexData();
@@ -42,17 +43,21 @@ auto DX9Image::Create(DX9Base* pBase, WSTRING BaseDir)->Error
 	UpdateVertexBuffer();
 	UpdateIndexBuffer();
 
-	m_BoundingBoxLine.Create(m_pDevice);
-	m_BoundingBoxLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), m_BoundingBoxColor);
-	m_BoundingBoxLine.AddEnd();
+	if (SUCCEEDED(m_BoundingBoxLine.Create(m_pDevice)))
+	{
+		m_BoundingBoxLine.AddBox(D3DXVECTOR2(0, 0), D3DXVECTOR2(10, 10), m_BoundingBoxColor);
+		m_BoundingBoxLine.AddEnd();
 
-	return Error::OK;
+		return EError::OK;
+	}
+	
+	return EError::IMAGE_NOT_CREATED;
 }
 
 void DX9Image::Destroy()
 {
-	m_pBase = nullptr;
-	m_pDevice = nullptr; // Just set to nullptr cuz it's newed in <DX9Base> class
+	m_pDX9Window = nullptr;
+	m_pDevice = nullptr; // Just set to nullptr cuz it's newed in <DX9Window> class
 
 	ClearVertexAndIndexData();
 
@@ -71,13 +76,13 @@ void DX9Image::CreateVertexBuffer()
 {
 	if (m_Vertices.size() == 0)
 	{
-		m_Vertices.push_back(VertexImage(m_Position.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-		m_Vertices.push_back(VertexImage(m_Position.x + m_Width, m_Position.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-		m_Vertices.push_back(VertexImage(m_Position.x, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-		m_Vertices.push_back(VertexImage(m_Position.x + m_Width, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x + m_Width, m_Position.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x + m_Width, m_Position.y + m_Height, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
 	}
 
-	int rVertSize = sizeof(VertexImage) * static_cast<int>(m_Vertices.size());
+	int rVertSize = sizeof(SVertexImage) * static_cast<int>(m_Vertices.size());
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVertexBuffer, nullptr)))
 	{
 		return;
@@ -88,11 +93,11 @@ void DX9Image::CreateIndexBuffer()
 {
 	if (m_Indices.size() == 0)
 	{
-		m_Indices.push_back(Index3(0, 1, 3));
-		m_Indices.push_back(Index3(0, 3, 2));
+		m_Indices.push_back(SIndex3(0, 1, 3));
+		m_Indices.push_back(SIndex3(0, 3, 2));
 	}
 
-	int rIndSize = sizeof(Index3) * static_cast<int>(m_Indices.size());
+	int rIndSize = sizeof(SIndex3) * static_cast<int>(m_Indices.size());
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, nullptr)))
 	{
 		return;
@@ -103,7 +108,7 @@ void DX9Image::UpdateVertexBuffer()
 {
 	if (m_Vertices.size() > 0)
 	{
-		int rVertSize = sizeof(VertexImage) * static_cast<int>(m_Vertices.size());
+		int rVertSize = sizeof(SVertexImage) * static_cast<int>(m_Vertices.size());
 		VOID* pVertices;
 		if (FAILED(m_pVertexBuffer->Lock(0, rVertSize, (void**)&pVertices, 0)))
 		{
@@ -118,7 +123,7 @@ void DX9Image::UpdateIndexBuffer()
 {
 	if (m_Indices.size() > 0)
 	{
-		int rIndSize = sizeof(Index3) * static_cast<int>(m_Indices.size());
+		int rIndSize = sizeof(SIndex3) * static_cast<int>(m_Indices.size());
 		VOID* pIndices;
 		if (FAILED(m_pIndexBuffer->Lock(0, rIndSize, (void **)&pIndices, 0)))
 		{
@@ -146,7 +151,7 @@ void DX9Image::Draw()
 		m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 	}
 
-	m_pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(VertexImage));
+	m_pDevice->SetStreamSource(0, m_pVertexBuffer, 0, sizeof(SVertexImage));
 	m_pDevice->SetFVF(D3DFVF_TEXTURE);
 	m_pDevice->SetIndices(m_pIndexBuffer);
 	m_pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, static_cast<int>(m_Vertices.size()), 0, static_cast<int>(m_Indices.size()));
@@ -190,6 +195,9 @@ void DX9Image::SetSize(int Width, int Height)
 	m_Height = Height;
 	m_ScaledWidth = static_cast<int>(m_Width * m_Scale.x);
 	m_ScaledHeight = static_cast<int>(m_Height * m_Scale.y);
+
+	SetBoundingBox(m_BoundingBoxExtraSize);
+
 	UpdateVertexData();
 }
 
@@ -222,6 +230,7 @@ void DX9Image::SetTexture(WSTRING FileName)
 void DX9Image::SetPosition(D3DXVECTOR2 Position)
 {
 	m_Position = Position;
+
 	UpdateVertexData();
 }
 
@@ -229,63 +238,78 @@ void DX9Image::SetPositionCentered(D3DXVECTOR2 Position)
 {
 	m_Position = D3DXVECTOR2(Position.x - (static_cast<float>(m_ScaledWidth) / 2.0f), Position.y - (static_cast<float>(m_ScaledHeight) / 2.0f));
 	m_Position = Position;
+
 	UpdateVertexData();
 }
 
-void DX9Image::SetScale(D3DXVECTOR2 Scale)
+auto DX9Image::SetScale(D3DXVECTOR2 Scale)->DX9Image*
 {
 	m_Scale = Scale;
-	m_ScaledWidth = static_cast<int>(m_Width * m_Scale.x);
-	m_ScaledHeight = static_cast<int>(m_Height * m_Scale.y);
+	m_ScaledWidth = static_cast<int>(static_cast<float>(m_Width) * m_Scale.x);
+	m_ScaledHeight = static_cast<int>(static_cast<float>(m_Height) * m_Scale.y);
+
+	SetBoundingBox(m_BoundingBoxExtraSize);
 
 	UpdateVertexData();
+
+	return this;
 }
 
-void DX9Image::SetVisibleRange(int Width, int Height)
+auto DX9Image::SetVisibleRange(int Width, int Height)->DX9Image*
 {
 	m_VisibleWidth = Width;
 	m_VisibleHeight = Height;
 
 	UpdateVertexData();
+
+	return this;
 }
 
-void DX9Image::SetUVRange(float u1, float u2, float v1, float v2)
+auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*
 {
 	if (m_Vertices.size())
 	{
 		UpdateVertexData(u1, v1, u2, v2);
 	}
+
+	return this;
 }
 
-void DX9Image::SetAlpha(int Alpha)
+auto DX9Image::SetAlpha(int Alpha)->DX9Image*
 {
 	if (m_Vertices.size())
 	{
 		Alpha = min(255, Alpha);
 		Alpha = max(0, Alpha);
 
-		for (VertexImage& iterator : m_Vertices)
+		for (SVertexImage& iterator : m_Vertices)
 		{
 			iterator.color = D3DCOLOR_ARGB(Alpha, 255, 255, 255);
 		}
 		UpdateVertexBuffer();
 	}
-}
-
-auto DX9Image::SetBoundingBox(D3DXVECTOR2 Size)->DX9Image*
-{
-	m_BoundingBox.PositionOffset.x = -Size.x / 2.0f;
-	m_BoundingBox.PositionOffset.y = -Size.y;
-
-	m_BoundingBox.Size.x = static_cast<float>(m_ScaledWidth) + Size.x;
-	m_BoundingBox.Size.y = static_cast<float>(m_ScaledHeight) + Size.y;
 
 	return this;
 }
 
-void DX9Image::SetBoundingBoxColor(DWORD Color)
+auto DX9Image::SetBoundingBox(D3DXVECTOR2 ExtraSize)->DX9Image*
+{
+	m_BoundingBoxExtraSize = ExtraSize;
+
+	m_BoundingBox.PositionOffset.x = -m_BoundingBoxExtraSize.x / 2.0f;
+	m_BoundingBox.PositionOffset.y = -m_BoundingBoxExtraSize.y;
+
+	m_BoundingBox.Size.x = static_cast<float>(m_ScaledWidth) + m_BoundingBoxExtraSize.x;
+	m_BoundingBox.Size.y = static_cast<float>(m_ScaledHeight) + m_BoundingBoxExtraSize.y;
+
+	return this;
+}
+
+auto DX9Image::SetBoundingBoxColor(DWORD Color)->DX9Image*
 {
 	DX9Image::m_BoundingBoxColor = Color;
+
+	return this;
 }
 
 void DX9Image::UpdateVertexData()
@@ -296,9 +320,9 @@ void DX9Image::UpdateVertexData()
 	int tW = m_Width;
 	int tH = m_Height;
 
-	if (m_VisibleWidth != -1)
+	if (m_VisibleWidth != VISIBLE_RANGE_NOT_SET)
 		tW = m_VisibleWidth;
-	if (m_VisibleHeight != -1)
+	if (m_VisibleHeight != VISIBLE_RANGE_NOT_SET)
 		tH = m_VisibleHeight;
 
 	m_Vertices[0].x = m_Position.x;
@@ -364,9 +388,9 @@ auto DX9Image::GetCenterPosition() const->D3DXVECTOR2
 	return Result;
 }
 
-auto DX9Image::GetBoundingBox() const->BoundingBox
+auto DX9Image::GetBoundingBox() const->SBoundingBox
 {
-	BoundingBox Result;
+	SBoundingBox Result;
 	Result.PositionOffset = m_Position + m_BoundingBox.PositionOffset;
 	Result.Size = m_BoundingBox.Size;
 

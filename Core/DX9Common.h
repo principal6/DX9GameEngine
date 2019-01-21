@@ -33,8 +33,8 @@
 
 namespace DX9ENGINE
 {
-	#define DX_SUCCEEDED(func) (func == Error::OK)
-	#define DX_FAILED(func) (func != Error::OK)
+	#define DX_SUCCEEDED(func) (func == EError::OK)
+	#define DX_FAILED(func) (func != EError::OK)
 	#define DX_DESTROY(obj) {if(obj) {obj->Destroy(); delete obj; obj = nullptr;}}
 	#define DX_DESTROY_UNIQUE(obj) {if(obj) {obj->Destroy();}}
 	#define DX_RELEASE(obj) {if(obj) {obj->Release(); obj = nullptr;}}
@@ -42,29 +42,33 @@ namespace DX9ENGINE
 	using CINT = const int;
 
 	static constexpr int MAX_FILE_LEN = 260;
+
+	// @warning: This value must be 256 for Direct Input
+	static constexpr int NUM_KEYS = 256;
+
 	static constexpr int MAX_UNIT_COUNT = 100;
-	static constexpr int NUM_KEYS = 256; // @warning: This value must be 256
 
 	static const DWORD D3DFVF_TEXTURE = D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 	static const DWORD D3DFVF_LINE = D3DFVF_XYZRHW | D3DFVF_DIFFUSE;
 
 	const wchar_t ASSET_DIR[] = L"\\Asset\\";
 
-	enum class Error
+	enum class EError
 	{
-		// No error
+		/** No error */
 		OK,
 
-		// Base creation
-		WINDOW_NOT_CREATED,
+		/** Base creation */
+		WINAPIWINDOW_NOT_CREATED,
 		DIRECTX_NOT_CREATED,
 
-		// Core creation
-		BASE_NOT_CREATED,
-		INPUT_NOT_CREATED,
+		/** Core creation */
+		WINDOW_NOT_CREATED,
 		IMAGE_NOT_CREATED,
+		INPUT_NOT_CREATED,
+		LINE_NOT_CREATED,
 
-		// Sub-class creation
+		/** Sub-class creation */
 		LIFE_NOT_CREATED,
 		MAP_NOT_CREATED,
 		SPRITE_NOT_CREATED,
@@ -74,100 +78,21 @@ namespace DX9ENGINE
 		OBJECT_NOT_CREATED,
 		TILESELECTOR_NOT_CREATED,
 
-		// Null pointer
-		DEVICE_NULL,
-		MAP_NULL,
-		BASE_NULL,
+		/** Null pointer */
+		NULLPTR_DEVICE,
+		NULLPTR_MAP,
+		NULLPTR_BASE,
 	};
 
-	enum class WindowStyle : DWORD
-	{
-		Overlapped = WS_OVERLAPPED,
-		Popup = WS_POPUP,
-		Child = WS_CHILD,
-		Minimize = WS_MINIMIZE,
-		Visible = WS_VISIBLE,
-		DIsabled = WS_DISABLED,
-		ClipSiblings = WS_CLIPSIBLINGS,
-		ClipChildren = WS_CLIPCHILDREN,
-		Maximize = WS_MAXIMIZE,
-		Caption = WS_CAPTION, // = WS_BORDER | WS_DLGFRAME
-		Border = WS_BORDER,
-		DlgFrame = WS_DLGFRAME,
-		VScroll = WS_VSCROLL,
-		HScroll = WS_HSCROLL,
-		SysMenu = WS_SYSMENU,
-		ThickFrame = WS_THICKFRAME,
-		Group = WS_GROUP,
-		TabStop = WS_TABSTOP,
-		MinimizeBox = WS_MINIMIZEBOX,
-		MaximizeBox = WS_MAXIMIZEBOX,
-		OverlappedWindow = WS_OVERLAPPEDWINDOW, // = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
-		PopupWindow = WS_POPUPWINDOW, // = WS_POPUP | WS_BORDER | WS_SYSMENU
-		ChildWindow = WS_CHILDWINDOW, // = WS_CHILD
-		ChildWindow2 = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN,
-	};
-
-	enum class FontID
-	{
-		Title,
-		Subtitle,
-		Text,
-		Debug,
-	};
-
-	enum class MapMode
-	{
-		TileMode,
-		MoveMode,
-	};
-
-	enum class EffectType
-	{
-		Still,
-		FlyRight,
-		FlyDown,
-		FlyUp,
-	};
-
-	enum class AnimationDir
-	{
-		Left,
-		Right,
-	};
-
-	enum class AnimationID
-	{
-		Idle,
-		Walk,
-		Jumping,
-		Falling,
-		Landing,
-		Attack1,
-		Attack2,
-		Attack3,
-
-		Effect,
-	};
-
-	struct AnimationData
-	{
-		AnimationID AnimID;
-		int FrameS, FrameE;
-
-		AnimationData() : FrameS(0), FrameE(0) {};
-		AnimationData(AnimationID _AnimID, int StartFrame, int EndFrame) : AnimID(_AnimID), FrameS(StartFrame), FrameE(EndFrame) {};
-	};
-
-	struct FloatUV
+	struct STextureUV
 	{
 		float u1, u2, v1, v2;
 
-		FloatUV() : u1(0), u2(0), v1(0), v2(0) {};
-		FloatUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
+		STextureUV() : u1(0), u2(0), v1(0), v2(0) {};
+		STextureUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
 	};
 
-	static void ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, FloatUV* UV)
+	inline static void ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, STextureUV* UV)
 	{
 		UV->u1 = static_cast<float>(FrameID % NumCols) / static_cast<float>(NumCols);
 		UV->u2 = UV->u1 + (1.0f / static_cast<float>(NumCols));
@@ -175,12 +100,12 @@ namespace DX9ENGINE
 		UV->v2 = UV->v1 + (1.0f / static_cast<float>(NumRows));
 	}
 
-	static void GetTileCols(int SheetWidth, int TileWidth, int* TileCols)
+	inline static void GetTileCols(int SheetWidth, int TileWidth, int* TileCols)
 	{
 		*TileCols = static_cast<int>(SheetWidth / TileWidth);
 	}
 
-	static void GetTileRows(int SheetHeight, int TileHeight, int* TileRows)
+	inline static void GetTileRows(int SheetHeight, int TileHeight, int* TileRows)
 	{
 		*TileRows = static_cast<int>(SheetHeight / TileHeight);
 	}

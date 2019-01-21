@@ -1,4 +1,5 @@
 #include "DX9Map.h"
+#include "DX9Monsters.h"
 #include "DX9Effect.h"
 
 using namespace DX9ENGINE;
@@ -12,15 +13,15 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-auto DX9Effect::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
+auto DX9Effect::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
-	if (pBase == nullptr)
-		return Error::BASE_NULL;
+	if (pDX9Window == nullptr)
+		return EError::NULLPTR_BASE;
 
 	if (pMap == nullptr)
-		return Error::MAP_NULL;
+		return EError::NULLPTR_MAP;
 
-	Error Result = DX9Image::Create(pBase, BaseDir);
+	EError Result = DX9Image::Create(pDX9Window, BaseDir);
 	m_pMap = pMap;
 
 	DX9Image::ClearVertexAndIndexData();
@@ -35,7 +36,7 @@ auto DX9Effect::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
 
 void DX9Effect::CreateVertexBuffer()
 {
-	int rVertSize = sizeof(VertexImage) * MAX_UNIT_COUNT * 4;
+	int rVertSize = sizeof(SVertexImage) * MAX_UNIT_COUNT * 4;
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0, D3DFVF_TEXTURE, D3DPOOL_MANAGED, &m_pVertexBuffer, nullptr)))
 	{
 		return;
@@ -44,7 +45,7 @@ void DX9Effect::CreateVertexBuffer()
 
 void DX9Effect::CreateIndexBuffer()
 {
-	int rIndSize = sizeof(Index3) * MAX_UNIT_COUNT * 2;
+	int rIndSize = sizeof(SIndex3) * MAX_UNIT_COUNT * 2;
 	if (FAILED(m_pDevice->CreateIndexBuffer(rIndSize, 0, D3DFMT_INDEX16, D3DPOOL_MANAGED, &m_pIndexBuffer, nullptr)))
 	{
 		return;
@@ -81,7 +82,7 @@ auto DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)->DX9
 	return this;
 }
 
-auto DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
+auto DX9Effect::AddEffectType(EEffectType Type, SAnimationData Data, D3DXVECTOR2 SpawnOffset, D3DXVECTOR2 BBSize,
 	int Delay, int RepeatCount)->DX9Effect*
 {
 	// Add this new effect type to the vector array
@@ -94,7 +95,7 @@ auto DX9Effect::AddEffectType(EffectType Type, AnimationData Data, D3DXVECTOR2 S
 }
 
 // Every effect is spawned at global position
-auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int Damage)->DX9Effect*
+auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, EAnimationDirection Dir, int Damage)->DX9Effect*
 {
 	// No more space for a new effect
 	if (m_InstanceCount >= MAX_UNIT_COUNT)
@@ -110,7 +111,7 @@ auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int D
 	D3DXVECTOR2 NewPos = Pos;
 	D3DXVECTOR2 SpawnOffsetBase = m_TypeData[EffectTypeID].GetSpawnOffset();
 	NewPos.y += SpawnOffsetBase.y;
-	if (Dir == AnimationDir::Left)
+	if (Dir == EAnimationDirection::Left)
 	{
 		NewPos.x -= SpawnOffsetBase.x;
 	}
@@ -122,7 +123,7 @@ auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, AnimationDir Dir, int D
 	NewPos.y -= (m_UnitHeight / 2);
 
 	D3DXVECTOR2 tBBSize = m_TypeData[EffectTypeID].GetBoundingBoxSize();
-	BoundingBox tBB;
+	SBoundingBox tBB;
 	tBB.PositionOffset.x = static_cast<float>(-tBBSize.x) / 2.0f;
 	tBB.PositionOffset.y = static_cast<float>(-tBBSize.y) / 2.0f;
 	tBB.Size.x = m_UnitWidth + tBBSize.x;
@@ -166,7 +167,7 @@ void DX9Effect::Update()
 	// There are instances
 	while (iterator)
 	{
-		EffectType tType = iterator->GetType();
+		EEffectType tType = iterator->GetType();
 		D3DXVECTOR2 tPos = iterator->GetPos();
 		int tTypeDataID = iterator->GetTypeDataID();
 
@@ -176,7 +177,7 @@ void DX9Effect::Update()
 
 		int tCurrFrame = iterator->GetCurrFrame();
 
-		FloatUV tUV;
+		STextureUV tUV;
 		ConvertFrameIDIntoUV(tCurrFrame, m_TextureAtlasCols, m_TextureAtlasRows, &tUV);
 
 		int tCurrRepeatCount = iterator->GetCurrRepeatCount();
@@ -214,17 +215,17 @@ void DX9Effect::Update()
 			NewPos.x += -SpawnOffset.x + MapOffset.x;
 			NewPos.y -= SpawnOffset.y - MapOffset.y;
 
-			m_Vertices.push_back(VertexImage(NewPos.x, NewPos.y, tUV.u1, tUV.v1));
-			m_Vertices.push_back(VertexImage(NewPos.x + m_UnitWidth, NewPos.y, tUV.u2, tUV.v1));
-			m_Vertices.push_back(VertexImage(NewPos.x, NewPos.y + m_UnitHeight, tUV.u1, tUV.v2));
-			m_Vertices.push_back(VertexImage(NewPos.x + m_UnitWidth, NewPos.y + m_UnitHeight, tUV.u2, tUV.v2));
+			m_Vertices.push_back(SVertexImage(NewPos.x, NewPos.y, tUV.u1, tUV.v1));
+			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitWidth, NewPos.y, tUV.u2, tUV.v1));
+			m_Vertices.push_back(SVertexImage(NewPos.x, NewPos.y + m_UnitHeight, tUV.u1, tUV.v2));
+			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitWidth, NewPos.y + m_UnitHeight, tUV.u2, tUV.v2));
 
 			int tIndicesCount = static_cast<int>(m_Indices.size());
-			m_Indices.push_back(Index3((tIndicesCount * 2), (tIndicesCount * 2) + 1, (tIndicesCount * 2) + 3));
-			m_Indices.push_back(Index3((tIndicesCount * 2), (tIndicesCount * 2) + 3, (tIndicesCount * 2) + 2));
+			m_Indices.push_back(SIndex3((tIndicesCount * 2), (tIndicesCount * 2) + 1, (tIndicesCount * 2) + 3));
+			m_Indices.push_back(SIndex3((tIndicesCount * 2), (tIndicesCount * 2) + 3, (tIndicesCount * 2) + 2));
 			
 			
-			BoundingBox tBB = iterator->GetBoundingBox();
+			SBoundingBox tBB = iterator->GetBoundingBox();
 			tBB.PositionOffset.x += -SpawnOffset.x + MapOffset.x;
 			tBB.PositionOffset.y -= SpawnOffset.y - MapOffset.y;
 
@@ -315,13 +316,13 @@ void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters)
 		{
 			// Check collision per each DX9Effect
 			D3DXVECTOR2 SpawnOffset = iterator->GetOffset();
-			BoundingBox tBBEfffect = iterator->GetBoundingBox();
+			SBoundingBox tBBEfffect = iterator->GetBoundingBox();
 			tBBEfffect.PositionOffset.x += -SpawnOffset.x + MapOffset.x;
 			tBBEfffect.PositionOffset.y -= SpawnOffset.y - MapOffset.y;
 			D3DXVECTOR2 tBBEFFPS = tBBEfffect.PositionOffset;
 			D3DXVECTOR2 tBBEFFPE = tBBEfffect.PositionOffset + tBBEfffect.Size;
 			
-			BoundingBox tBBMonster = (*pInstances)[i].GetBoundingBox();
+			SBoundingBox tBBMonster = (*pInstances)[i].GetBoundingBox();
 			D3DXVECTOR2 tBBMONPS = tBBMonster.PositionOffset;
 			D3DXVECTOR2 tBBMONPE = tBBMonster.PositionOffset + tBBMonster.Size;
 

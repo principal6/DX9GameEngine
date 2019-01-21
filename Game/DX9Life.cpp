@@ -1,4 +1,4 @@
-#include "../Core/DX9Base.h"
+#include "../Core/DX9Window.h"
 #include "DX9Life.h"
 #include "DX9Map.h"
 
@@ -14,15 +14,15 @@ DX9Life::DX9Life()
 	m_NumRows = 0;
 	m_NumCols = 0;
 
-	m_AnimDir = AnimationDir::Right;
-	m_CurrAnimID = AnimationID::Idle;
+	m_AnimDir = EAnimationDirection::Right;
+	m_CurrAnimID = EAnimationID::Idle;
 	m_CurrFrameID = 0;
 	m_AnimCount = 0;
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_UnitWidth = 0;
-	m_UnitHeight = 0;
+	m_LifeWidth = 0;
+	m_LifeHeight = 0;
 
 	m_GlobalPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_GlobalPosInverse = D3DXVECTOR2(0.0f, 0.0f);
@@ -30,19 +30,19 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-auto DX9Life::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
+auto DX9Life::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
-	if (DX_SUCCEEDED(DX9Image::Create(pBase, BaseDir)))
+	if (DX_SUCCEEDED(DX9Image::Create(pDX9Window, BaseDir)))
 	{
 		if (nullptr == (m_pMap = pMap))
-			return Error::MAP_NULL;
+			return EError::NULLPTR_MAP;
 
 		SetGlobalPosition(m_GlobalPos);
 
-		return Error::OK;
+		return EError::OK;
 	}
 
-	return Error::IMAGE_NOT_CREATED;
+	return EError::IMAGE_NOT_CREATED;
 }
 
 auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Life*
@@ -50,8 +50,8 @@ auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale)
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
 	SetNumRowsAndCols(numCols, numRows); // m_UnitWidth & m_UnitHeight are set here
-	m_ScaledWidth = static_cast<int>(m_UnitWidth * Scale);
-	m_ScaledHeight = static_cast<int>(m_UnitHeight * Scale);
+	m_ScaledWidth = static_cast<int>(m_LifeWidth * Scale);
+	m_ScaledHeight = static_cast<int>(m_LifeHeight * Scale);
 
 	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	SetBoundingBox(D3DXVECTOR2(0.0f, 0.0f));
@@ -64,10 +64,10 @@ void DX9Life::SetNumRowsAndCols(int numCols, int numRows)
 	m_NumCols = numCols;
 	m_NumRows = numRows;
 
-	m_UnitWidth = static_cast<int>(m_Width / numCols);
-	m_UnitHeight = static_cast<int>(m_Height / numRows);
+	m_LifeWidth = static_cast<int>(m_Width / numCols);
+	m_LifeHeight = static_cast<int>(m_Height / numRows);
 
-	SetSize(m_UnitWidth, m_UnitHeight);
+	SetSize(m_LifeWidth, m_LifeHeight);
 	SetFrame(0);
 }
 
@@ -76,15 +76,15 @@ void DX9Life::SetFrame(int FrameID)
 	if ((m_NumRows == 0) || (m_NumCols == 0))
 		return;
 
-	FloatUV tUV;
+	STextureUV tUV;
 	ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
 
 	switch (m_AnimDir)
 	{
-	case AnimationDir::Left:
+	case EAnimationDirection::Left:
 		UpdateVertexData(tUV.u2, tUV.v1, tUV.u1, tUV.v2);
 		break;
-	case AnimationDir::Right:
+	case EAnimationDirection::Right:
 		UpdateVertexData(tUV.u1, tUV.v1, tUV.u2, tUV.v2);
 		break;
 	default:
@@ -92,14 +92,14 @@ void DX9Life::SetFrame(int FrameID)
 	}
 }
 
-auto DX9Life::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)->DX9Life*
+auto DX9Life::AddAnimation(EAnimationID AnimID, int StartFrame, int EndFrame)->DX9Life*
 {
-	m_AnimData.push_back(AnimationData(AnimID, StartFrame, EndFrame));
+	m_AnimData.push_back(SAnimationData(AnimID, StartFrame, EndFrame));
 
 	return this;
 }
 
-void DX9Life::SetAnimation(AnimationID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
+void DX9Life::SetAnimation(EAnimationID AnimID, bool bCanInterrupt, bool bForcedSet, bool bRepeating)
 {
 	int AnimIDInt = static_cast<int>(AnimID);
 
@@ -133,7 +133,7 @@ void DX9Life::Animate()
 	SetFrame(m_CurrFrameID);
 }
 
-void DX9Life::SetDirection(AnimationDir Direction)
+void DX9Life::SetDirection(EAnimationDirection Direction)
 {
 	m_AnimDir = Direction;
 }
@@ -153,7 +153,7 @@ auto DX9Life::GetScaledUnitHeight() const->int
 	return m_ScaledHeight;
 }
 
-auto DX9Life::GetDirection() const->AnimationDir
+auto DX9Life::GetDirection() const->EAnimationDirection
 {
 	return m_AnimDir;
 }
@@ -161,13 +161,13 @@ auto DX9Life::GetDirection() const->AnimationDir
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_pBase->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPos.y;
+	m_GlobalPosInverse.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_pBase->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
+	m_GlobalPos.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
 }
 
 auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life*
@@ -175,11 +175,11 @@ auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life*
 	m_GlobalPos = Position;
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x > m_pBase->GetWindowData()->WindowHalfWidth)
-		m_GlobalPosInverse.x = m_pBase->GetWindowData()->WindowHalfWidth;
+	if (m_GlobalPosInverse.x > m_pDX9Window->GetWindowData()->WindowHalfWidth)
+		m_GlobalPosInverse.x = m_pDX9Window->GetWindowData()->WindowHalfWidth;
 
-	if (m_GlobalPosInverse.y < m_pBase->GetWindowData()->WindowHalfHeight)
-		m_GlobalPosInverse.y = m_pBase->GetWindowData()->WindowHalfHeight;
+	if (m_GlobalPosInverse.y < m_pDX9Window->GetWindowData()->WindowHalfHeight)
+		m_GlobalPosInverse.y = m_pDX9Window->GetWindowData()->WindowHalfHeight;
 
 	SetPosition(m_GlobalPosInverse);
 
@@ -204,8 +204,8 @@ auto DX9Life::GetVelocity() const->D3DXVECTOR2
 auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result;
-	Result.x = m_GlobalPos.x - m_pBase->GetWindowData()->WindowHalfWidth;
-	Result.y = m_GlobalPosInverse.y - m_pBase->GetWindowData()->WindowHalfHeight;
+	Result.x = m_GlobalPos.x - m_pDX9Window->GetWindowData()->WindowHalfWidth;
+	Result.y = m_GlobalPosInverse.y - m_pDX9Window->GetWindowData()->WindowHalfHeight;
 
 	if (Result.x < 0)
 		Result.x = 0;
@@ -234,15 +234,15 @@ void DX9Life::SetVelocity(D3DXVECTOR2 Vel)
 void DX9Life::MoveWithVelocity()
 {
 	m_GlobalPos.x += m_Velocity.x;
-	m_GlobalPos.y -= m_Velocity.y; //@warning: Y value of GlobalPos is in the opposite direction!
+	m_GlobalPos.y -= m_Velocity.y; // @warning: Y value of GlobalPos is in the opposite direction!
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_pBase->GetWindowData()->WindowHalfWidth)
+	if (m_GlobalPosInverse.x < m_pDX9Window->GetWindowData()->WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
-	if (m_GlobalPosInverse.y > m_pBase->GetWindowData()->WindowHalfHeight)
+	if (m_GlobalPosInverse.y > m_pDX9Window->GetWindowData()->WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
@@ -253,49 +253,49 @@ void DX9Life::MoveWithVelocity()
 void DX9Life::MoveConst(D3DXVECTOR2 dXY)
 {
 	m_GlobalPos.x += dXY.x;
-	m_GlobalPos.y -= dXY.y; //@warning: Y value of GlobalPos is in the opposite direction!
+	m_GlobalPos.y -= dXY.y; // @warning: Y value of GlobalPos is in the opposite direction!
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < m_pBase->GetWindowData()->WindowHalfWidth)
+	if (m_GlobalPosInverse.x < m_pDX9Window->GetWindowData()->WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
 	else
 	{
-		if (m_Position.x != m_pBase->GetWindowData()->WindowHalfWidth)
-			m_Position.x = m_pBase->GetWindowData()->WindowHalfWidth;
+		if (m_Position.x != m_pDX9Window->GetWindowData()->WindowHalfWidth)
+			m_Position.x = m_pDX9Window->GetWindowData()->WindowHalfWidth;
 	}
 
-	if (m_GlobalPosInverse.y > m_pBase->GetWindowData()->WindowHalfHeight)
+	if (m_GlobalPosInverse.y > m_pDX9Window->GetWindowData()->WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
 	else
 	{
-		if (m_Position.y != m_pBase->GetWindowData()->WindowHalfHeight)
-			m_Position.y = m_pBase->GetWindowData()->WindowHalfHeight;
+		if (m_Position.y != m_pDX9Window->GetWindowData()->WindowHalfHeight)
+			m_Position.y = m_pDX9Window->GetWindowData()->WindowHalfHeight;
 	}
 
 	SetPosition(m_Position);
 }
 
-void DX9Life::Walk(AnimationDir Direction)
+void DX9Life::Walk(EAnimationDirection Direction)
 {
 	D3DXVECTOR2 Velocity;
 	switch (Direction)
 	{
-	case AnimationDir::Left:
+	case EAnimationDirection::Left:
 		Velocity = D3DXVECTOR2(-STRIDE, 0);
 		break;
-	case AnimationDir::Right:
+	case EAnimationDirection::Right:
 		Velocity = D3DXVECTOR2(STRIDE, 0);
 		break;
 	default:
 		break;
 	}
 
-	SetAnimation(AnimationID::Walk, true);
+	SetAnimation(EAnimationID::Walk, true);
 	SetDirection(Direction);
 
 	D3DXVECTOR2 tNewVel = m_pMap->GetVelocityAfterCollision(GetBoundingBox(), Velocity);
@@ -329,16 +329,16 @@ void DX9Life::Gravitate()
 		{
 			m_bHitGround = true;
 			//SetAnimation(AnimationID::Landing, true, true); // This is only for main Sprite
-			SetAnimation(AnimationID::Idle, true, true);
+			SetAnimation(EAnimationID::Idle, true, true);
 		}
 	}
 	else
 	{
 		if (m_Velocity.y < 0)
-			SetAnimation(AnimationID::Jumping, true, true);
+			SetAnimation(EAnimationID::Jumping, true, true);
 
 		if (m_Velocity.y > 0)
-			SetAnimation(AnimationID::Falling, true, true);
+			SetAnimation(EAnimationID::Falling, true, true);
 
 		m_bHitGround = false;
 	}
