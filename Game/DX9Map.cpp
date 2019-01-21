@@ -1,5 +1,5 @@
+#include "../Core/DX9Base.h"
 #include "DX9Map.h"
-#include "Core/DX9Base.h"
 
 using namespace DX9ENGINE;
 

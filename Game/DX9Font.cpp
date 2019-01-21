@@ -1,4 +1,4 @@
-#include "Core/DX9Base.h"
+#include "../Core/DX9Base.h"
 #include "DX9Font.h"
 
 using namespace DX9ENGINE;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fstream>
-#include "Core/DX9Image.h"
+#include "../Core/DX9Image.h"
 
 namespace DX9ENGINE
 {

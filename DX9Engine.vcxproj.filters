@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -16,32 +8,11 @@
     <Filter Include="Core">
       <UniqueIdentifier>{a6f244a0-dffc-4090-9594-be8964ddb2d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{2c087ac9-9960-4914-bd02-7ffa1936d561}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DX9Sprite.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Map.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Effect.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Font.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Life.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9AnimUnit.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Monsters.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DX9Engine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Core\DX9Common.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -51,58 +22,64 @@
     <ClInclude Include="Core\DX9Line.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DX9Background.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Core\DX9Base.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\DX9Input.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="DX9Engine.h" />
+    <ClInclude Include="Game\DX9Background.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\DX9Effect.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\DX9Font.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\DX9Life.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\DX9Map.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\DX9Monsters.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Sprite.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Map.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Effect.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Font.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Life.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9AnimUnit.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Monsters.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DX9Engine.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Core\DX9Image.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\DX9Line.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="DX9Background.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Core\DX9Base.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\DX9Input.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="DX9Engine.cpp" />
+    <ClCompile Include="Game\DX9Background.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\DX9Effect.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\DX9Font.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\DX9Life.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\DX9Map.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\DX9Monsters.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

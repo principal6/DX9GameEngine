@@ -65,7 +65,7 @@ auto DX9Engine::Create(int Width, int Height)->Error
 	}
 	
 	// Create sprite object
-	if (m_Sprite = new DX9Sprite())
+	if (m_Sprite = new DX9Life())
 	{
 		if (DX_FAILED(m_Sprite->Create(m_Base, m_BaseDir, m_Map)))
 			return Error::SPRITE_NOT_CREATED;
@@ -239,10 +239,10 @@ void DX9Engine::SetBackground(WSTRING TextureFN)
 	m_Background->SetTexture(TextureFN);
 }
 
-auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Sprite*
+auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Life*
 {
 	assert(m_Sprite);
-	return m_Sprite->MakeUnit(TextureFN, numCols, numRows, Scale);
+	return m_Sprite->MakeLife(TextureFN, numCols, numRows, Scale);
 }
 
 void DX9Engine::SpriteWalk(AnimationDir Direction)
@@ -283,7 +283,7 @@ auto DX9Engine::GetFontObject()->DX9Font*
 	return m_FontManager;
 }
 
-auto DX9Engine::GetSpriteObject()->DX9Sprite*
+auto DX9Engine::GetSpriteObject()->DX9Life*
 {
 	assert(m_Sprite);
 	return m_Sprite;

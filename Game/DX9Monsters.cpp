@@ -1,4 +1,4 @@
-#include "Core/DX9Base.h"
+#include "../Core/DX9Base.h"
 #include "DX9Map.h"
 #include "DX9Monsters.h"
 
@@ -31,26 +31,22 @@ DX9Monster::DX9Monster()
 
 auto DX9Monster::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
 {
-	if (pBase == nullptr)
-		return Error::BASE_NULL;
+	if (DX_SUCCEEDED(DX9Life::Create(pBase, BaseDir, pMap)))
+	{
+		m_HPFrame = new DX9Image;
+		m_HPFrame->Create(pBase, BaseDir);
+		m_HPFrame->SetTexture(L"hpbarbg.png");
 
-	if (pMap == nullptr)
-		return Error::MAP_NULL;
+		m_HPBar = new DX9Image;
+		m_HPBar->Create(pBase, BaseDir);
+		m_HPBar->SetTexture(L"hpbar.png");
 
-	Error Result = DX9Life::Create(pBase, BaseDir);
-	m_pMap = pMap;
+		m_bUILoaded = true;
 
-	m_HPFrame = new DX9Image;
-	m_HPFrame->Create(pBase, BaseDir);
-	m_HPFrame->SetTexture(L"hpbarbg.png");
+		return Error::OK;
+	}
 
-	m_HPBar = new DX9Image;
-	m_HPBar->Create(pBase, BaseDir);
-	m_HPBar->SetTexture(L"hpbar.png");
-
-	m_bUILoaded = true;
-
-	return Result;
+	return Error::LIFE_NOT_CREATED;
 }
 
 void DX9Monster::Destroy()
@@ -78,9 +74,9 @@ void DX9Monster::SetMonsterType(DX9MonsterType Type)
 auto DX9Monster::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Monster*
 {
 	m_GlobalPos = Position;
-	CalculateGlobalPositionInverse();
+	DX9Life::CalculateGlobalPositionInverse();
 
-	SetPosition(m_GlobalPosInverse);
+	DX9Life::SetPosition(m_GlobalPosInverse);
 
 	if (m_bUILoaded)
 		SetUIPosition(m_GlobalPosInverse);
@@ -181,7 +177,7 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 			DX9Monster Temp;
 			Temp.Create(m_pBase, m_BaseDir, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
-			Temp.MakeUnit(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
+			Temp.MakeLife(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 
 			for (AnimationData& AnimIterator : TypeIterator.m_AnimData)
 			{

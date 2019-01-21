@@ -2,12 +2,12 @@
 
 #include "Core/DX9Base.h"
 #include "Core/DX9Input.h"
-#include "DX9Background.h"
-#include "DX9Sprite.h"
-#include "DX9Monsters.h"
-#include "DX9Effect.h"
-#include "DX9Map.h"
-#include "DX9Font.h"
+#include "Game/DX9Background.h"
+#include "Game/DX9Life.h"
+#include "Game/DX9Monsters.h"
+#include "Game/DX9Effect.h"
+#include "Game/DX9Map.h"
+#include "Game/DX9Font.h"
 
 namespace DX9ENGINE
 {
@@ -40,7 +40,7 @@ namespace DX9ENGINE
 		DX9Input* m_Input;
 		DX9Background* m_Background;
 		DX9Map* m_Map;
-		DX9Sprite* m_Sprite;
+		DX9Life* m_Sprite;
 		DX9MonsterManager* m_MonsterManager;
 		DX9Effect* m_EffectManager;
 		DX9Font* m_FontManager;
@@ -78,7 +78,7 @@ namespace DX9ENGINE
 
 		void DX9Engine::SetBackground(WSTRING TextureFN);
 
-		auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Sprite*;
+		auto DX9Engine::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Life*;
 		void DX9Engine::SpriteWalk(AnimationDir Direction);
 		void DX9Engine::SpriteJump();
 		void DX9Engine::SpriteSetAnimation(AnimationID AnimationID);
@@ -87,7 +87,7 @@ namespace DX9ENGINE
 		auto DX9Engine::SpawnEffect(int EffectID, int Damage)->DX9Effect*;
 
 		auto DX9Engine::GetFontObject()->DX9Font*;
-		auto DX9Engine::GetSpriteObject()->DX9Sprite*;
+		auto DX9Engine::GetSpriteObject()->DX9Life*;
 		auto DX9Engine::GetMonsterManagerObject()->DX9MonsterManager*;
 		auto DX9Engine::GetEffectManagerObject()->DX9Effect*;
 	};
