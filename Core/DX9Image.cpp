@@ -21,6 +21,8 @@ DX9Image::DX9Image()
 	m_ScaledHeight = m_Height;
 	m_VisibleWidth = VISIBLE_RANGE_NOT_SET;
 	m_VisibleHeight = VISIBLE_RANGE_NOT_SET;
+	m_AtlasWidth = 0;
+	m_AtlasHeight = 0;
 	m_Position = D3DXVECTOR2(0.0f, 0.0f);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 
@@ -221,6 +223,11 @@ void DX9Image::SetTexture(WSTRING FileName)
 
 	m_Width = tImageInfo.Width;
 	m_Height = tImageInfo.Height;
+
+	// Entire texture size (will never be changed unless the texture itself changes)
+	m_AtlasWidth = m_Width;
+	m_AtlasHeight = m_Height;
+
 	m_ScaledWidth = static_cast<int>(m_Width * m_Scale.x);
 	m_ScaledHeight = static_cast<int>(m_Height * m_Scale.y);
 
@@ -261,6 +268,23 @@ auto DX9Image::SetVisibleRange(int Width, int Height)->DX9Image*
 	m_VisibleHeight = Height;
 
 	UpdateVertexData();
+
+	return this;
+}
+
+auto DX9Image::SetUVRangeByInTexturePosition(D3DXVECTOR2 StartPos, D3DXVECTOR2 Size)->DX9Image*
+{
+	if (m_Vertices.size())
+	{
+		SetSize(Size.x, Size.y);
+
+		float u1 = min(StartPos.x / static_cast<float>(m_AtlasWidth), 1.0f);
+		float u2 = min((StartPos.x + Size.x) / static_cast<float>(m_AtlasWidth), 1.0f);
+		float v1 = min(StartPos.y / static_cast<float>(m_AtlasWidth), 1.0f);
+		float v2 = min((StartPos.y + Size.y) / static_cast<float>(m_AtlasWidth), 1.0f);
+
+		UpdateVertexData(u1, v1, u2, v2);
+	}
 
 	return this;
 }

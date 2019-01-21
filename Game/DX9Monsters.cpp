@@ -35,11 +35,13 @@ auto DX9Monster::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->E
 	{
 		m_HPFrame = new DX9Image;
 		m_HPFrame->Create(pDX9Window, BaseDir);
-		m_HPFrame->SetTexture(L"hpbarbg.png");
+		m_HPFrame->SetTexture(L"gamegui.png");
+		m_HPFrame->SetUVRangeByInTexturePosition(D3DXVECTOR2(0, 0), D3DXVECTOR2(47, 10));
 
 		m_HPBar = new DX9Image;
 		m_HPBar->Create(pDX9Window, BaseDir);
-		m_HPBar->SetTexture(L"hpbar.png");
+		m_HPBar->SetTexture(L"gamegui.png");
+		m_HPBar->SetUVRangeByInTexturePosition(D3DXVECTOR2(0, 10), D3DXVECTOR2(47, 10));
 
 		m_bUILoaded = true;
 
@@ -59,8 +61,9 @@ void DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 {
 	D3DXVECTOR2 tPos = GetCenterPosition();
 	tPos.y = Position.y;
-	tPos.y -= OFFSET_Y_HPBAR;
-	tPos.x -= static_cast<float>(m_HPFrame->GetWidth() / 2);
+	tPos.y -= OFFSET_Y_HPBAR + m_BoundingBoxExtraSize.y;
+	tPos.x -= static_cast<float>(m_HPFrame->GetWidth() / 2.0f);
+
 	m_HPFrame->SetPosition(tPos);
 	m_HPBar->SetPosition(tPos);
 }
@@ -186,6 +189,7 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 
 			Temp.SetGlobalPosition(GlobalPosition);
 			Temp.SetAnimation(EAnimationID::Idle);
+			Temp.SetBoundingBox(TypeIterator.m_BoundingBoxExtraSize);
 
 			m_Instances.push_back(Temp);
 

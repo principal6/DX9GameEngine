@@ -32,7 +32,7 @@ int main()
 		->SetBoundingBox(D3DXVECTOR2(-24, -24));
 
 	g_MyGame.GetMonsterManagerObject()
-		->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
+		->AddMonsterType(DX9MonsterType(L"Mage", L"mage.png", 4, 2, 200, D3DXVECTOR2(-40, -30)))
 		->AddAnimation(SAnimationData(EAnimationID::Idle, 0, 7));
 
 	g_MyGame.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 60.0f))

@@ -16,12 +16,14 @@ namespace DX9ENGINE
 		int m_TextureNumRows;
 		int m_HPMax;
 		VECTOR<SAnimationData> m_AnimData;
+		D3DXVECTOR2 m_BoundingBoxExtraSize;
 
 	public:
 		DX9MonsterType() {};
-		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP) :
+		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP,
+			D3DXVECTOR2 BoundingBoxExtraSize) :
 			m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols),
-			m_TextureNumRows(TextureNumRows), m_HPMax(HP) {};
+			m_TextureNumRows(TextureNumRows), m_HPMax(HP), m_BoundingBoxExtraSize(BoundingBoxExtraSize){};
 		~DX9MonsterType() {};
 
 		auto DX9MonsterType::AddAnimation(SAnimationData Value)->DX9MonsterType*;

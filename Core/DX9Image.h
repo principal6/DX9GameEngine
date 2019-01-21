@@ -64,6 +64,7 @@ namespace DX9ENGINE
 		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
 		virtual auto DX9Image::SetScale(D3DXVECTOR2 Scale)->DX9Image*;
 		virtual auto DX9Image::SetVisibleRange(int Width, int Height)->DX9Image*;
+		virtual auto DX9Image::SetUVRangeByInTexturePosition(D3DXVECTOR2 StartPos, D3DXVECTOR2 Size)->DX9Image*;
 		virtual auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*;
 		virtual auto DX9Image::SetAlpha(int Alpha)->DX9Image*;
 		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 ExtraSize)->DX9Image*;
@@ -114,6 +115,8 @@ namespace DX9ENGINE
 		int m_ScaledHeight;
 		int m_VisibleWidth;
 		int m_VisibleHeight;
+		int m_AtlasWidth;
+		int m_AtlasHeight;
 		D3DXVECTOR2 m_Position;
 		D3DXVECTOR2 m_Scale;
 

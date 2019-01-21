@@ -19,10 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C069A9C5-7CC1-4E4C-A680-BA0573274629}</ProjectGuid>
+    <ProjectGuid>{BC4350A5-FAD2-4092-B499-6948319A43D7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DX9EngineBase</RootNamespace>
+    <RootNamespace>DX9GameEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>DX9GameEngine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
