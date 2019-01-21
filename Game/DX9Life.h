@@ -65,8 +65,7 @@ namespace DX9ENGINE
 		virtual void DX9Life::SetDirection(EAnimationDirection Direction);
 
 		virtual auto DX9Life::IsBeingAnimated() const->bool;
-		virtual auto DX9Life::GetScaledUnitWidth() const->int;
-		virtual auto DX9Life::GetScaledUnitHeight() const->int;
+		virtual auto DX9Life::GetScaledLifeSize() const->D3DXVECTOR2;
 		virtual auto DX9Life::GetDirection() const->EAnimationDirection;
 
 		// Move
@@ -94,8 +93,7 @@ namespace DX9ENGINE
 		D3DXVECTOR2 m_Velocity;
 		bool m_bHitGround;
 
-		int m_LifeWidth;
-		int m_LifeHeight;
+		D3DXVECTOR2 m_LifeSize;
 
 	private:
 		virtual void DX9Life::SetNumRowsAndCols(int numCols, int numRows);

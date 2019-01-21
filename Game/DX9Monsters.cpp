@@ -36,12 +36,12 @@ auto DX9Monster::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->E
 		m_HPFrame = new DX9Image;
 		m_HPFrame->Create(pDX9Window, BaseDir);
 		m_HPFrame->SetTexture(L"gamegui.png");
-		m_HPFrame->SetUVRangeByInTexturePosition(D3DXVECTOR2(0, 0), D3DXVECTOR2(47, 10));
+		m_HPFrame->SetAtlasUV(D3DXVECTOR2(0, 0), D3DXVECTOR2(47, 10));
 
 		m_HPBar = new DX9Image;
 		m_HPBar->Create(pDX9Window, BaseDir);
 		m_HPBar->SetTexture(L"gamegui.png");
-		m_HPBar->SetUVRangeByInTexturePosition(D3DXVECTOR2(0, 10), D3DXVECTOR2(47, 10));
+		m_HPBar->SetAtlasUV(D3DXVECTOR2(0, 10), D3DXVECTOR2(47, 10));
 
 		m_bUILoaded = true;
 
@@ -62,7 +62,7 @@ void DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
 	D3DXVECTOR2 tPos = GetCenterPosition();
 	tPos.y = Position.y;
 	tPos.y -= OFFSET_Y_HPBAR + m_BoundingBoxExtraSize.y;
-	tPos.x -= static_cast<float>(m_HPFrame->GetWidth() / 2.0f);
+	tPos.x -= m_HPFrame->GetSize().x / 2.0f;
 
 	m_HPFrame->SetPosition(tPos);
 	m_HPBar->SetPosition(tPos);
@@ -108,9 +108,9 @@ void DX9Monster::UpdateGlobalPosition()
 void DX9Monster::CalculateHP()
 {
 	float fPercent = static_cast<float>(DX9Monster::m_HPCurr) / static_cast<float>(m_Type.m_HPMax);
-	float tW = static_cast<float>(m_HPBar->GetScaledWidth());
+	float tWidth = m_HPBar->GetScaledSize().x;
 
-	m_HPBar->SetVisibleRange(static_cast<int>(tW * fPercent), m_HPBar->GetScaledHeight());
+	m_HPBar->SetVisibleRange(D3DXVECTOR2(tWidth * fPercent, m_HPBar->GetScaledSize().y));
 }
 
 void DX9Monster::Damage(int Damage)

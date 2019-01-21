@@ -32,13 +32,10 @@ namespace DX9ENGINE
 
 		int MapRows;
 		int MapCols;
-		int MapWidth;
-		int MapHeight;
 		int TileSize;
-		int TileSheetWidth;
-		int TileSheetHeight;
-		int MoveSheetWidth;
-		int MoveSheetHeight;
+		D3DXVECTOR2 MapSize;
+		D3DXVECTOR2 TileSheetSize;
+		D3DXVECTOR2 MoveSheetSize;
 
 		SMapInfo() : MapRows(0), MapCols(0), TileSize(0) {};
 	};
@@ -83,7 +80,7 @@ namespace DX9ENGINE
 		auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) const->D3DXVECTOR2;
 
 	private:
-		static auto DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH)->STextureUV;
+		static auto DX9Map::ConvertIDtoUV(int ID, int TileSize, D3DXVECTOR2 SheetSize)->STextureUV;
 		static auto DX9Map::ConvertIDToXY(int MapID, int MapCols)->D3DXVECTOR2;
 		static auto DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols)->int;
 		static auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset,

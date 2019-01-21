@@ -63,17 +63,16 @@ namespace DX9ENGINE
 		virtual void DX9Image::SetPosition(D3DXVECTOR2 Position);
 		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
 		virtual auto DX9Image::SetScale(D3DXVECTOR2 Scale)->DX9Image*;
-		virtual auto DX9Image::SetVisibleRange(int Width, int Height)->DX9Image*;
-		virtual auto DX9Image::SetUVRangeByInTexturePosition(D3DXVECTOR2 StartPos, D3DXVECTOR2 Size)->DX9Image*;
+		virtual auto DX9Image::SetVisibleRange(D3DXVECTOR2 Range)->DX9Image*;
+		virtual auto DX9Image::SetAtlasUV(D3DXVECTOR2 OffsetInAtlas, D3DXVECTOR2 Size,
+			bool bSetSize = true)->DX9Image*;
 		virtual auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*;
 		virtual auto DX9Image::SetAlpha(int Alpha)->DX9Image*;
 		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 ExtraSize)->DX9Image*;
 		virtual auto DX9Image::SetBoundingBoxColor(DWORD Color)->DX9Image*;
 
-		virtual auto DX9Image::GetWidth() const->int;
-		virtual auto DX9Image::GetHeight() const->int;
-		virtual auto DX9Image::GetScaledWidth() const->int;
-		virtual auto DX9Image::GetScaledHeight() const->int;
+		virtual auto DX9Image::GetSize() const->D3DXVECTOR2;
+		virtual auto DX9Image::GetScaledSize() const->D3DXVECTOR2;;
 		virtual auto DX9Image::GetPosition() const->D3DXVECTOR2;
 		virtual auto DX9Image::GetCenterPosition() const->D3DXVECTOR2;
 		virtual auto DX9Image::GetBoundingBox() const->SBoundingBox;
@@ -90,7 +89,7 @@ namespace DX9ENGINE
 		virtual void DX9Image::UpdateVertexData(float u1, float v1, float u2, float v2);
 
 #ifndef DX9MAPEDITOR
-		virtual void DX9Image::SetSize(int Width, int Height);
+		virtual void DX9Image::SetSize(D3DXVECTOR2 Size);
 #endif
 
 	protected:
@@ -109,14 +108,12 @@ namespace DX9ENGINE
 		VECTOR<SVertexImage> m_Vertices;
 		VECTOR<SIndex3> m_Indices;
 
-		int m_Width;
-		int m_Height;
-		int m_ScaledWidth;
-		int m_ScaledHeight;
-		int m_VisibleWidth;
-		int m_VisibleHeight;
-		int m_AtlasWidth;
-		int m_AtlasHeight;
+		D3DXVECTOR2 m_Size;
+		D3DXVECTOR2 m_ScaledSize;
+		D3DXVECTOR2 m_VisibleRange;
+		D3DXVECTOR2 m_AtlasSize;
+		D3DXVECTOR2 m_OffsetInAtlas;
+
 		D3DXVECTOR2 m_Position;
 		D3DXVECTOR2 m_Scale;
 

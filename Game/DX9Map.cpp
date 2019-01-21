@@ -16,12 +16,12 @@ const wchar_t* DX9Map::MOVE_64 = L"move64.png";
 /*-----------------------------------------------------------------------------
 	Static method declaration
 -----------------------------------------------------------------------------*/
-auto DX9Map::ConvertIDtoUV(int ID, int TileSize, int SheetW, int SheetH)->STextureUV
+auto DX9Map::ConvertIDtoUV(int ID, int TileSize, D3DXVECTOR2 SheetSize)->STextureUV
 {
 	STextureUV Result;
 	int tTileCols, tTileRows;
-	GetTileCols(SheetW, TileSize, &tTileCols);
-	GetTileRows(SheetH, TileSize, &tTileRows);
+	GetTileCols(static_cast<int>(SheetSize.x), TileSize, &tTileCols);
+	GetTileRows(static_cast<int>(SheetSize.y), TileSize, &tTileRows);
 
 	if (ID == -1)
 	{
@@ -83,10 +83,8 @@ DX9Map::DX9Map()
 	m_bMapCreated = false;
 
 	m_MapInfo.TileSize = DEF_TILE_SIZE;
-	m_MapInfo.TileSheetWidth = 0;
-	m_MapInfo.TileSheetHeight = 0;
-	m_MapInfo.MoveSheetWidth = 0;
-	m_MapInfo.MoveSheetHeight = 0;
+	m_MapInfo.TileSheetSize = D3DXVECTOR2(0.0f, 0.0f);
+	m_MapInfo.MoveSheetSize = D3DXVECTOR2(0.0f, 0.0f);
 
 	m_bMoveTextureLoaded = false;
 	m_pTextureMove = nullptr;
@@ -132,14 +130,13 @@ void DX9Map::SetTileTexture(WSTRING FileName)
 {
 	DX9Image::SetTexture(FileName);
 
-	assert(m_Width > 0);
+	assert(m_Size.x);
 
-	if ((m_Width) && (m_Height))
+	if ((m_Size.x) && (m_Size.y))
 	{
 		m_MapInfo.TileName = FileName;
 
-		m_MapInfo.TileSheetWidth = m_Width; // 'm_Width = TileSheetWidth' after SetTexture() being called
-		m_MapInfo.TileSheetHeight = m_Height;
+		m_MapInfo.TileSheetSize = m_Size; // 'm_Width = TileSheetWidth' after SetTexture() being called
 	}
 }
 
@@ -163,8 +160,8 @@ void DX9Map::SetMoveTexture(WSTRING FileName)
 
 	m_MapInfo.MoveName = FileName;
 
-	m_MapInfo.MoveSheetWidth = tImageInfo.Width;
-	m_MapInfo.MoveSheetHeight = tImageInfo.Height;
+	m_MapInfo.MoveSheetSize.x = static_cast<float>(tImageInfo.Width);
+	m_MapInfo.MoveSheetSize.y = static_cast<float>(tImageInfo.Height);
 	m_bMoveTextureLoaded = true;
 }
 
@@ -215,8 +212,8 @@ void DX9Map::CreateMapBase()
 	ClearAllData();
 
 	// Set map width & height
-	m_MapInfo.MapWidth = m_MapInfo.MapCols * m_MapInfo.TileSize;
-	m_MapInfo.MapHeight = m_MapInfo.MapRows * m_MapInfo.TileSize;
+	m_MapInfo.MapSize.x = static_cast<float>(m_MapInfo.MapCols * m_MapInfo.TileSize);
+	m_MapInfo.MapSize.y = static_cast<float>(m_MapInfo.MapRows * m_MapInfo.TileSize);
 
 	// Set tile texture of the map
 	SetTileTexture(m_MapInfo.TileName);
@@ -285,7 +282,7 @@ void DX9Map::CreateLoadedMap(WSTRING Data)
 
 void DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 {
-	STextureUV tUV = ConvertIDtoUV(TileID, m_MapInfo.TileSize, m_MapInfo.TileSheetWidth, m_MapInfo.TileSheetHeight);
+	STextureUV tUV = ConvertIDtoUV(TileID, m_MapInfo.TileSize, m_MapInfo.TileSheetSize);
 
 	DWORD tColor;
 	if (TileID == -1)
@@ -313,9 +310,9 @@ void DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y)
 {
 	// @warning: This function should be called only if MoveSheet is loaded first
-	if (m_MapInfo.MoveSheetWidth && m_MapInfo.MoveSheetHeight)
+	if (m_MapInfo.MoveSheetSize.x && m_MapInfo.MoveSheetSize.y)
 	{
-		STextureUV tUV = ConvertIDtoUV(MoveID, m_MapInfo.TileSize, m_MapInfo.MoveSheetWidth, m_MapInfo.MoveSheetHeight);
+		STextureUV tUV = ConvertIDtoUV(MoveID, m_MapInfo.TileSize, m_MapInfo.MoveSheetSize);
 
 		DWORD Color = D3DCOLOR_ARGB(MOVE_ALPHA, 255, 255, 255);
 		float tX = static_cast<float>(X * m_MapInfo.TileSize);
@@ -559,7 +556,7 @@ void DX9Map::SetMapFragmentTile(int TileID, int X, int Y)
 		int MapID = X + (Y * m_MapInfo.MapCols);
 		int VertID0 = MapID * 4;
 
-		STextureUV tUV = ConvertIDtoUV(TileID, m_MapInfo.TileSize, m_MapInfo.TileSheetWidth, m_MapInfo.TileSheetHeight);
+		STextureUV tUV = ConvertIDtoUV(TileID, m_MapInfo.TileSize, m_MapInfo.TileSheetSize);
 
 		DWORD tColor;
 		if (TileID == -1)
@@ -597,7 +594,7 @@ void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y)
 		int MapID = X + (Y * m_MapInfo.MapCols);
 		int VertID0 = MapID * 4;
 
-		STextureUV tUV = ConvertIDtoUV(MoveID, m_MapInfo.TileSize, m_MapInfo.MoveSheetWidth, m_MapInfo.MoveSheetHeight);
+		STextureUV tUV = ConvertIDtoUV(MoveID, m_MapInfo.TileSize, m_MapInfo.MoveSheetSize);
 
 		m_VertMove[VertID0].u = tUV.u1;
 		m_VertMove[VertID0].v = tUV.v1;

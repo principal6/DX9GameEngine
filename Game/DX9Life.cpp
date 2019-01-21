@@ -21,8 +21,7 @@ DX9Life::DX9Life()
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_LifeWidth = 0;
-	m_LifeHeight = 0;
+	m_LifeSize = D3DXVECTOR2(0.0f, 0.0f);
 
 	m_GlobalPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_GlobalPosInverse = D3DXVECTOR2(0.0f, 0.0f);
@@ -50,11 +49,9 @@ auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale)
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
 	SetNumRowsAndCols(numCols, numRows); // m_UnitWidth & m_UnitHeight are set here
-	m_ScaledWidth = static_cast<int>(m_LifeWidth * Scale);
-	m_ScaledHeight = static_cast<int>(m_LifeHeight * Scale);
 
-	SetPosition(D3DXVECTOR2(0.0f, 0.0f));
-	SetBoundingBox(D3DXVECTOR2(0.0f, 0.0f));
+	DX9Image::SetPosition(D3DXVECTOR2(0.0f, 0.0f));
+	DX9Image::SetBoundingBox(D3DXVECTOR2(0.0f, 0.0f));
 
 	return this;
 }
@@ -64,10 +61,10 @@ void DX9Life::SetNumRowsAndCols(int numCols, int numRows)
 	m_NumCols = numCols;
 	m_NumRows = numRows;
 
-	m_LifeWidth = static_cast<int>(m_Width / numCols);
-	m_LifeHeight = static_cast<int>(m_Height / numRows);
+	m_LifeSize.x = m_Size.x / static_cast<float>(numCols);
+	m_LifeSize.y = m_Size.y / static_cast<float>(numRows);
 
-	SetSize(m_LifeWidth, m_LifeHeight);
+	SetSize(m_LifeSize);
 	SetFrame(0);
 }
 
@@ -143,14 +140,9 @@ auto DX9Life::IsBeingAnimated() const->bool
 	return m_bBeingAnimated;
 }
 
-auto DX9Life::GetScaledUnitWidth() const->int
+auto DX9Life::GetScaledLifeSize() const->D3DXVECTOR2
 {
-	return m_ScaledWidth;
-}
-
-auto DX9Life::GetScaledUnitHeight() const->int
-{
-	return m_ScaledHeight;
+	return m_ScaledSize;
 }
 
 auto DX9Life::GetDirection() const->EAnimationDirection
@@ -161,13 +153,13 @@ auto DX9Life::GetDirection() const->EAnimationDirection
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPos.y;
+	m_GlobalPosInverse.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledSize.y - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
+	m_GlobalPos.y = m_pDX9Window->GetWindowData()->WindowHeight - m_ScaledSize.y - m_GlobalPosInverse.y;
 }
 
 auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life*

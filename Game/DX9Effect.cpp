@@ -76,8 +76,8 @@ auto DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)->DX9
 	DX9Image::SetTexture(FileName);
 	m_TextureAtlasCols = numCols;
 	m_TextureAtlasRows = numRows;
-	m_UnitWidth = m_Width / m_TextureAtlasCols;
-	m_UnitHeight = m_Height / m_TextureAtlasRows;
+	m_UnitSize.x = m_Size.x / static_cast<float>(m_TextureAtlasCols);
+	m_UnitSize.y = m_Size.y / static_cast<float>(m_TextureAtlasRows);
 
 	return this;
 }
@@ -119,15 +119,15 @@ auto DX9Effect::Spawn(int EffectTypeID, D3DXVECTOR2 Pos, EAnimationDirection Dir
 	{
 		NewPos.x += SpawnOffsetBase.x;
 	}
-	NewPos.x -= (m_UnitWidth / 2); // Moving to the image's center
-	NewPos.y -= (m_UnitHeight / 2);
+	NewPos.x -= (m_UnitSize.x / 2.0f); // Moving to the image's center
+	NewPos.y -= (m_UnitSize.y / 2.0f);
 
 	D3DXVECTOR2 tBBSize = m_TypeData[EffectTypeID].GetBoundingBoxSize();
 	SBoundingBox tBB;
 	tBB.PositionOffset.x = static_cast<float>(-tBBSize.x) / 2.0f;
 	tBB.PositionOffset.y = static_cast<float>(-tBBSize.y) / 2.0f;
-	tBB.Size.x = m_UnitWidth + tBBSize.x;
-	tBB.Size.y = m_UnitHeight + tBBSize.y;
+	tBB.Size.x = m_UnitSize.x + tBBSize.x;
+	tBB.Size.y = m_UnitSize.y + tBBSize.y;
 	tBB.PositionOffset += NewPos;
 
 	int tRepeatCount = m_TypeData[EffectTypeID].GetRepeatCount();
@@ -216,9 +216,9 @@ void DX9Effect::Update()
 			NewPos.y -= SpawnOffset.y - MapOffset.y;
 
 			m_Vertices.push_back(SVertexImage(NewPos.x, NewPos.y, tUV.u1, tUV.v1));
-			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitWidth, NewPos.y, tUV.u2, tUV.v1));
-			m_Vertices.push_back(SVertexImage(NewPos.x, NewPos.y + m_UnitHeight, tUV.u1, tUV.v2));
-			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitWidth, NewPos.y + m_UnitHeight, tUV.u2, tUV.v2));
+			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitSize.x, NewPos.y, tUV.u2, tUV.v1));
+			m_Vertices.push_back(SVertexImage(NewPos.x, NewPos.y + m_UnitSize.y, tUV.u1, tUV.v2));
+			m_Vertices.push_back(SVertexImage(NewPos.x + m_UnitSize.x, NewPos.y + m_UnitSize.y, tUV.u2, tUV.v2));
 
 			int tIndicesCount = static_cast<int>(m_Indices.size());
 			m_Indices.push_back(SIndex3((tIndicesCount * 2), (tIndicesCount * 2) + 1, (tIndicesCount * 2) + 3));

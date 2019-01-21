@@ -109,8 +109,8 @@ namespace DX9ENGINE
 		const DX9Map* m_pMap;
 		int m_TextureAtlasCols;
 		int m_TextureAtlasRows;
-		int m_UnitWidth;
-		int m_UnitHeight;
+
+		D3DXVECTOR2 m_UnitSize;
 
 		VECTOR<EffectTypeData> m_TypeData;
 
