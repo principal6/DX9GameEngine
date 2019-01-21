@@ -139,8 +139,9 @@ void DX9Window::SetDirect3DParameters()
 	m_D3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	m_D3DPP.BackBufferFormat = D3DFMT_UNKNOWN;
 	m_D3DPP.hDeviceWindow = m_hWnd;
-	m_D3DPP.BackBufferWidth = m_WindowData.WindowWidth;
-	m_D3DPP.BackBufferHeight = m_WindowData.WindowHeight;
+
+	//m_D3DPP.BackBufferWidth = m_WindowData.WindowWidth;
+	//m_D3DPP.BackBufferHeight = m_WindowData.WindowHeight;
 }
 
 void DX9Window::Destroy()

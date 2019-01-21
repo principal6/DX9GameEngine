@@ -56,7 +56,7 @@ namespace DX9ENGINE
 
 #ifdef DX9MAPEDITOR
 		// @warning: SetSize() is used publicly only in Map Editor
-		virtual void DX9Image::SetSize(int Width, int Height);
+		virtual void DX9Image::SetSize(D3DXVECTOR2 Size);
 #endif
 
 		virtual void DX9Image::SetTexture(WSTRING FileName);
