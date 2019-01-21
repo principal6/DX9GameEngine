@@ -4,7 +4,7 @@
 
 namespace DX9ENGINE
 {
-	class DX9Line final : public DX9Common
+	class DX9Line final
 	{
 	private:
 		struct VertexLine

@@ -1,10 +1,14 @@
 #pragma once
 
 #include "DX9AnimUnit.h"
-#include "DX9Map.h"
 
 namespace DX9ENGINE
 {
+	// ***
+	// *** Forward declaration ***
+	class DX9Map;
+	// ***
+
 	class DX9Life : public DX9AnimUnit
 	{
 	protected:
@@ -19,7 +23,6 @@ namespace DX9ENGINE
 		bool m_bHitGround;
 
 	protected:
-		void DX9Life::SetMapPointer(DX9Map* pMap);
 		void DX9Life::CalculateGlobalPositionInverse();
 		void DX9Life::CalculateGlobalPosition();
 
@@ -27,8 +30,7 @@ namespace DX9ENGINE
 		DX9Life();
 		virtual ~DX9Life() {};
 
-		virtual auto DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error override;
-		virtual void DX9Life::Destroy() override;
+		virtual auto DX9Life::Create(DX9Base* pBase, WSTRING BaseDir)->Error override;
 
 		virtual auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life* = 0;
 
@@ -37,12 +39,12 @@ namespace DX9ENGINE
 		virtual auto DX9Life::GetVelocity() const->D3DXVECTOR2;
 		virtual auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2;
 
+		// Move
 		virtual void DX9Life::Accelerate(D3DXVECTOR2 Accel);
 		virtual void DX9Life::AddVelocity(D3DXVECTOR2 Vel);
 		virtual void DX9Life::SetVelocity(D3DXVECTOR2 Vel);
 		virtual void DX9Life::MoveWithVelocity();
 		virtual void DX9Life::MoveConst(D3DXVECTOR2 dXY);
-
 		virtual void DX9Life::Walk(AnimationDir Direction);
 		virtual void DX9Life::Jump();
 		virtual void DX9Life::Gravitate();

@@ -5,6 +5,11 @@
 
 namespace DX9ENGINE
 {
+	// ***
+	// *** Forward declaration ***
+	class DX9Base;
+	// ***
+
 	struct MapInfo
 	{
 		WSTRING MapName;
@@ -24,26 +29,25 @@ namespace DX9ENGINE
 		MapInfo() : MapRows(0), MapCols(0), TileSize(0) {};
 	};
 
+	struct MapData
+	{
+		int TileID;
+		int MoveID;
+
+		MapData() : TileID(0), MoveID(0) {};
+		MapData(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
+	};
+
+	enum class MapDirection
+	{
+		Up,
+		Down,
+		Left,
+		Right,
+	};
+
 	class DX9Map final : protected DX9Image
 	{
-	private:
-		struct MapData
-		{
-			int TileID;
-			int MoveID;
-
-			MapData() : TileID(0), MoveID(0) {};
-			MapData(int TILEID, int MOVEID) : TileID(TILEID), MoveID(MOVEID) {};
-		};
-
-		enum class Direction
-		{
-			Up,
-			Down,
-			Left,
-			Right,
-		};
-
 	private:
 		static const int MAX_LINE_LEN;
 		static const int MAX_TILEID_LEN;
@@ -92,14 +96,14 @@ namespace DX9ENGINE
 		void DX9Map::CreateVertexBufferMove(); // IndexBuffer is not needed because they are the same
 		void DX9Map::UpdateVertexBufferMove();
 
-		auto DX9Map::IsMovableTile(int MapID, Direction Direction) const->bool;
-		auto DX9Map::GetMapTileBoundary(int MapID, Direction Direction) const->float;
+		auto DX9Map::IsMovableTile(int MapID, MapDirection Direction) const->bool;
+		auto DX9Map::GetMapTileBoundary(int MapID, MapDirection Direction) const->float;
 
 	public:
 		DX9Map();
 		~DX9Map() {};
 
-		auto DX9Map::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error;
+		auto DX9Map::Create(DX9Base* pBase, WSTRING BaseDir)->Error;
 		void DX9Map::Destroy() override;
 
 		void DX9Map::CreateNewMap(MapInfo* Info);

@@ -33,17 +33,8 @@ void DX9Line::Destroy()
 	m_Vertices.clear();
 	m_Indices.clear();
 
-	if (m_pIB)
-	{
-		m_pIB->Release();
-		m_pIB = nullptr;
-	}
-		
-	if (m_pVB)
-	{
-		m_pVB->Release();
-		m_pVB = nullptr;
-	}
+	DX_RELEASE(m_pIB);
+	DX_RELEASE(m_pVB);
 }
 
 void DX9Line::AddLine(D3DXVECTOR2 StartPos, D3DXVECTOR2 Length, DWORD Color)

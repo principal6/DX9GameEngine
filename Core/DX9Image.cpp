@@ -1,4 +1,5 @@
 #include "DX9Image.h"
+#include "DX9Base.h"
 
 using namespace DX9ENGINE;
 
@@ -26,13 +27,14 @@ DX9Image::DX9Image()
 	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
-auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
+auto DX9Image::Create(DX9Base* pBase, WSTRING BaseDir)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
-	m_pDevice = pDevice;
-	ms_MainWindowData = refData;
+	m_pBase = pBase;
+	m_pDevice = pBase->GetDevice();
+	m_BaseDir = BaseDir;
 
 	ClearVertexAndIndexData();
 	CreateVertexBuffer();
@@ -49,26 +51,14 @@ auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
 
 void DX9Image::Destroy()
 {
+	m_pBase = nullptr;
 	m_pDevice = nullptr; // Just set to nullptr cuz it's newed in <DX9Base> class
+
 	ClearVertexAndIndexData();
 
-	if (m_pTexture)
-	{
-		m_pTexture->Release();
-		m_pTexture = nullptr;
-	}
-
-	if (m_pIndexBuffer)
-	{
-		m_pIndexBuffer->Release();
-		m_pIndexBuffer = nullptr;
-	}
-
-	if (m_pVertexBuffer)
-	{
-		m_pVertexBuffer->Release();
-		m_pVertexBuffer = nullptr;
-	}
+	DX_RELEASE(m_pTexture);
+	DX_RELEASE(m_pIndexBuffer);
+	DX_RELEASE(m_pVertexBuffer);
 }
 
 void DX9Image::ClearVertexAndIndexData()
@@ -212,7 +202,7 @@ void DX9Image::SetTexture(WSTRING FileName)
 	}
 
 	WSTRING NewFileName;
-	NewFileName = ms_MainWindowData.AppDir;
+	NewFileName = m_BaseDir;
 	NewFileName += ASSET_DIR;
 	NewFileName += FileName;
 

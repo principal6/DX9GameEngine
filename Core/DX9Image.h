@@ -5,42 +5,50 @@
 
 namespace DX9ENGINE
 {
-	class DX9Image : public DX9Common
+	// ***
+	// *** Forward declaration ***
+	class DX9Base;
+	// ***
+
+	struct VertexImage
 	{
-	protected:
-		struct VertexImage
-		{
-			FLOAT x, y, z, rhw;
-			DWORD color;
-			FLOAT u, v;
+		FLOAT x, y, z, rhw;
+		DWORD color;
+		FLOAT u, v;
 
-			VertexImage() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
-			VertexImage(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
-			VertexImage(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
-				x(_x), y(_y), z(_z), rhw(_rhw), color(_color), u(_u), v(_v) {};
-		};
+		VertexImage() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
+		VertexImage(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
+		VertexImage(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
+			x(_x), y(_y), z(_z), rhw(_rhw), color(_color), u(_u), v(_v) {};
+	};
 
-		struct Index3
-		{
-			WORD _0, _1, _2;
+	struct Index3
+	{
+		WORD _0, _1, _2;
 
-			Index3() : _0(0), _1(0), _2(0) {};
-			Index3(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
-		};
+		Index3() : _0(0), _1(0), _2(0) {};
+		Index3(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
+	};
 
-		struct BoundingBox
-		{
-			D3DXVECTOR2 PositionOffset;
-			D3DXVECTOR2 Size;
+	struct BoundingBox
+	{
+		D3DXVECTOR2 PositionOffset;
+		D3DXVECTOR2 Size;
 
-			BoundingBox() : PositionOffset(D3DXVECTOR2(0, 0)), Size(D3DXVECTOR2(0, 0)) {};
-			BoundingBox(D3DXVECTOR2 _POSOFFSET, D3DXVECTOR2 _SIZE) : PositionOffset(_POSOFFSET), Size(_SIZE) {};
-		};
+		BoundingBox() : PositionOffset(D3DXVECTOR2(0, 0)), Size(D3DXVECTOR2(0, 0)) {};
+		BoundingBox(D3DXVECTOR2 _POSOFFSET, D3DXVECTOR2 _SIZE) : PositionOffset(_POSOFFSET), Size(_SIZE) {};
+	};
 
+	class DX9Image
+	{
 	protected:
 		static const DWORD DEF_BOUNDINGBOX_COLOR;
 
+		DX9Base* m_pBase;
+		WSTRING m_BaseDir;
+
 		LPDIRECT3DDEVICE9 m_pDevice;
+
 		LPDIRECT3DVERTEXBUFFER9 m_pVertexBuffer;
 		LPDIRECT3DINDEXBUFFER9 m_pIndexBuffer;
 		LPDIRECT3DTEXTURE9 m_pTexture;
@@ -74,8 +82,8 @@ namespace DX9ENGINE
 		DX9Image();
 		virtual ~DX9Image() {};
 
-		virtual auto DX9Image::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error;
-		virtual void DX9Image::Destroy() override;
+		virtual auto DX9Image::Create(DX9Base* pBase, WSTRING BaseDir)->Error;
+		virtual void DX9Image::Destroy();
 
 		virtual void DX9Image::Draw();
 		virtual void DX9Image::DrawBoundingBox();

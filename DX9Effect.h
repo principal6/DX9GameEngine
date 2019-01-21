@@ -95,7 +95,7 @@ namespace DX9ENGINE
 		DX9Effect();
 		~DX9Effect() {};
 
-		auto DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
+		auto DX9Effect::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
 		void DX9Effect::Destroy() override;
 
 		auto DX9Effect::SetTextureAtlas(WSTRING FileName, int numCols, int numRows)->DX9Effect*;

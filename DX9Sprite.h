@@ -10,7 +10,7 @@ namespace DX9ENGINE
 		DX9Sprite() {};
 		~DX9Sprite() {};
 
-		auto DX9Sprite::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
+		auto DX9Sprite::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
 		auto DX9Sprite::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Sprite* override;
 
 		auto DX9Sprite::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Sprite* override;

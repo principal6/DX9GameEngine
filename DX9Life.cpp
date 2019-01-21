@@ -1,4 +1,6 @@
+#include "Core/DX9Base.h"
 #include "DX9Life.h"
+#include "DX9Map.h"
 
 using namespace DX9ENGINE;
 
@@ -15,38 +17,27 @@ DX9Life::DX9Life()
 	m_bHitGround = true;
 }
 
-auto DX9Life::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
+auto DX9Life::Create(DX9Base* pBase, WSTRING BaseDir)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
-	Error Result = DX9AnimUnit::Create(pDevice, refData);
+	Error Result = DX9AnimUnit::Create(pBase, BaseDir);
 	SetGlobalPosition(m_GlobalPos);
 
 	return Result;
 }
 
-void DX9Life::Destroy()
-{
-	DX9AnimUnit::Destroy();
-}
-
-void DX9Life::SetMapPointer(DX9Map* pMap)
-{
-	m_pMap = pMap;
-	int deb = 0;
-}
-
 void DX9Life::CalculateGlobalPositionInverse()
 {
 	m_GlobalPosInverse = m_GlobalPos;
-	m_GlobalPosInverse.y = ms_MainWindowData.WindowHeight - m_ScaledHeight - m_GlobalPos.y;
+	m_GlobalPosInverse.y = m_pBase->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPos.y;
 }
 
 void DX9Life::CalculateGlobalPosition()
 {
 	m_GlobalPos = m_GlobalPosInverse;
-	m_GlobalPos.y = ms_MainWindowData.WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
+	m_GlobalPos.y = m_pBase->GetWindowData()->WindowHeight - m_ScaledHeight - m_GlobalPosInverse.y;
 }
 
 auto DX9Life::GetGlobalPosition() const->D3DXVECTOR2
@@ -67,8 +58,8 @@ auto DX9Life::GetVelocity() const->D3DXVECTOR2
 auto DX9Life::GetOffsetForMapMove() const->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result;
-	Result.x = m_GlobalPos.x - ms_MainWindowData.WindowHalfWidth;
-	Result.y = m_GlobalPosInverse.y - ms_MainWindowData.WindowHalfHeight;
+	Result.x = m_GlobalPos.x - m_pBase->GetWindowData()->WindowHalfWidth;
+	Result.y = m_GlobalPosInverse.y - m_pBase->GetWindowData()->WindowHalfHeight;
 
 	if (Result.x < 0)
 		Result.x = 0;
@@ -101,11 +92,11 @@ void DX9Life::MoveWithVelocity()
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < ms_MainWindowData.WindowHalfWidth)
+	if (m_GlobalPosInverse.x < m_pBase->GetWindowData()->WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
-	if (m_GlobalPosInverse.y > ms_MainWindowData.WindowHalfHeight)
+	if (m_GlobalPosInverse.y > m_pBase->GetWindowData()->WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
@@ -120,24 +111,24 @@ void DX9Life::MoveConst(D3DXVECTOR2 dXY)
 
 	CalculateGlobalPositionInverse();
 
-	if (m_GlobalPosInverse.x < ms_MainWindowData.WindowHalfWidth)
+	if (m_GlobalPosInverse.x < m_pBase->GetWindowData()->WindowHalfWidth)
 	{
 		m_Position.x = m_GlobalPos.x;
 	}
 	else
 	{
-		if (m_Position.x != ms_MainWindowData.WindowHalfWidth)
-			m_Position.x = ms_MainWindowData.WindowHalfWidth;
+		if (m_Position.x != m_pBase->GetWindowData()->WindowHalfWidth)
+			m_Position.x = m_pBase->GetWindowData()->WindowHalfWidth;
 	}
 
-	if (m_GlobalPosInverse.y > ms_MainWindowData.WindowHalfHeight)
+	if (m_GlobalPosInverse.y > m_pBase->GetWindowData()->WindowHalfHeight)
 	{
 		m_Position.y = m_GlobalPosInverse.y;
 	}
 	else
 	{
-		if (m_Position.y != ms_MainWindowData.WindowHalfHeight)
-			m_Position.y = ms_MainWindowData.WindowHalfHeight;
+		if (m_Position.y != m_pBase->GetWindowData()->WindowHalfHeight)
+			m_Position.y = m_pBase->GetWindowData()->WindowHalfHeight;
 	}
 
 	SetPosition(m_Position);

@@ -1,3 +1,4 @@
+#include "DX9Map.h"
 #include "DX9Effect.h"
 
 using namespace DX9ENGINE;
@@ -11,23 +12,23 @@ DX9Effect::DX9Effect()
 	m_pLastInstance = nullptr;
 }	
 
-auto DX9Effect::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
+auto DX9Effect::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
 	if (pMap == nullptr)
 		return Error::MAP_NULL;
 
-	Error Result = DX9Image::Create(pDevice, refData);
+	Error Result = DX9Image::Create(pBase, BaseDir);
+	m_pMap = pMap;
+
 	DX9Image::ClearVertexAndIndexData();
 
 	CreateVertexBuffer();
 	CreateIndexBuffer();
 
 	m_BoundingBoxLine.CreateMax(m_pDevice);
-
-	m_pMap = pMap;
 
 	return Result;
 }
@@ -176,7 +177,7 @@ void DX9Effect::Update()
 		int tCurrFrame = iterator->GetCurrFrame();
 
 		FloatUV tUV;
-		DX9Common::ConvertFrameIDIntoUV(tCurrFrame, m_TextureAtlasCols, m_TextureAtlasRows, &tUV);
+		ConvertFrameIDIntoUV(tCurrFrame, m_TextureAtlasCols, m_TextureAtlasRows, &tUV);
 
 		int tCurrRepeatCount = iterator->GetCurrRepeatCount();
 		int tMaxRepeatCount = m_TypeData[tTypeDataID].GetRepeatCount();

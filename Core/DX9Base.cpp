@@ -4,7 +4,6 @@ using namespace DX9ENGINE;
 
 // Static member variable
 int DX9Base::ms_ChildWindowCount = 0;
-LPDIRECT3D9 DX9Base::ms_pD3D = nullptr;
 
 // Window procedure for Game Window
 LRESULT CALLBACK GameWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
@@ -25,16 +24,13 @@ LRESULT CALLBACK GameWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM l
 DX9Base::DX9Base()
 {
 	m_hWnd = nullptr;
-
 	m_pD3DDevice = nullptr;
 	m_BGColor = D3DCOLOR_XRGB(0, 0, 255);
 }
 
 auto DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->Error
 {
-	RGBInt rBGColor = RGBInt(255, 0, 255);
-
-	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, rBGColor, GameWindowProc)
+	if (CreateWND(L"Game", X, Y, Width, Height, WindowStyle::OverlappedWindow, m_BGColor, GameWindowProc)
 		== nullptr)
 		return Error::WINDOW_NOT_CREATED;
 
@@ -44,12 +40,9 @@ auto DX9Base::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->Error
 	return Error::OK;
 }
 
-auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt Color,
+auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, DWORD Color,
 	WNDPROC Proc, LPCWSTR MenuName)->Error
 {
-	m_CurrWindowWidth = Width;
-	m_CurrWindowHeight = Height;
-
 	if (CreateWND(L"Editor", X, Y, Width, Height, WindowStyle::OverlappedWindow, Color, Proc, MenuName)
 		== nullptr)
 		return Error::WINDOW_NOT_CREATED;
@@ -57,17 +50,15 @@ auto DX9Base::CreateParentWindow(CINT X, CINT Y, CINT Width, CINT Height, RGBInt
 	return Error::OK;
 
 }
-auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
-	RGBInt Color, WNDPROC Proc)->Error
-{
-	m_CurrWindowWidth = Width;
-	m_CurrWindowHeight = Height;
 
+auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CINT Height,
+	DWORD Color, WNDPROC Proc)->Error
+{
 	// Set DirectX clear color
-	m_BGColor = D3DCOLOR_XRGB(Color.Red, Color.Green, Color.Blue);
+	m_BGColor = Color;
 
 	WSTRING Name = L"EditorChild";
-	wchar_t temp[WindowData::MAX_FILE_LEN] {};
+	wchar_t temp[MAX_FILE_LEN] {};
 	_itow_s(ms_ChildWindowCount, temp, 10);
 	Name += temp;
 
@@ -85,31 +76,28 @@ auto DX9Base::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, CIN
 
 void DX9Base::Destroy()
 {
-	if (m_pD3DDevice != nullptr)
-	{
-		m_pD3DDevice->Release();
-		m_pD3DDevice = nullptr;
-	}	
-
-	if (ms_pD3D != nullptr)
-	{
-		ms_pD3D->Release();
-		ms_pD3D = nullptr;
-	}
+	DX_RELEASE(m_pD3DDevice);
+	DX_RELEASE(m_pD3D);
 }
 
 auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
-	WindowStyle WindowStyle, RGBInt BackColor, WNDPROC Proc, LPCWSTR MenuName, HWND hWndParent)->HWND
+	WindowStyle WindowStyle, DWORD BackColor, WNDPROC Proc, LPCWSTR MenuName, HWND hWndParent)->HWND
 {
-	ms_hInstance = GetModuleHandle(nullptr);
+	m_hInstance = GetModuleHandle(nullptr);
 	
+	// Set window data
+	m_WindowData.WindowWidth = Width;
+	m_WindowData.WindowHeight = Height;
+	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
+	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
+
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
 	r_WndClass.cbWndExtra = 0;
-	r_WndClass.hbrBackground = CreateSolidBrush(RGB(BackColor.Red, BackColor.Green, BackColor.Blue));
+	r_WndClass.hbrBackground = CreateSolidBrush(RGB(GetColorR(BackColor), GetColorG(BackColor), GetColorB(BackColor)));
 	r_WndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
 	r_WndClass.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-	r_WndClass.hInstance = ms_hInstance;
+	r_WndClass.hInstance = m_hInstance;
 	r_WndClass.lpfnWndProc = Proc;
 	r_WndClass.lpszClassName = Name;
 	r_WndClass.lpszMenuName = MenuName;
@@ -120,11 +108,11 @@ auto DX9Base::CreateWND(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT He
 	AdjustWindowRect(&rWndRect, (DWORD)WindowStyle, false);
 
 	m_hWnd = CreateWindow(Name, Name, (DWORD)WindowStyle, rWndRect.left, rWndRect.top,
-		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, hWndParent, (HMENU)nullptr, ms_hInstance, nullptr);
+		rWndRect.right - rWndRect.left, rWndRect.bottom - rWndRect.top, hWndParent, (HMENU)nullptr, m_hInstance, nullptr);
 
 	ShowWindow(m_hWnd, SW_SHOW);
 
-	UnregisterClass(Name, ms_hInstance);
+	UnregisterClass(Name, m_hInstance);
 	
 	return m_hWnd;
 }
@@ -136,7 +124,7 @@ void DX9Base::SetBackgroundColor(D3DCOLOR color)
 
 auto DX9Base::InitD3D()->int
 {
-	if (nullptr == (ms_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
+	if (nullptr == (m_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return -1;
 
 	D3DPRESENT_PARAMETERS D3DPP;
@@ -145,10 +133,10 @@ auto DX9Base::InitD3D()->int
 	D3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	D3DPP.BackBufferFormat = D3DFMT_UNKNOWN;
 	D3DPP.hDeviceWindow = m_hWnd;
-	D3DPP.BackBufferWidth = m_CurrWindowWidth;
-	D3DPP.BackBufferHeight = m_CurrWindowHeight;
+	D3DPP.BackBufferWidth = m_WindowData.WindowWidth;
+	D3DPP.BackBufferHeight = m_WindowData.WindowHeight;
 
-	if (FAILED(ms_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hWnd,
+	if (FAILED(m_pD3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, m_hWnd,
 		D3DCREATE_SOFTWARE_VERTEXPROCESSING, &D3DPP, &m_pD3DDevice)))
 	{
 		return -1;
@@ -189,6 +177,25 @@ auto DX9Base::GetDevice()->LPDIRECT3DDEVICE9 const
 	return m_pD3DDevice;
 }
 
+auto DX9Base::GethWnd()->HWND
+{
+	return m_hWnd;
+}
+
+auto DX9Base::GethInstance()->HINSTANCE
+{
+	return m_hInstance;
+}
+
+auto DX9Base::GetWindowData()->WindowData*
+{
+	return &m_WindowData;
+}
+
+
+//
+// Dialog functions
+//
 void DX9Base::SetDlgBase()
 {
 	ZeroMemory(&m_OFN, sizeof(m_OFN));

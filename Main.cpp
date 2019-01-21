@@ -21,32 +21,32 @@ int main()
 	g_Engine.SetBackground(L"colored_talltrees.png");
 	g_Engine.LoadMap(L"map01.jwm");
 	g_Engine.SpriteCreate(L"advnt_full.png", 16, 8, 1.5f)
-		->AddAnimation(DX9Common::AnimationID::Idle, 0, 0)
-		->AddAnimation(DX9Common::AnimationID::Walk, 1, 6)
-		->AddAnimation(DX9Common::AnimationID::Jumping, 23, 23)
-		->AddAnimation(DX9Common::AnimationID::Falling, 24, 24)
-		->AddAnimation(DX9Common::AnimationID::Landing, 25, 25)
-		->AddAnimation(DX9Common::AnimationID::Attack1, 39, 40) // Punch
-		->AddAnimation(DX9Common::AnimationID::Attack2, 36, 38) // HorzAttack
+		->AddAnimation(AnimationID::Idle, 0, 0)
+		->AddAnimation(AnimationID::Walk, 1, 6)
+		->AddAnimation(AnimationID::Jumping, 23, 23)
+		->AddAnimation(AnimationID::Falling, 24, 24)
+		->AddAnimation(AnimationID::Landing, 25, 25)
+		->AddAnimation(AnimationID::Attack1, 39, 40) // Punch
+		->AddAnimation(AnimationID::Attack2, 36, 38) // HorzAttack
 		->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f))
 		->SetBoundingBox(D3DXVECTOR2(-24, -24));
 
 	g_Engine.GetMonsterManagerObject()
 		->AddMonsterType(DX9MonsterType(L"Mage", L"mage-1-85x94.png", 4, 2, 200))
-		->AddAnimation(DX9Common::AnimationData(DX9Common::AnimationID::Idle, 0, 7));
+		->AddAnimation(AnimationData(AnimationID::Idle, 0, 7));
 
 	g_Engine.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 60.0f))
-		->SetAnimation(DX9Common::AnimationID::Idle);
+		->SetAnimation(AnimationID::Idle);
 	g_Engine.SpawnMonster(L"Mage", D3DXVECTOR2(400.0f, 300.0f))
-		->SetAnimation(DX9Common::AnimationID::Idle);
+		->SetAnimation(AnimationID::Idle);
 
 	g_Engine.GetEffectManagerObject()
 		->SetTextureAtlas(L"particlefx_14.png", 8, 8)
-		->AddEffectType(DX9Common::EffectType::Still, DX9Common::AnimationData(DX9Common::AnimationID::Effect, 0, 63),
+		->AddEffectType(EffectType::Still, AnimationData(AnimationID::Effect, 0, 63),
 			D3DXVECTOR2(80.0f, 0.0f), D3DXVECTOR2(0.0f, 0.0f), 15);
 
 	g_Engine.GetFontObject()
-		->MakeFont(DX9Common::FontID::Debug, L"굴림", 14, true);
+		->MakeFont(FontID::Debug, L"굴림", 14, true);
 
 	g_Engine.SetRenderFunction(Render);
 	g_Engine.SetKeyboardFunction(Keyboard);
@@ -59,7 +59,7 @@ int main()
 void Render()
 {
 	g_Engine.GetFontObject()
-		->SelectFont(DX9Common::FontID::Debug)
+		->SelectFont(FontID::Debug)
 		->SetFontColor(D3DCOLOR_ARGB(255, 0, 100, 50))
 		->Draw(0, 5, L"화살표 키: 이동, 점프 / Ctrl: 물리 공격 / Alt: 마법 공격")
 		->Draw(0, 25, L"B: 바운딩 박스 토글");
@@ -70,13 +70,13 @@ void Keyboard(DWORD Key)
 	switch (Key)
 	{
 	case DIK_RIGHTARROW:
-		g_Engine.SpriteWalk(DX9Common::AnimationDir::Right);
+		g_Engine.SpriteWalk(AnimationDir::Right);
 		break;
 	case DIK_LEFTARROW:
-		g_Engine.SpriteWalk(DX9Common::AnimationDir::Left);
+		g_Engine.SpriteWalk(AnimationDir::Left);
 		break;
 	case DIK_LCONTROL:
-		g_Engine.SpriteSetAnimation(DX9Common::AnimationID::Attack1);
+		g_Engine.SpriteSetAnimation(AnimationID::Attack1);
 		break;
 	case DIK_LALT:
 		g_Engine.SpawnEffect(0, 30);

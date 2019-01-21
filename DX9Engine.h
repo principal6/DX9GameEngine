@@ -14,7 +14,7 @@ namespace DX9ENGINE
 	using PF_RENDER = void(*)();
 	using PF_KEYBOARD = void(*)(DWORD DIK_KeyCode);
 
-	class DX9Engine final : DX9Common
+	class DX9Engine final
 	{
 	private:
 		static const int ANIM_TICK = 70;
@@ -45,10 +45,12 @@ namespace DX9ENGINE
 		DX9Effect* m_EffectManager;
 		DX9Font* m_FontManager;
 
+		WSTRING m_BaseDir;
+		HWND m_hMainWnd;
 		MSG m_MSG;
 
 	private:
-		void DX9Engine::Destroy() override;
+		void DX9Engine::Destroy();
 
 		void DX9Engine::DrawBackground();
 		void DX9Engine::DrawMap();

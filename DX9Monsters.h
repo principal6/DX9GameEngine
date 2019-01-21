@@ -7,8 +7,7 @@ namespace DX9ENGINE
 	/*-----------------------------------------------------------------------------
 		DX9MonsterType Class
 	-----------------------------------------------------------------------------*/
-
-	class DX9MonsterType final : protected DX9Common
+	class DX9MonsterType final
 	{
 	public:
 		WSTRING m_Name;
@@ -21,18 +20,16 @@ namespace DX9ENGINE
 	public:
 		DX9MonsterType() {};
 		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP) :
-			m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols), m_TextureNumRows(TextureNumRows),
-			m_HPMax(HP) {};
+			m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols),
+			m_TextureNumRows(TextureNumRows), m_HPMax(HP) {};
 		~DX9MonsterType() {};
 
 		auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*;
-		void DX9MonsterType::Destroy() override;
 	};
 
 	/*-----------------------------------------------------------------------------
 		DX9Monster Class
 	-----------------------------------------------------------------------------*/
-
 	class DX9Monster final : public DX9Life
 	{
 	private:
@@ -53,7 +50,7 @@ namespace DX9ENGINE
 		DX9Monster();
 		~DX9Monster() {};
 
-		auto DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
+		auto DX9Monster::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
 		void DX9Monster::Destroy() override;
 
 		void DX9Monster::SetMonsterType(DX9MonsterType Type);
@@ -67,11 +64,13 @@ namespace DX9ENGINE
 		DX9MonsterManager Class
 	-----------------------------------------------------------------------------*/
 
-	class DX9MonsterManager final : public DX9Common
+	class DX9MonsterManager final
 	{
 	private:
 		static LPDIRECT3DDEVICE9 m_pDevice;
+		DX9Base* m_pBase;
 		DX9Map* m_pMap;
+		WSTRING m_BaseDir;
 
 		VECTOR<DX9MonsterType> m_Types;
 		VECTOR<DX9Monster> m_Instances;
@@ -80,7 +79,7 @@ namespace DX9ENGINE
 		DX9MonsterManager() {};
 		~DX9MonsterManager() {};
 
-		auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error;
+		auto DX9MonsterManager::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error;
 		void DX9MonsterManager::Destroy();
 
 		auto DX9MonsterManager::AddMonsterType(DX9MonsterType Value)->DX9MonsterType*;

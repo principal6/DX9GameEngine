@@ -1,4 +1,5 @@
 #include "DX9AnimUnit.h"
+#include "Core/DX9Base.h"
 
 using namespace DX9ENGINE;
 
@@ -16,19 +17,6 @@ DX9AnimUnit::DX9AnimUnit()
 
 	m_UnitWidth = 0;
 	m_UnitHeight = 0;
-}
-
-auto DX9AnimUnit::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData)->Error
-{
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
-
-	return DX9Image::Create(pDevice, refData);
-}
-
-void DX9AnimUnit::Destroy()
-{
-	DX9Image::Destroy();
 }
 
 auto DX9AnimUnit::MakeUnit(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9AnimUnit*
@@ -62,23 +50,13 @@ void DX9AnimUnit::SetTexture(WSTRING FileName)
 	DX9Image::SetTexture(FileName);
 }
 
-void DX9AnimUnit::SetScale(D3DXVECTOR2 Scale)
-{
-	DX9Image::SetScale(Scale);
-}
-
-void DX9AnimUnit::SetAlpha(int Alpha)
-{
-	DX9Image::SetAlpha(Alpha);
-}
-
 void DX9AnimUnit::SetFrame(int FrameID)
 {
 	if ((m_NumRows == 0) || (m_NumCols == 0))
 		return;
 	
 	FloatUV tUV;
-	DX9Common::ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
+	ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
 
 	switch (m_AnimDir)
 	{
@@ -95,7 +73,7 @@ void DX9AnimUnit::SetFrame(int FrameID)
 
 auto DX9AnimUnit::AddAnimation(AnimationID AnimID, int StartFrame, int EndFrame)->DX9AnimUnit*
 {
-	m_AnimData.push_back(DX9Common::AnimationData(AnimID, StartFrame, EndFrame));
+	m_AnimData.push_back(AnimationData(AnimID, StartFrame, EndFrame));
 
 	return this;
 }
@@ -139,12 +117,6 @@ void DX9AnimUnit::SetDirection(AnimationDir Direction)
 	m_AnimDir = Direction;
 }
 
-auto DX9AnimUnit::SetBoundingBox(D3DXVECTOR2 Size)->DX9AnimUnit*
-{
-	DX9Image::SetBoundingBox(Size);
-	return this;
-}
-
 void DX9AnimUnit::SetPosition(D3DXVECTOR2 Pos)
 {
 	DX9Image::SetPosition(Pos);
@@ -173,24 +145,4 @@ auto DX9AnimUnit::GetScaledUnitHeight() const->int
 auto DX9AnimUnit::GetDirection() const->AnimationDir
 {
 	return m_AnimDir;
-}
-
-auto DX9AnimUnit::GetCenterPosition() const->D3DXVECTOR2
-{
-	return DX9Image::GetCenterPosition();
-}
-
-auto DX9AnimUnit::GetBoundingBox() const->BoundingBox
-{
-	return DX9Image::GetBoundingBox();
-}
-
-void DX9AnimUnit::Draw()
-{
-	DX9Image::Draw();
-}
-
-void DX9AnimUnit::DrawBoundingBox()
-{
-	DX9Image::DrawBoundingBox();
 }

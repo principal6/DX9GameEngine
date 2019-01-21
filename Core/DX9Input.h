@@ -10,9 +10,11 @@
 
 namespace DX9ENGINE
 {
-	class DX9Input final : protected DX9Common
+	class DX9Input final
 	{
 	private:
+		HWND m_hWnd;
+
 		LPDIRECTINPUT8 m_DI8;
 		LPDIRECTINPUTDEVICE8 m_DIDevKeyboard;
 		LPDIRECTINPUTDEVICE8 m_DIDevMouse;
@@ -37,8 +39,8 @@ namespace DX9ENGINE
 		DX9Input();
 		~DX9Input() {};
 
-		auto DX9Input::Create(HWND hWnd)->Error;
-		void DX9Input::Destroy() override;
+		auto DX9Input::Create(HWND hWnd, HINSTANCE hInstance)->Error;
+		void DX9Input::Destroy();
 
 		auto DX9Input::OnKeyDown(DWORD DIK_KeyCode)->bool;
 		auto DX9Input::OnKeyUp(DWORD DIK_KeyCode)->bool;

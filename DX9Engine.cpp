@@ -20,6 +20,11 @@ DX9Engine::DX9Engine()
 
 auto DX9Engine::Create(int Width, int Height)->Error
 {
+	// Set base directory
+	wchar_t tempDir[MAX_FILE_LEN]{};
+	GetCurrentDirectoryW(255, tempDir);
+	m_BaseDir = tempDir;
+
 	// Create base (window and initialize Direct3D9)
 	if (m_Base = new DX9Base)
 	{
@@ -27,63 +32,56 @@ auto DX9Engine::Create(int Width, int Height)->Error
 			return Error::BASE_NOT_CREATED;
 
 		// Set main window handle
-		m_hWnd = m_Base->GethWnd();
+		m_hMainWnd = m_Base->GethWnd();
 	}
 
 	// Create input device
 	if (m_Input = new DX9Input)
 	{
 		// Pass main window's handle to DX9Input
-		if (DX_FAILED(m_Input->Create(m_hWnd)))
+		if (DX_FAILED(m_Input->Create(m_Base->GethWnd(), m_Base->GethInstance())))
 			return Error::INPUT_NOT_CREATED;
 	}
 
 	// Create font manager object
 	if (m_FontManager = new DX9Font)
 	{
-		if (DX_FAILED(m_FontManager->Create(m_Base->GetDevice())))
+		if (DX_FAILED(m_FontManager->Create(m_Base)))
 			return Error::FONTMANAGER_NOT_CREATED;
 	}
-
-	// Set data that will be shared in many sub-classes
-	ms_MainWindowData.WindowWidth = Width;
-	ms_MainWindowData.WindowHeight = Height;
-	ms_MainWindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
-	ms_MainWindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
-	GetCurrentDirectoryW(255, ms_MainWindowData.AppDir);
 
 	// Create image object
 	if (m_Background = new DX9Background)
 	{
-		if (DX_FAILED(m_Background->Create(m_Base->GetDevice(), ms_MainWindowData)))
+		if (DX_FAILED(m_Background->Create(m_Base, m_BaseDir)))
 			return Error::IMAGE_NOT_CREATED;
 	}
 	
 	// Create map object
 	if (m_Map = new DX9Map)
 	{
-		if (DX_FAILED(m_Map->Create(m_Base->GetDevice(), ms_MainWindowData)))
+		if (DX_FAILED(m_Map->Create(m_Base, m_BaseDir)))
 			return Error::MAP_NOT_CREATED;
 	}
 	
 	// Create sprite object
 	if (m_Sprite = new DX9Sprite())
 	{
-		if (DX_FAILED(m_Sprite->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
+		if (DX_FAILED(m_Sprite->Create(m_Base, m_BaseDir, m_Map)))
 			return Error::SPRITE_NOT_CREATED;
 	}
 
 	// Create monster manager object
 	if (m_MonsterManager = new DX9MonsterManager())
 	{
-		if (DX_FAILED(m_MonsterManager->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
+		if (DX_FAILED(m_MonsterManager->Create(m_Base, m_BaseDir, m_Map)))
 			return Error::MONSTERMANAGER_NOT_CREATED;
 	}
 
 	// Create effect manager object
 	if (m_EffectManager = new DX9Effect)
 	{
-		if (DX_FAILED(m_EffectManager->Create(m_Base->GetDevice(), ms_MainWindowData, m_Map)))
+		if (DX_FAILED(m_EffectManager->Create(m_Base, m_BaseDir, m_Map)))
 			return Error::EFFECTMANAGER_NOT_CREATED;
 	}
 
@@ -136,26 +134,14 @@ void DX9Engine::Run()
 		}
 	}
 
-	/*
-	while (GetMessage(&m_MSG, 0, 0, 0)) {
-		if (!TranslateAccelerator(m_hWnd, hAccel, &m_MSG)) {
-			TranslateMessage(&m_MSG);
-			DispatchMessage(&m_MSG);
-
-			MainLoop();
-		}
-	}
-	return static_cast<int>(m_MSG.wParam);
-	*/
-
 	Destroy();
 }
 
 void DX9Engine::Shutdown()
 {
-	if (m_hWnd)
+	if (m_hMainWnd)
 	{
-		DestroyWindow(m_hWnd);
+		DestroyWindow(m_hMainWnd);
 	}
 }
 

@@ -16,7 +16,7 @@ DX9Input::DX9Input()
 	m_MouseY = 0;
 }
 
-auto DX9Input::Create(HWND hWnd)->Error
+auto DX9Input::Create(HWND hWnd, HINSTANCE hInstance)->Error
 {
 	m_hWnd = hWnd;
 
@@ -24,7 +24,7 @@ auto DX9Input::Create(HWND hWnd)->Error
 	memset(m_MouseBtnUp, false, sizeof(m_MouseBtnUp));
 	memset(m_MouseBtnIdle, true, sizeof(m_MouseBtnIdle));
 
-	if(FAILED(DirectInput8Create(DX9Common::ms_hInstance, DIRECTINPUT_VERSION,
+	if(FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION,
 		IID_IDirectInput8, (void **) &m_DI8, nullptr)))
 		return Error::OBJECT_NOT_CREATED;
 

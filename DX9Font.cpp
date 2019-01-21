@@ -1,3 +1,4 @@
+#include "Core/DX9Base.h"
 #include "DX9Font.h"
 
 using namespace DX9ENGINE;
@@ -11,12 +12,13 @@ DX9Font::DX9Font()
 	m_FontColor = 0xFF000000;
 }
 
-auto DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)->Error
+auto DX9Font::Create(DX9Base* pBase)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
-	m_pDevice = pDevice;
+	m_pBase = pBase;
+	m_pDevice = m_pBase->GetDevice();
 
 	return Error::OK;
 }
@@ -73,7 +75,7 @@ auto DX9Font::SetFontColor(DWORD Color)->DX9Font*
 auto DX9Font::Draw(int X, int Y, WSTRING String)->DX9Font*
 {
 	RECT Rect_Font;
-	SetRect(&Rect_Font, X, Y, ms_MainWindowData.WindowWidth, ms_MainWindowData.WindowHeight);
+	SetRect(&Rect_Font, X, Y, m_pBase->GetWindowData()->WindowWidth, m_pBase->GetWindowData()->WindowHeight);
 	m_Fonts[m_CurrFontInstanceID].pFont->DrawText(nullptr, String.c_str(), -1, &Rect_Font, DT_LEFT|DT_NOCLIP, m_FontColor);
 	return this;
 }

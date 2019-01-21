@@ -2,7 +2,12 @@
 
 namespace DX9ENGINE
 {
-	class DX9Font final : protected DX9Common
+	// ***
+	// *** Forward declaration ***
+	class DX9Base;
+	// ***
+
+	class DX9Font final
 	{
 	private:
 		struct FontInstance
@@ -16,6 +21,7 @@ namespace DX9ENGINE
 
 	private:
 		static LPDIRECT3DDEVICE9 m_pDevice;
+		DX9Base* m_pBase;
 
 		VECTOR<FontInstance> m_Fonts;
 
@@ -26,7 +32,7 @@ namespace DX9ENGINE
 		DX9Font();
 		~DX9Font() {};
 
-		auto DX9Font::Create(LPDIRECT3DDEVICE9 pDevice)->Error;
+		auto DX9Font::Create(DX9Base* pBase)->Error;
 		void DX9Font::Destroy();
 
 		void DX9Font::MakeFont(FontID ID, WSTRING FontName, int FontSize, bool IsBold);

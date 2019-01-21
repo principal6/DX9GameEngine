@@ -171,7 +171,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\DX9Base.cpp" />
-    <ClCompile Include="Core\DX9Common.cpp" />
     <ClCompile Include="Core\DX9Image.cpp" />
     <ClCompile Include="Core\DX9Input.cpp" />
     <ClCompile Include="Core\DX9Line.cpp" />

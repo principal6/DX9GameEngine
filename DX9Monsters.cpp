@@ -1,3 +1,5 @@
+#include "Core/DX9Base.h"
+#include "DX9Map.h"
 #include "DX9Monsters.h"
 
 using namespace DX9ENGINE;
@@ -10,11 +12,6 @@ auto DX9MonsterType::AddAnimation(AnimationData Value)->DX9MonsterType*
 {
 	m_AnimData.push_back(Value);
 	return this;
-}
-
-void DX9MonsterType::Destroy()
-{
-	m_AnimData.clear();
 }
 
 /*-----------------------------------------------------------------------------
@@ -32,23 +29,23 @@ DX9Monster::DX9Monster()
 	m_HPBar = nullptr;
 }
 
-auto DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
+auto DX9Monster::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
 	if (pMap == nullptr)
 		return Error::MAP_NULL;
 
-	Error Result = DX9Life::Create(pDevice, refData);
-	DX9Life::SetMapPointer(pMap);
+	Error Result = DX9Life::Create(pBase, BaseDir);
+	m_pMap = pMap;
 
 	m_HPFrame = new DX9Image;
-	m_HPFrame->Create(pDevice, refData);
+	m_HPFrame->Create(pBase, BaseDir);
 	m_HPFrame->SetTexture(L"hpbarbg.png");
 
 	m_HPBar = new DX9Image;
-	m_HPBar->Create(pDevice, refData);
+	m_HPBar->Create(pBase, BaseDir);
 	m_HPBar->SetTexture(L"hpbar.png");
 
 	m_bUILoaded = true;
@@ -58,19 +55,8 @@ auto DX9Monster::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* 
 
 void DX9Monster::Destroy()
 {
-	if (m_HPFrame)
-	{
-		m_HPFrame->Destroy();
-		delete m_HPFrame;
-	}
-
-	if (m_HPBar)
-	{
-		m_HPBar->Destroy();
-		delete m_HPBar;
-	}
-
-	DX9Life::Destroy();
+	DX_DESTROY(m_HPFrame);
+	DX_DESTROY(m_HPBar);
 }
 
 void DX9Monster::SetUIPosition(D3DXVECTOR2 Position)
@@ -152,16 +138,17 @@ void DX9Monster::Draw()
 // Static member variable declaration
 LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 
-auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, DX9Map* pMap)->Error
+auto DX9MonsterManager::Create(DX9Base* pBase, WSTRING BaseDir, DX9Map* pMap)->Error
 {
-	if (pDevice == nullptr)
-		return Error::DEVICE_NULL;
+	if (pBase == nullptr)
+		return Error::BASE_NULL;
 
 	if (pMap == nullptr)
 		return Error::MAP_NULL;
 
-	m_pDevice = pDevice;
-	ms_MainWindowData = refData;
+	m_pBase = pBase;
+	m_pDevice = pBase->GetDevice();
+	m_BaseDir = BaseDir;
 	m_pMap = pMap;
 
 	return Error::OK;
@@ -169,6 +156,7 @@ auto DX9MonsterManager::Create(LPDIRECT3DDEVICE9 pDevice, WindowData& refData, D
 
 void DX9MonsterManager::Destroy()
 {
+	m_pBase = nullptr;
 	m_pDevice = nullptr;
 	m_pMap = nullptr;
 
@@ -191,11 +179,11 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 		if (TypeIterator.m_Name == MonsterName)
 		{
 			DX9Monster Temp;
-			Temp.Create(m_pDevice, ms_MainWindowData, m_pMap);
+			Temp.Create(m_pBase, m_BaseDir, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
 			Temp.MakeUnit(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
 
-			for (DX9Common::AnimationData& AnimIterator : TypeIterator.m_AnimData)
+			for (AnimationData& AnimIterator : TypeIterator.m_AnimData)
 			{
 				Temp.AddAnimation(AnimIterator.AnimID, AnimIterator.FrameS, AnimIterator.FrameE);
 			}
