@@ -7,7 +7,6 @@ using namespace DX9ENGINE;
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowParent;
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowLeft;
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowRight;
-RECT DX9MapEditor::ms_TempRect;
 SMapInfo DX9MapEditor::ms_MapInfo;
 UNIQUE_PTR<DX9Image> DX9MapEditor::ms_TileImage;
 UNIQUE_PTR<DX9Image> DX9MapEditor::ms_MoveImage;
@@ -31,7 +30,18 @@ auto DX9ENGINE::GetRightChildPositionAndSizeFromParent(RECT Rect)->RECT
 	return Result;
 }
 
-void DX9MapEditor::UpdateMapEditorCaption()
+STATIC void DX9MapEditor::LoadTileImages()
+{
+	ms_Map->GetMapInfo(&ms_MapInfo);
+
+	ms_TileImage->SetTexture(ms_MapInfo.TileSheetName);
+	ms_MoveImage->SetTexture(ms_MapInfo.MoveSheetName);
+	ms_MapTileSelector->SetMapInfo(&ms_MapInfo);
+
+	ms_MapBG->SetSize(ms_MapInfo.MapSize);
+}
+
+STATIC void DX9MapEditor::UpdateMapEditorCaption()
 {
 	WSTRING tempCaption = MAP_EDITOR_NAME;
 
@@ -58,23 +68,14 @@ void DX9MapEditor::UpdateMapEditorCaption()
 		tempCaption += L" / ";
 		tempCaption += ConvertIntToWSTRING(ms_MapTileSelector->GetMapSelectorPositionInCells().y);
 	}
-	
+
 	ms_WindowParent->SetWindowCaption(tempCaption);
-}
-
-void DX9MapEditor::LoadTileImages()
-{
-	ms_Map->GetMapInfo(&ms_MapInfo);
-
-	ms_TileImage->SetTexture(ms_MapInfo.TileSheetName);
-	ms_MoveImage->SetTexture(ms_MapInfo.MoveSheetName);
-	ms_MapTileSelector->SetMapInfo(&ms_MapInfo);
-
-	ms_MapBG->SetSize(ms_MapInfo.MapSize);
 }
 
 LRESULT CALLBACK DX9ENGINE::ParentWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
+	RECT tempRect{ 0, 0, 0, 0 };
+
 	switch (Message)
 	{
 	case WM_COMMAND:
@@ -135,16 +136,16 @@ LRESULT CALLBACK DX9ENGINE::ParentWindowProc(HWND hWnd, UINT Message, WPARAM wPa
 		if (DX9MapEditor::ms_WindowLeft && DX9MapEditor::ms_WindowRight)
 		{
 			// Resize ms_WindowLeft and its correspondent window
-			GetClientRect(hWnd, &DX9MapEditor::ms_TempRect);
-			DX9MapEditor::ms_TempRect = GetLeftChildPositionAndSizeFromParent(DX9MapEditor::ms_TempRect);
-			MoveWindow(DX9MapEditor::ms_WindowLeft->GethWnd(), DX9MapEditor::ms_TempRect.left, DX9MapEditor::ms_TempRect.top,
-				DX9MapEditor::ms_TempRect.right, DX9MapEditor::ms_TempRect.bottom, TRUE);
+			GetClientRect(hWnd, &tempRect);
+			tempRect = GetLeftChildPositionAndSizeFromParent(tempRect);
+			MoveWindow(DX9MapEditor::ms_WindowLeft->GethWnd(), tempRect.left, tempRect.top,
+				tempRect.right, tempRect.bottom, TRUE);
 
 			// Resize ms_WindowRight and its correspondent window
-			GetClientRect(hWnd, &DX9MapEditor::ms_TempRect);
-			DX9MapEditor::ms_TempRect = GetRightChildPositionAndSizeFromParent(DX9MapEditor::ms_TempRect);
-			MoveWindow(DX9MapEditor::ms_WindowRight->GethWnd(), DX9MapEditor::ms_TempRect.left, DX9MapEditor::ms_TempRect.top,
-				DX9MapEditor::ms_TempRect.right, DX9MapEditor::ms_TempRect.bottom, TRUE);
+			GetClientRect(hWnd, &tempRect);
+			tempRect = GetRightChildPositionAndSizeFromParent(tempRect);
+			MoveWindow(DX9MapEditor::ms_WindowRight->GethWnd(), tempRect.left, tempRect.top,
+				tempRect.right, tempRect.bottom, TRUE);
 
 			if (DX9MapEditor::ms_WindowLeft->GetDevice() && DX9MapEditor::ms_WindowRight->GetDevice())
 			{
@@ -312,10 +313,12 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 	// Create left child base and initialize Direct3D9
 	if (ms_WindowLeft = MAKE_UNIQUE(DX9Window)())
 	{
+		RECT tempRect;
+
 		// Get main window RECT
-		GetClientRect(m_hWndMain, &ms_TempRect);
-		ms_TempRect = GetLeftChildPositionAndSizeFromParent(ms_TempRect);
-		if (DX_FAILED(ms_WindowLeft->CreateChildWindow(m_hWndMain, ms_TempRect.left, ms_TempRect.top, ms_TempRect.right, ms_TempRect.bottom,
+		GetClientRect(m_hWndMain, &tempRect);
+		tempRect = GetLeftChildPositionAndSizeFromParent(tempRect);
+		if (DX_FAILED(ms_WindowLeft->CreateChildWindow(m_hWndMain, tempRect.left, tempRect.top, tempRect.right, tempRect.bottom,
 			D3DCOLOR_XRGB(160, 160, 160), LeftChildWindowProc)))
 			return EError::WINDOW_NOT_CREATED;
 	}
@@ -335,10 +338,12 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 	// Create right child base and initialize Direct3D9
 	if (ms_WindowRight = MAKE_UNIQUE(DX9Window)())
 	{
+		RECT tempRect;
+
 		// Get main window RECT
-		GetClientRect(m_hWndMain, &ms_TempRect);
-		ms_TempRect = GetRightChildPositionAndSizeFromParent(ms_TempRect);
-		if (DX_FAILED(ms_WindowRight->CreateChildWindow(m_hWndMain, ms_TempRect.left, ms_TempRect.top, ms_TempRect.right, ms_TempRect.bottom,
+		GetClientRect(m_hWndMain, &tempRect);
+		tempRect = GetRightChildPositionAndSizeFromParent(tempRect);
+		if (DX_FAILED(ms_WindowRight->CreateChildWindow(m_hWndMain, tempRect.left, tempRect.top, tempRect.right, tempRect.bottom,
 			D3DCOLOR_XRGB(200, 200, 200), RightChildWindowProc)))
 			return EError::WINDOW_NOT_CREATED;
 	}
@@ -370,21 +375,6 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 
 void DX9MapEditor::Run()
 {
-	/*
-	while (m_MSG.message != WM_QUIT)
-	{
-		if (PeekMessage(&m_MSG, nullptr, 0U, 0U, PM_REMOVE))
-		{
-			TranslateMessage(&m_MSG);
-			DispatchMessage(&m_MSG);
-		}
-		else
-		{
-			MainLoop();
-		}
-	}
-	*/
-
 	while (GetMessage(&m_MSG, nullptr, 0, 0))
 	{
 		if (!TranslateAccelerator(m_hWndMain, m_hAccel, &m_MSG))
@@ -396,12 +386,10 @@ void DX9MapEditor::Run()
 		}
 	}
 
-	//return static_cast<int>(m_MSG.wParam);
-
 	Destroy();
 }
 
-void DX9MapEditor::MainLoop()
+PRIVATE void DX9MapEditor::MainLoop()
 {
 	ms_WindowLeft->BeginRender();
 	ms_WindowRight->BeginRender();
@@ -434,7 +422,7 @@ void DX9MapEditor::MainLoop()
 	ms_WindowRight->EndRender();
 }
 
-void DX9MapEditor::Destroy()
+PRIVATE void DX9MapEditor::Destroy()
 {
 	DX_DESTROY_SMART(ms_Map);
 	DX_DESTROY_SMART(ms_MapTileSelector);

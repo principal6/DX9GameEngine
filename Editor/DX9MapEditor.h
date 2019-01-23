@@ -24,7 +24,6 @@ namespace DX9ENGINE
 		static UNIQUE_PTR<DX9Window> ms_WindowParent;
 		static UNIQUE_PTR<DX9Window> ms_WindowLeft;
 		static UNIQUE_PTR<DX9Window> ms_WindowRight;
-		static RECT ms_TempRect;
 		static SMapInfo ms_MapInfo;
 
 		// For left child window
@@ -47,9 +46,11 @@ namespace DX9ENGINE
 	private:
 		void DX9MapEditor::Destroy();
 
+		void DX9MapEditor::MainLoop();
+
 		static void LoadTileImages();
 		static void UpdateMapEditorCaption();
-
+		
 		friend auto GetLeftChildPositionAndSizeFromParent(RECT Rect)->RECT;
 		friend auto GetRightChildPositionAndSizeFromParent(RECT Rect)->RECT;
 		friend LRESULT CALLBACK ParentWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam);
@@ -64,7 +65,5 @@ namespace DX9ENGINE
 		auto DX9MapEditor::Create(int Width, int Height)->EError;
 
 		void DX9MapEditor::Run();
-
-		void DX9MapEditor::MainLoop();
 	};
 };

@@ -32,9 +32,11 @@
 	#define MAKE_SHARED(T) std::make_shared<T>
 #endif
 
-// To distinguish protected functions from others in cpp files
+// Static function
+#define STATIC
+// Protected method
 #define PROTECTED
-// To distinguish private functions from others in cpp files
+// Private method
 #define PRIVATE
 
 namespace DX9ENGINE
