@@ -337,7 +337,7 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 	wchar_t tempDir[MAX_FILE_LEN]{};
 	GetCurrentDirectoryW(MAX_FILE_LEN, tempDir);
 	m_BaseDir = tempDir;
-	m_BaseDir = m_BaseDir.substr(0, m_BaseDir.find_last_not_of(PROJECT_FOLDER));
+	m_BaseDir = m_BaseDir.substr(0, m_BaseDir.find(PROJECT_FOLDER));
 
 	// Create parent window
 	if (ms_WindowParent = MAKE_UNIQUE(DX9Window)())

@@ -24,7 +24,9 @@ auto DX9Game::Create(int Width, int Height)->EError
 	wchar_t tempDir[MAX_FILE_LEN]{};
 	GetCurrentDirectoryW(MAX_FILE_LEN, tempDir);
 	m_BaseDir = tempDir;
-	m_BaseDir = m_BaseDir.substr(0, m_BaseDir.find_last_not_of(PROJECT_FOLDER));
+	m_BaseDir = m_BaseDir.substr(0, m_BaseDir.find(PROJECT_FOLDER));
+
+	std::wcout << m_BaseDir.c_str() << std::endl;
 
 	// Create base (window and initialize Direct3D9)
 	if (m_Window = MAKE_UNIQUE(DX9Window)())
@@ -189,6 +191,7 @@ void DX9Game::MainLoop()
 
 	if ((m_EffectManager) && (m_MonsterManager))
 	{
+		// TODO: collision with multiple monsters needed
 		m_EffectManager->CheckCollisionWithMonsters(m_MonsterManager.get());
 	}
 

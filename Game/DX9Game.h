@@ -14,7 +14,7 @@ namespace DX9ENGINE
 	using PF_RENDER = void(*)();
 	using PF_KEYBOARD = void(*)(DWORD DIK_KeyCode);
 
-	static const wchar_t PROJECT_FOLDER[]{ L"Game" };
+	static const wchar_t PROJECT_FOLDER[]{ L"\\Game" };
 
 	class DX9Game final
 	{
