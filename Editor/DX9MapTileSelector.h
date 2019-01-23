@@ -21,9 +21,10 @@ namespace DX9ENGINE
 		auto Create(DX9Window* pTileSelectorWindow, DX9Window* pMapWindow, WSTRING BaseDir)->EError;
 		void Destroy();
 
-		void UpdateTileSelector(SMouseData* MouseData);
-		void UpdateMapSelector(SMouseData* MouseData);
+		void UpdateTileSelector();
+		void UpdateMapSelector();
 		void UpdateMapMode(EMapMode Mode);
+		void UpdateOffset();
 		void Draw();
 
 		auto SetMapInfo(SMapInfo* pInfo)->EError;
@@ -41,10 +42,16 @@ namespace DX9ENGINE
 		static const wchar_t* SEL_FN;
 
 		SMapInfo* m_pMapInfo;
-		POINT m_TileSelectorPositionInCells;
-		POINT m_SelectionSize;
+		DX9Window* m_pTileSelectorWindow;
+		DX9Window* m_pMapWIndow;
+
 		UNIQUE_PTR<DX9Image> m_TileSelector;
 		UNIQUE_PTR<DX9Image> m_MapSelector;
+
+		POINT m_SelectionSize;
+		POINT m_TileSelectorOffset;
+		POINT m_TileSelectorPositionInCells;
+		POINT m_MapSelectorOffset;
 		POINT m_MapSelectorPositionInCells;
 	};
 };

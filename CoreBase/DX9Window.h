@@ -66,18 +66,27 @@ namespace DX9ENGINE
 			DWORD Color, WNDPROC Proc)->EError;
 		void DX9Window::Destroy();
 
+		// Scrollbars
+		void DX9Window::UseVerticalScrollbar();
+		void DX9Window::UseHorizontalScrollbar();
+		void DX9Window::SetVerticalScrollbarRange(int Max);
+		void DX9Window::SetHorizontalScrollbarRange(int Max);
+		auto DX9Window::GetVerticalScrollbarPosition()->int;
+		auto DX9Window::GetHorizontalScrollbarPosition()->int;
+
 		void DX9Window::SetWindowCaption(WSTRING Caption);
 		void DX9Window::SetBackgroundColor(D3DCOLOR color);
-		void DX9Window::Resize();
+		void DX9Window::Resize(RECT Rect);
 
 		void DX9Window::BeginRender() const;
 		void DX9Window::EndRender() const;
 
-		auto DX9Window::GetDevice()->LPDIRECT3DDEVICE9 const;
-		auto DX9Window::GethWnd()->HWND;
-		auto DX9Window::GethInstance()->HINSTANCE;
+		auto DX9Window::GetDevice() const->LPDIRECT3DDEVICE9;
+		auto DX9Window::GethWnd() const->HWND;
+		auto DX9Window::GethInstance() const->HINSTANCE;
 		auto DX9Window::GetWindowData()->SWindowData*;
 		auto DX9Window::GetMouseData()->SMouseData*;
+		auto DX9Window::GetRenderRect()->RECT;
 
 		// Dialog
 		void DX9Window::SetDlgBase();
@@ -97,14 +106,26 @@ namespace DX9ENGINE
 			EWindowStyle WindowStyle, DWORD BackColor, WNDPROC Proc, LPCWSTR MenuName = nullptr, HWND hWndParent = nullptr)->HWND;
 		auto DX9Window::InitializeDirectX()->int;
 		void DX9Window::SetDirect3DParameters();
+		void DX9Window::UpdateRenderRect();
+
+		void DX9Window::SetWindowData(int Width, int Height);
+		void DX9Window::UpdateVerticalScrollbarPosition();
+		void DX9Window::UpdateHorizontalScrollbarPosition();
 
 	private:
+		static const int VERTICAL_SCROLL_BAR_WIDTH = 20;
+		static const int HORIZONTAL_SCROLL_BAR_HEIGHT = 20;
 		static int ms_ChildWindowCount;
 		
 		HINSTANCE m_hInstance;
 		HWND m_hWnd;
 		RECT m_Rect;
+		mutable RECT m_RenderRect;
 		SWindowData m_WindowData;
+		SMouseData m_MouseData;
+
+		HWND m_hVerticalScrollbar;
+		HWND m_hHorizontalScrollbar;
 
 		LPDIRECT3D9 m_pD3D;
 		LPDIRECT3DDEVICE9 m_pDevice;
@@ -114,7 +135,5 @@ namespace DX9ENGINE
 		OPENFILENAME m_OFN;
 		TCHAR m_FileName[MAX_FILE_LEN];
 		TCHAR m_FileTitle[MAX_FILE_LEN];
-
-		SMouseData m_MouseData;
 	};
 };

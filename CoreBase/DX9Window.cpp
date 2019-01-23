@@ -21,62 +21,6 @@ LRESULT CALLBACK GameWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM l
 	return(DefWindowProc(hWnd, Message, wParam, lParam));
 }
 
-// Window procedure for Editor Window
-void DX9Window::EditorChildWindowMessageHandler(UINT Message, WPARAM wParam, LPARAM lParam)
-{
-	switch (Message)
-	{
-	case WM_MOUSEMOVE:
-		m_MouseData.MousePosition.x = GET_X_LPARAM(lParam);
-		m_MouseData.MousePosition.y = GET_Y_LPARAM(lParam);
-		m_MouseData.bOnMouseMove = true;
-		break;
-
-	case WM_LBUTTONDOWN:
-		if (!m_MouseData.bMouseLeftButtonPressed)
-		{
-			m_MouseData.MouseDownPosition.x = GET_X_LPARAM(lParam);
-			m_MouseData.MouseDownPosition.y = GET_Y_LPARAM(lParam);
-
-			m_MouseData.bMouseLeftButtonPressed = true;
-		}
-		break;
-
-	case WM_LBUTTONUP:
-		m_MouseData.bMouseLeftButtonPressed = false;
-		break;
-
-	case WM_RBUTTONDOWN:
-		m_MouseData.bMouseRightButtonPressed = true;
-		break;
-
-	case WM_RBUTTONUP:
-		m_MouseData.bMouseRightButtonPressed = false;
-		break;
-	}
-}
-
-auto DX9Window::IsMouseLeftButtonPressed() const->bool
-{
-	return m_MouseData.bMouseLeftButtonPressed;
-}
-
-auto DX9Window::IsMouseRightButtonPressed() const->bool
-{
-	return m_MouseData.bMouseRightButtonPressed;
-}
-
-auto DX9Window::OnMouseMove()->bool
-{
-	if (m_MouseData.bOnMouseMove)
-	{
-		m_MouseData.bOnMouseMove = false;
-		return true;
-	}
-	
-	return false;
-}
-
 DX9Window::DX9Window()
 {
 	m_hInstance = nullptr;
@@ -87,6 +31,9 @@ DX9Window::DX9Window()
 
 	memset(m_FileName, 0, MAX_FILE_LEN);
 	memset(m_FileTitle, 0, MAX_FILE_LEN);
+
+	m_hVerticalScrollbar = nullptr;
+	m_hHorizontalScrollbar = nullptr;
 }
 
 auto DX9Window::CreateGameWindow(CINT X, CINT Y, CINT Width, CINT Height)->EError
@@ -135,16 +82,13 @@ auto DX9Window::CreateChildWindow(HWND hWndParent, CINT X, CINT Y, CINT Width, C
 	return EError::OK;
 }
 
-auto DX9Window::CreateWINAPIWindow(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
+PRIVATE auto DX9Window::CreateWINAPIWindow(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
 	EWindowStyle WindowStyle, DWORD BackColor, WNDPROC Proc, LPCWSTR MenuName, HWND hWndParent)->HWND
 {
 	m_hInstance = GetModuleHandle(nullptr);
 	
 	// Set window data
-	m_WindowData.WindowWidth = Width;
-	m_WindowData.WindowHeight = Height;
-	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
-	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
+	SetWindowData(Width, Height);
 
 	WNDCLASS r_WndClass;
 	r_WndClass.cbClsExtra = 0;
@@ -172,7 +116,15 @@ auto DX9Window::CreateWINAPIWindow(const wchar_t* Name, CINT X, CINT Y, CINT Wid
 	return m_hWnd;
 }
 
-auto DX9Window::InitializeDirectX()->int
+PRIVATE void DX9Window::SetWindowData(int Width, int Height)
+{
+	m_WindowData.WindowWidth = Width;
+	m_WindowData.WindowHeight = Height;
+	m_WindowData.WindowHalfWidth = static_cast<float>(Width / 2.0f);
+	m_WindowData.WindowHalfHeight = static_cast<float>(Height / 2.0f);
+}
+
+PRIVATE auto DX9Window::InitializeDirectX()->int
 {
 	if (nullptr == (m_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return -1;
@@ -188,22 +140,151 @@ auto DX9Window::InitializeDirectX()->int
 	return 0;
 }
 
-void DX9Window::SetDirect3DParameters()
+PRIVATE void DX9Window::SetDirect3DParameters()
 {
 	ZeroMemory(&m_D3DPP, sizeof(m_D3DPP));
 	m_D3DPP.Windowed = TRUE;
 	m_D3DPP.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	m_D3DPP.BackBufferFormat = D3DFMT_UNKNOWN;
 	m_D3DPP.hDeviceWindow = m_hWnd;
+	
+	// Create the back buffer with maximum size(screen resolution).
+	// This way you don't need to reset the device when the window is resized
+	m_D3DPP.BackBufferWidth = GetSystemMetrics(SM_CXSCREEN);
+	m_D3DPP.BackBufferHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	//m_D3DPP.BackBufferWidth = m_WindowData.WindowWidth;
-	//m_D3DPP.BackBufferHeight = m_WindowData.WindowHeight;
+	UpdateRenderRect();
+}
+
+PRIVATE void DX9Window::UpdateRenderRect()
+{
+	m_RenderRect = { 0, 0, 0, 0 };
+	m_RenderRect.right = m_WindowData.WindowWidth;
+	if (m_hVerticalScrollbar)
+		m_RenderRect.right -= VERTICAL_SCROLL_BAR_WIDTH;
+
+	m_RenderRect.bottom = m_WindowData.WindowHeight;
+	if (m_hHorizontalScrollbar)
+		m_RenderRect.bottom -= HORIZONTAL_SCROLL_BAR_HEIGHT;
 }
 
 void DX9Window::Destroy()
 {
 	DX_RELEASE(m_pDevice);
 	DX_RELEASE(m_pD3D);
+}
+
+void DX9Window::UseVerticalScrollbar()
+{
+	if (m_hVerticalScrollbar == nullptr)
+	{
+		m_hVerticalScrollbar = CreateWindow(L"scrollbar", NULL, WS_CHILD | WS_VISIBLE | SBS_VERT,
+			0, 0, 0, 0, m_hWnd, (HMENU)100, m_hInstance, NULL);
+
+		SetVerticalScrollbarRange(0);
+
+		UpdateVerticalScrollbarPosition();
+
+		UpdateRenderRect();
+	}
+}
+
+void DX9Window::UseHorizontalScrollbar()
+{
+	if (m_hHorizontalScrollbar == nullptr)
+	{
+		m_hHorizontalScrollbar = CreateWindow(L"scrollbar", NULL, WS_CHILD | WS_VISIBLE | SBS_HORZ,
+			0, 0, 0, 0, m_hWnd, (HMENU)100, m_hInstance, NULL);
+
+		SetHorizontalScrollbarRange(0);
+
+		UpdateHorizontalScrollbarPosition();
+
+		UpdateRenderRect();
+	}
+}
+
+void DX9Window::SetVerticalScrollbarRange(int Max)
+{
+	if (m_hVerticalScrollbar)
+	{
+		SCROLLINFO tInfo;
+		tInfo.cbSize = sizeof(tInfo);
+		tInfo.fMask = SIF_PAGE | SIF_RANGE;
+
+		tInfo.nPage = 1;
+
+		tInfo.nMin = 0;
+		tInfo.nMax = Max;
+		SetScrollInfo(m_hVerticalScrollbar, SB_CTL, &tInfo, TRUE);
+	}
+}
+
+void DX9Window::SetHorizontalScrollbarRange(int Max)
+{
+	if (m_hHorizontalScrollbar)
+	{
+		SCROLLINFO tInfo;
+		tInfo.cbSize = sizeof(tInfo);
+		tInfo.fMask = SIF_PAGE | SIF_RANGE;
+
+		tInfo.nPage = 1;
+
+		tInfo.nMin = 0;
+		tInfo.nMax = Max;
+		SetScrollInfo(m_hHorizontalScrollbar, SB_CTL, &tInfo, TRUE);
+	}
+}
+
+auto DX9Window::GetVerticalScrollbarPosition()->int
+{
+	if (m_hVerticalScrollbar)
+	{
+		return GetScrollPos(m_hVerticalScrollbar, SB_CTL);
+	}
+	else
+	{
+		return 0;
+	}
+}
+auto DX9Window::GetHorizontalScrollbarPosition()->int
+{
+	if (m_hHorizontalScrollbar)
+	{
+		return GetScrollPos(m_hHorizontalScrollbar, SB_CTL);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+PRIVATE void DX9Window::UpdateVerticalScrollbarPosition()
+{
+	if (m_hVerticalScrollbar)
+	{
+		int x, y, w, h;
+		x = m_WindowData.WindowWidth - VERTICAL_SCROLL_BAR_WIDTH;
+		y = 0;
+		w = VERTICAL_SCROLL_BAR_WIDTH;
+		h = m_WindowData.WindowHeight - HORIZONTAL_SCROLL_BAR_HEIGHT;
+
+		MoveWindow(m_hVerticalScrollbar, x, y, w, h, TRUE);
+	}
+}
+
+PRIVATE void DX9Window::UpdateHorizontalScrollbarPosition()
+{
+	if (m_hHorizontalScrollbar)
+	{
+		int x, y, w, h;
+		x = 0;
+		y = m_WindowData.WindowHeight - HORIZONTAL_SCROLL_BAR_HEIGHT;
+		w = m_WindowData.WindowWidth - VERTICAL_SCROLL_BAR_WIDTH;
+		h = HORIZONTAL_SCROLL_BAR_HEIGHT;
+
+		MoveWindow(m_hHorizontalScrollbar, x, y, w, h, TRUE);
+	}
 }
 
 void DX9Window::SetWindowCaption(WSTRING Caption)
@@ -216,13 +297,12 @@ void DX9Window::SetBackgroundColor(D3DCOLOR color)
 	m_BGColor = color;
 }
 
-void DX9Window::Resize()
+void DX9Window::Resize(RECT Rect)
 {
-	if (m_pDevice)
-	{
-		SetDirect3DParameters();
-		m_pDevice->Reset(&m_D3DPP);
-	}
+	SetWindowData(Rect.right, Rect.bottom);
+	MoveWindow(m_hWnd, Rect.left, Rect.top, Rect.right, Rect.bottom, false);
+
+	UpdateRenderRect();
 }
 
 void DX9Window::BeginRender() const
@@ -234,20 +314,20 @@ void DX9Window::BeginRender() const
 void DX9Window::EndRender() const
 {
 	m_pDevice->EndScene();
-	m_pDevice->Present(nullptr, nullptr, nullptr, nullptr);
+	m_pDevice->Present(&m_RenderRect, &m_RenderRect, nullptr, nullptr);
 }
 
-auto DX9Window::GetDevice()->LPDIRECT3DDEVICE9 const
+auto DX9Window::GetDevice() const->LPDIRECT3DDEVICE9
 {
 	return m_pDevice;
 }
 
-auto DX9Window::GethWnd()->HWND
+auto DX9Window::GethWnd() const->HWND
 {
 	return m_hWnd;
 }
 
-auto DX9Window::GethInstance()->HINSTANCE
+auto DX9Window::GethInstance() const->HINSTANCE
 {
 	return m_hInstance;
 }
@@ -260,6 +340,11 @@ auto DX9Window::GetWindowData()->SWindowData*
 auto DX9Window::GetMouseData()->SMouseData*
 {
 	return &m_MouseData;
+}
+
+auto DX9Window::GetRenderRect()->RECT
+{
+	return m_RenderRect;
 }
 
 
@@ -311,4 +396,122 @@ auto DX9Window::GetDlgFileTitle()->WSTRING
 		tempString = tempString.substr(temp + 1);
 
 	return tempString;
+}
+
+
+/** Window procedure for Editor window */
+void DX9Window::EditorChildWindowMessageHandler(UINT Message, WPARAM wParam, LPARAM lParam)
+{
+	int tempScrPos;
+	int tempScrMin;
+	int tempScrMax;
+
+	switch (Message)
+	{
+	case WM_MOUSEMOVE:
+		m_MouseData.MousePosition.x = GET_X_LPARAM(lParam);
+		m_MouseData.MousePosition.y = GET_Y_LPARAM(lParam);
+		m_MouseData.bOnMouseMove = true;
+		break;
+
+	case WM_LBUTTONDOWN:
+		if (!m_MouseData.bMouseLeftButtonPressed)
+		{
+			m_MouseData.MouseDownPosition.x = GET_X_LPARAM(lParam);
+			m_MouseData.MouseDownPosition.y = GET_Y_LPARAM(lParam);
+
+			m_MouseData.bMouseLeftButtonPressed = true;
+		}
+		break;
+
+	case WM_LBUTTONUP:
+		m_MouseData.bMouseLeftButtonPressed = false;
+		break;
+
+	case WM_RBUTTONDOWN:
+		m_MouseData.bMouseRightButtonPressed = true;
+		break;
+
+	case WM_RBUTTONUP:
+		m_MouseData.bMouseRightButtonPressed = false;
+		break;
+
+	case WM_VSCROLL:
+		GetScrollRange((HWND)lParam, SB_CTL, &tempScrMin, &tempScrMax);
+		tempScrPos = GetScrollPos((HWND)lParam, SB_CTL);
+
+		switch (LOWORD(wParam))
+		{
+		case SB_LINEUP:
+			tempScrPos = max(tempScrMin, tempScrPos - 1);
+			break;
+		case SB_LINEDOWN:
+			tempScrPos = min(tempScrMax, tempScrPos + 1);
+			break;
+		case SB_PAGEUP:
+			tempScrPos = max(tempScrMin, tempScrPos - 10);
+			break;
+		case SB_PAGEDOWN:
+			tempScrPos = min(tempScrMax, tempScrPos + 10);
+			break;
+		case SB_THUMBTRACK:
+			tempScrPos = HIWORD(wParam);
+			break;
+		}
+		SetScrollPos((HWND)lParam, SB_CTL, tempScrPos, TRUE);
+		InvalidateRect(m_hWnd, NULL, FALSE);
+		break;
+
+	case WM_HSCROLL:
+		GetScrollRange((HWND)lParam, SB_CTL, &tempScrMin, &tempScrMax);
+		tempScrPos = GetScrollPos((HWND)lParam, SB_CTL);
+
+		switch (LOWORD(wParam))
+		{
+		case SB_LINELEFT:
+			tempScrPos = max(tempScrMin, tempScrPos - 1);
+			break;
+		case SB_LINERIGHT:
+			tempScrPos = min(tempScrMax, tempScrPos + 1);
+			break;
+		case SB_PAGELEFT:
+			tempScrPos = max(tempScrMin, tempScrPos - 10);
+			break;
+		case SB_PAGERIGHT:
+			tempScrPos = min(tempScrMax, tempScrPos + 10);
+			break;
+		case SB_THUMBTRACK:
+			tempScrPos = HIWORD(wParam);
+			break;
+		}
+		SetScrollPos((HWND)lParam, SB_CTL, tempScrPos, TRUE);
+		InvalidateRect(m_hWnd, NULL, FALSE);
+		break;
+
+	case WM_SIZE:
+		UpdateVerticalScrollbarPosition();
+		UpdateHorizontalScrollbarPosition();
+		break;
+	}
+}
+
+auto DX9Window::IsMouseLeftButtonPressed() const->bool
+{
+	return m_MouseData.bMouseLeftButtonPressed;
+}
+
+auto DX9Window::IsMouseRightButtonPressed() const->bool
+{
+	return m_MouseData.bMouseRightButtonPressed;
+}
+
+auto DX9Window::OnMouseMove()->bool
+{
+	if (m_MouseData.bOnMouseMove)
+	{
+		m_MouseData.bOnMouseMove = false;
+		return true;
+	}
+
+	return false;
 }

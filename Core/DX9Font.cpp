@@ -12,7 +12,7 @@ DX9Font::DX9Font()
 auto DX9Font::Create(DX9Window* pDX9Window)->EError
 {
 	if (pDX9Window == nullptr)
-		return EError::NULLPTR_BASE;
+		return EError::NULLPTR_WINDOW;
 
 	m_pDX9Window = pDX9Window;
 

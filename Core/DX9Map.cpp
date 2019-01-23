@@ -103,7 +103,7 @@ DX9Map::DX9Map()
 auto DX9Map::Create(DX9Window* pDX9Window, WSTRING BaseDir)->EError
 {
 	if (pDX9Window == nullptr)
-		return EError::NULLPTR_BASE;
+		return EError::NULLPTR_WINDOW;
 
 	m_pDX9Window = pDX9Window;
 	m_pDevice = m_pDX9Window->GetDevice();

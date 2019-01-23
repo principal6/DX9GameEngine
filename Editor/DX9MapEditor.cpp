@@ -3,42 +3,45 @@
 
 using namespace DX9ENGINE;
 
-// Static member variables
+/** Static member variables */
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowParent;
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowLeft;
 UNIQUE_PTR<DX9Window> DX9MapEditor::ms_WindowRight;
+
 SMapInfo DX9MapEditor::ms_MapInfo;
+
 UNIQUE_PTR<DX9Image> DX9MapEditor::ms_TileImage;
 UNIQUE_PTR<DX9Image> DX9MapEditor::ms_MoveImage;
-UNIQUE_PTR<DX9Image> DX9MapEditor::ms_MapBG;
+UNIQUE_PTR<DX9Image> DX9MapEditor::ms_TileBG;
+
 UNIQUE_PTR<DX9Map> DX9MapEditor::ms_Map;
+UNIQUE_PTR<DX9Image> DX9MapEditor::ms_MapBG;
+
 UNIQUE_PTR<DX9MapTileSelector> DX9MapEditor::ms_MapTileSelector;
 
 auto DX9ENGINE::GetLeftChildPositionAndSizeFromParent(RECT Rect)->RECT
 {
-	RECT Result = {0, 0,
-		DX9MapEditor::WINDOW_SEPERATE_X - DX9MapEditor::WINDOW_VSCROLL_SIZE,
-		Rect.bottom - DX9MapEditor::WINDOW_HSCROLL_SIZE };
+	RECT Result = {0, 0, DX9MapEditor::WINDOW_SEPERATE_X, Rect.bottom };
 	return Result;
 }
 
 auto DX9ENGINE::GetRightChildPositionAndSizeFromParent(RECT Rect)->RECT
 {
 	RECT Result = { DX9MapEditor::WINDOW_SEPERATE_X + DX9MapEditor::WINDOW_SEPERATE_INTERVAL, 0,
-		Rect.right - DX9MapEditor::WINDOW_SEPERATE_X - DX9MapEditor::WINDOW_VSCROLL_SIZE - DX9MapEditor::WINDOW_PADDING_X,
-		Rect.bottom - DX9MapEditor::WINDOW_HSCROLL_SIZE };
+		Rect.right - DX9MapEditor::WINDOW_SEPERATE_X - DX9MapEditor::WINDOW_PADDING_X, Rect.bottom };
 	return Result;
 }
 
 STATIC void DX9MapEditor::LoadTileImages()
 {
 	ms_Map->GetMapInfo(&ms_MapInfo);
+	ms_MapBG->SetSize(ms_MapInfo.MapSize);
 
 	ms_TileImage->SetTexture(ms_MapInfo.TileSheetName);
 	ms_MoveImage->SetTexture(ms_MapInfo.MoveSheetName);
-	ms_MapTileSelector->SetMapInfo(&ms_MapInfo);
+	ms_TileBG->SetSize(ms_MapInfo.TileSheetSize);
 
-	ms_MapBG->SetSize(ms_MapInfo.MapSize);
+	ms_MapTileSelector->SetMapInfo(&ms_MapInfo);
 }
 
 STATIC void DX9MapEditor::UpdateMapEditorCaption()
@@ -72,6 +75,53 @@ STATIC void DX9MapEditor::UpdateMapEditorCaption()
 	ms_WindowParent->SetWindowCaption(tempCaption);
 }
 
+STATIC void DX9MapEditor::UpdateScrollbarSize()
+{
+	/** Left child window scrollbar */
+	int RenderWidth = ms_WindowLeft->GetRenderRect().right;
+	int RenderHeight = ms_WindowLeft->GetRenderRect().bottom;
+	int TilesheetWidth = static_cast<int>(ms_MapInfo.TileSheetSize.x);
+	int TilesheetHeight = static_cast<int>(ms_MapInfo.TileSheetSize.y);
+
+	int VerticalSizeDifference = max(TilesheetHeight - RenderHeight, 0);
+	int VerticalSizeDifferenceInCells = 0;
+	if (VerticalSizeDifference)
+	{
+		VerticalSizeDifferenceInCells = (VerticalSizeDifference / ms_MapInfo.TileSize) + 1;
+	}
+	ms_WindowLeft->SetVerticalScrollbarRange(VerticalSizeDifferenceInCells);
+
+	int HorizontalSizeDifference = max(TilesheetWidth - RenderWidth, 0);
+	int HorizontalSizeDifferenceInCells = 0;
+	if (HorizontalSizeDifference)
+	{
+		HorizontalSizeDifferenceInCells = (HorizontalSizeDifference / ms_MapInfo.TileSize) + 1;
+	}
+	ms_WindowLeft->SetHorizontalScrollbarRange(HorizontalSizeDifferenceInCells);
+
+	/** Right child window scrollbar */
+	RenderWidth = ms_WindowRight->GetRenderRect().right;
+	RenderHeight = ms_WindowRight->GetRenderRect().bottom;
+	int MapSizeX = static_cast<int>(ms_MapInfo.MapSize.x);
+	int MapSizeY = static_cast<int>(ms_MapInfo.MapSize.y);
+
+	VerticalSizeDifference = max(MapSizeY - RenderHeight, 0);
+	VerticalSizeDifferenceInCells = 0;
+	if (VerticalSizeDifference)
+	{
+		VerticalSizeDifferenceInCells = (VerticalSizeDifference / ms_MapInfo.TileSize) + 1;
+	}
+	ms_WindowRight->SetVerticalScrollbarRange(VerticalSizeDifferenceInCells);
+
+	HorizontalSizeDifference = max(MapSizeX - RenderWidth, 0);
+	HorizontalSizeDifferenceInCells = 0;
+	if (HorizontalSizeDifference)
+	{
+		HorizontalSizeDifferenceInCells = (HorizontalSizeDifference / ms_MapInfo.TileSize) + 1;
+	}
+	ms_WindowRight->SetHorizontalScrollbarRange(HorizontalSizeDifferenceInCells);
+}
+
 LRESULT CALLBACK DX9ENGINE::ParentWindowProc(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
 {
 	RECT tempRect{ 0, 0, 0, 0 };
@@ -102,6 +152,9 @@ LRESULT CALLBACK DX9ENGINE::ParentWindowProc(HWND hWnd, UINT Message, WPARAM wPa
 
 					// Set editor caption
 					DX9MapEditor::UpdateMapEditorCaption();
+
+					// Update scrollbar size
+					DX9MapEditor::UpdateScrollbarSize();
 				}
 			}
 			break;
@@ -135,23 +188,16 @@ LRESULT CALLBACK DX9ENGINE::ParentWindowProc(HWND hWnd, UINT Message, WPARAM wPa
 		// Resize ms_WindowLeft and ms_WindowRight and their correspondent window in accordance with the parent window size
 		if (DX9MapEditor::ms_WindowLeft && DX9MapEditor::ms_WindowRight)
 		{
-			// Resize ms_WindowLeft and its correspondent window
 			GetClientRect(hWnd, &tempRect);
-			tempRect = GetLeftChildPositionAndSizeFromParent(tempRect);
-			MoveWindow(DX9MapEditor::ms_WindowLeft->GethWnd(), tempRect.left, tempRect.top,
-				tempRect.right, tempRect.bottom, TRUE);
+
+			// Resize ms_WindowLeft and its correspondent window
+			DX9MapEditor::ms_WindowLeft->Resize(GetLeftChildPositionAndSizeFromParent(tempRect));
 
 			// Resize ms_WindowRight and its correspondent window
-			GetClientRect(hWnd, &tempRect);
-			tempRect = GetRightChildPositionAndSizeFromParent(tempRect);
-			MoveWindow(DX9MapEditor::ms_WindowRight->GethWnd(), tempRect.left, tempRect.top,
-				tempRect.right, tempRect.bottom, TRUE);
+			DX9MapEditor::ms_WindowRight->Resize(GetRightChildPositionAndSizeFromParent(tempRect));
 
-			if (DX9MapEditor::ms_WindowLeft->GetDevice() && DX9MapEditor::ms_WindowRight->GetDevice())
-			{
-				DX9MapEditor::ms_WindowLeft->Resize();
-				DX9MapEditor::ms_WindowRight->Resize();
-			}
+			// Update scrollbar size
+			DX9MapEditor::UpdateScrollbarSize();
 		}
 		break;
 	case WM_DESTROY:
@@ -167,10 +213,7 @@ LRESULT CALLBACK DX9ENGINE::LeftChildWindowProc(HWND hWnd, UINT Message, WPARAM 
 
 	if (DX9MapEditor::ms_MapTileSelector)
 	{
-		if (DX9MapEditor::ms_WindowLeft->IsMouseLeftButtonPressed())
-		{
-			DX9MapEditor::ms_MapTileSelector->UpdateTileSelector(DX9MapEditor::ms_WindowLeft->GetMouseData());
-		}
+		DX9MapEditor::ms_MapTileSelector->UpdateTileSelector();
 	}
 
 	return(DefWindowProc(hWnd, Message, wParam, lParam));
@@ -182,7 +225,7 @@ LRESULT CALLBACK DX9ENGINE::RightChildWindowProc(HWND hWnd, UINT Message, WPARAM
 
 	if (DX9MapEditor::ms_MapTileSelector)
 	{
-		DX9MapEditor::ms_MapTileSelector->UpdateMapSelector(DX9MapEditor::ms_WindowRight->GetMouseData());
+		DX9MapEditor::ms_MapTileSelector->UpdateMapSelector();
 
 		if (DX9MapEditor::ms_WindowRight->IsMouseLeftButtonPressed())
 		{
@@ -271,6 +314,9 @@ LRESULT CALLBACK DX9ENGINE::DlgProcNewMap(HWND hDlg, UINT iMessage, WPARAM wPara
 
 					// Set editor caption
 					DX9MapEditor::UpdateMapEditorCaption();
+
+					// Update scrollbar size
+					DX9MapEditor::UpdateScrollbarSize();
 				}
 			}
 		case IDCANCEL:
@@ -318,12 +364,16 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 		// Get main window RECT
 		GetClientRect(m_hWndMain, &tempRect);
 		tempRect = GetLeftChildPositionAndSizeFromParent(tempRect);
+		
 		if (DX_FAILED(ms_WindowLeft->CreateChildWindow(m_hWndMain, tempRect.left, tempRect.top, tempRect.right, tempRect.bottom,
 			D3DCOLOR_XRGB(160, 160, 160), LeftChildWindowProc)))
 			return EError::WINDOW_NOT_CREATED;
+
+		ms_WindowLeft->UseHorizontalScrollbar();
+		ms_WindowLeft->UseVerticalScrollbar();
 	}
 
-	// Create image objects
+	// Create tile image objects
 	if (ms_TileImage = MAKE_UNIQUE(DX9Image)())
 	{
 		if (DX_FAILED(ms_TileImage->Create(ms_WindowLeft.get(), m_BaseDir)))
@@ -335,6 +385,15 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 			return EError::IMAGE_NOT_CREATED;
 	}
 
+	// Create tile background
+	if (ms_TileBG = MAKE_UNIQUE(DX9Image)())
+	{
+		if (DX_FAILED(ms_TileBG->Create(ms_WindowLeft.get(), m_BaseDir)))
+			return EError::IMAGE_NOT_CREATED;
+		ms_TileBG->SetXRGB(D3DCOLOR_XRGB(20, 20, 120));
+	}
+
+
 	// Create right child base and initialize Direct3D9
 	if (ms_WindowRight = MAKE_UNIQUE(DX9Window)())
 	{
@@ -343,9 +402,13 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 		// Get main window RECT
 		GetClientRect(m_hWndMain, &tempRect);
 		tempRect = GetRightChildPositionAndSizeFromParent(tempRect);
+
 		if (DX_FAILED(ms_WindowRight->CreateChildWindow(m_hWndMain, tempRect.left, tempRect.top, tempRect.right, tempRect.bottom,
 			D3DCOLOR_XRGB(200, 200, 200), RightChildWindowProc)))
 			return EError::WINDOW_NOT_CREATED;
+
+		ms_WindowRight->UseHorizontalScrollbar();
+		ms_WindowRight->UseVerticalScrollbar();
 	}
 	
 	// Create map object
@@ -395,28 +458,41 @@ PRIVATE void DX9MapEditor::MainLoop()
 	ms_WindowRight->BeginRender();
 	if (ms_Map)
 	{
+		int TileHorzPos = ms_WindowLeft->GetHorizontalScrollbarPosition();
+		int TileVertPos = ms_WindowLeft->GetVerticalScrollbarPosition();
+		TileHorzPos *= ms_MapInfo.TileSize;
+		TileVertPos *= ms_MapInfo.TileSize;
+
+		ms_TileBG->SetPosition(D3DXVECTOR2(static_cast<float>(-TileHorzPos), static_cast<float>(-TileVertPos)));
+		ms_TileBG->Draw();
+
 		if (ms_Map->GetMode() == EMapMode::TileMode)
 		{
-			if (ms_TileImage)
-			{
-				ms_TileImage->Draw();
-			}
+			ms_TileImage->SetPosition(D3DXVECTOR2(static_cast<float>(-TileHorzPos), static_cast<float>(-TileVertPos)));
+			ms_TileImage->Draw();
 		}
 		else
 		{
-			if (ms_MoveImage)
-			{
-				ms_MoveImage->Draw();
-			}
+			ms_MoveImage->SetPosition(D3DXVECTOR2(static_cast<float>(-TileHorzPos), static_cast<float>(-TileVertPos)));
+			ms_MoveImage->Draw();
 		}
 
-		ms_MapBG->SetPosition(D3DXVECTOR2(0, 0));
-		ms_Map->SetPosition(D3DXVECTOR2(0, 0));
+
+		int MapHorzPos = ms_WindowRight->GetHorizontalScrollbarPosition();
+		int MapVertPos = ms_WindowRight->GetVerticalScrollbarPosition();
+		MapHorzPos *= ms_MapInfo.TileSize;
+		MapVertPos *= ms_MapInfo.TileSize;
+
+		ms_MapBG->SetPosition(D3DXVECTOR2(static_cast<float>(-MapHorzPos), static_cast<float>(-MapVertPos)));
+		ms_Map->SetPosition(D3DXVECTOR2(static_cast<float>(-MapHorzPos), static_cast<float>(-MapVertPos)));
 		ms_MapBG->Draw();
 		ms_Map->Draw();
 
 		if (ms_MapTileSelector)
+		{
+			ms_MapTileSelector->UpdateOffset();
 			ms_MapTileSelector->Draw();
+		}
 	}
 	ms_WindowLeft->EndRender();
 	ms_WindowRight->EndRender();
@@ -424,10 +500,15 @@ PRIVATE void DX9MapEditor::MainLoop()
 
 PRIVATE void DX9MapEditor::Destroy()
 {
-	DX_DESTROY_SMART(ms_Map);
 	DX_DESTROY_SMART(ms_MapTileSelector);
+
+	DX_DESTROY_SMART(ms_MapBG);
+	DX_DESTROY_SMART(ms_Map);
+	
+	DX_DESTROY_SMART(ms_TileBG);
 	DX_DESTROY_SMART(ms_TileImage);
 	DX_DESTROY_SMART(ms_MoveImage);
+
 	DX_DESTROY_SMART(ms_WindowLeft);
 	DX_DESTROY_SMART(ms_WindowRight);
 	DX_DESTROY_SMART(ms_WindowParent);

@@ -31,7 +31,7 @@ DX9Image::DX9Image()
 auto DX9Image::Create(DX9Window* pDX9Window, WSTRING BaseDir)->EError
 {
 	if (pDX9Window == nullptr)
-		return EError::NULLPTR_BASE;
+		return EError::NULLPTR_WINDOW;
 
 	m_pDX9Window = pDX9Window;
 	m_pDevice = pDX9Window->GetDevice();

@@ -140,7 +140,7 @@ LPDIRECT3DDEVICE9 DX9MonsterManager::m_pDevice;
 auto DX9MonsterManager::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
 	if (pDX9Window == nullptr)
-		return EError::NULLPTR_BASE;
+		return EError::NULLPTR_WINDOW;
 
 	if (pMap == nullptr)
 		return EError::NULLPTR_MAP;

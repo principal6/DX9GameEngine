@@ -88,8 +88,8 @@ namespace DX9ENGINE
 
 		/** Null pointer */
 		NULLPTR_DEVICE,
+		NULLPTR_WINDOW,
 		NULLPTR_MAP,
-		NULLPTR_BASE,
 		NULLPTR_MAP_INFO,
 	};
 

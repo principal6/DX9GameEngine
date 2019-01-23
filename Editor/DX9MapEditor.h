@@ -17,8 +17,6 @@ namespace DX9ENGINE
 		static const int WINDOW_Y = 50;
 		static const int WINDOW_SEPERATE_X = 250;
 		static const int WINDOW_SEPERATE_INTERVAL = 10;
-		static const int WINDOW_VSCROLL_SIZE = 15;
-		static const int WINDOW_HSCROLL_SIZE = 15;
 		static const int WINDOW_PADDING_X = 10;
 
 		static UNIQUE_PTR<DX9Window> ms_WindowParent;
@@ -29,10 +27,11 @@ namespace DX9ENGINE
 		// For left child window
 		static UNIQUE_PTR<DX9Image> ms_TileImage;
 		static UNIQUE_PTR<DX9Image> ms_MoveImage;
+		static UNIQUE_PTR<DX9Image> ms_TileBG;
 		
 		// For right child window
-		static UNIQUE_PTR<DX9Image> ms_MapBG;
 		static UNIQUE_PTR<DX9Map> ms_Map;
+		static UNIQUE_PTR<DX9Image> ms_MapBG;
 
 		// For both child windows
 		static UNIQUE_PTR<DX9MapTileSelector> ms_MapTileSelector;
@@ -50,6 +49,7 @@ namespace DX9ENGINE
 
 		static void LoadTileImages();
 		static void UpdateMapEditorCaption();
+		static void UpdateScrollbarSize();
 		
 		friend auto GetLeftChildPositionAndSizeFromParent(RECT Rect)->RECT;
 		friend auto GetRightChildPositionAndSizeFromParent(RECT Rect)->RECT;

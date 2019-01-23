@@ -26,17 +26,28 @@ PRIVATE auto DX9MapTileSelector::ConvertPositionToCellXY(POINT Position)->POINT
 DX9MapTileSelector::DX9MapTileSelector()
 {
 	m_pMapInfo = nullptr;
+	m_pTileSelectorWindow = nullptr;
+	m_pMapWIndow = nullptr;
 
-	m_TileSelectorPositionInCells = { 0, 0 };
 	m_SelectionSize = { 0, 0 };
+	m_TileSelectorOffset = { 0, 0 };
+	m_TileSelectorPositionInCells = { 0, 0 };
+	m_MapSelectorOffset = { 0, 0 };
+	m_MapSelectorPositionInCells = { 0, 0 };
 }
 
 auto DX9MapTileSelector::Create(DX9Window* pTileSelectorWindow, DX9Window* pMapWindow, WSTRING BaseDir)->EError
 {
+	if (nullptr == (m_pTileSelectorWindow = pTileSelectorWindow))
+		return EError::NULLPTR_WINDOW;
+
+	if (nullptr == (m_pMapWIndow = pMapWindow))
+		return EError::NULLPTR_WINDOW;
+
 	// Create tile selector image
 	if (m_TileSelector = MAKE_UNIQUE(DX9Image)())
 	{
-		if (DX_FAILED(m_TileSelector->Create(pTileSelectorWindow, BaseDir)))
+		if (DX_FAILED(m_TileSelector->Create(m_pTileSelectorWindow, BaseDir)))
 			return EError::IMAGE_NOT_CREATED;
 	}
 	m_TileSelector->SetTexture(SEL_FN);
@@ -47,7 +58,7 @@ auto DX9MapTileSelector::Create(DX9Window* pTileSelectorWindow, DX9Window* pMapW
 	// Map selector's texture will be set when SetMapInfo() is called
 	if (m_MapSelector = MAKE_UNIQUE(DX9Image)())
 	{
-		if (DX_FAILED(m_MapSelector->Create(pMapWindow, BaseDir)))
+		if (DX_FAILED(m_MapSelector->Create(m_pMapWIndow, BaseDir)))
 			return EError::IMAGE_NOT_CREATED;
 	}
 	m_MapSelector->SetAlpha(SEL_ALPHA);
@@ -60,76 +71,119 @@ void DX9MapTileSelector::Destroy()
 
 }
 
-void DX9MapTileSelector::UpdateTileSelector(SMouseData* MouseData)
+void DX9MapTileSelector::UpdateTileSelector()
 {
+	SMouseData* MouseData = m_pTileSelectorWindow->GetMouseData();
+
 	if (m_pMapInfo)
 	{
 		if (m_pMapInfo->TileSize)
 		{
-			POINT PositionInCells = ConvertPositionToCellXY(MouseData->MousePosition);
-			POINT DownPositionInCells = ConvertPositionToCellXY(MouseData->MouseDownPosition);
-
-			// @warning:
-			// We do not restrict the tilesheet's max selection range
-			// because normally the texture file width and height are bigger than the tilesheet itself
-			// fot a better precision in DirectX9 texture.
-			// *** The texture size must be 2^n (e.g. 256*512, 1024*128)
-			/*
-			PositionInCells.x = min(PositionInCells.x, m_pMapInfo->TileSheetCols);
-			PositionInCells.y = min(PositionInCells.y, m_pMapInfo->TileSheetRows);
-			DownPositionInCells.x = min(DownPositionInCells.x, m_pMapInfo->TileSheetCols);
-			DownPositionInCells.y = min(DownPositionInCells.y, m_pMapInfo->TileSheetRows);
-			*/
-
-			m_SelectionSize.x = abs(DownPositionInCells.x - PositionInCells.x);
-			m_SelectionSize.y = abs(DownPositionInCells.y - PositionInCells.y);
-
-			m_TileSelectorPositionInCells = DownPositionInCells;
-			if ((DownPositionInCells.x - PositionInCells.x) > 0)
+			if (MouseData->bMouseLeftButtonPressed)
 			{
-				// X position flip
-				m_TileSelectorPositionInCells.x = DownPositionInCells.x - m_SelectionSize.x;
+				POINT PositionInCells = ConvertPositionToCellXY(MouseData->MousePosition);
+				POINT DownPositionInCells = ConvertPositionToCellXY(MouseData->MouseDownPosition);
+
+				m_SelectionSize.x = abs(DownPositionInCells.x - PositionInCells.x);
+				m_SelectionSize.y = abs(DownPositionInCells.y - PositionInCells.y);
+
+				m_TileSelectorPositionInCells = DownPositionInCells;
+
+				if ((DownPositionInCells.x - PositionInCells.x) > 0)
+				{
+					// X position flip
+					m_TileSelectorPositionInCells.x = DownPositionInCells.x - m_SelectionSize.x;
+				}
+				if ((DownPositionInCells.y - PositionInCells.y) > 0)
+				{
+					// Y position flip
+					m_TileSelectorPositionInCells.y = DownPositionInCells.y - m_SelectionSize.y;
+				}
+
+				POINT ScreenPositionInCells = m_TileSelectorPositionInCells;
+
+				// Set offset for scrollbar movement
+				m_TileSelectorPositionInCells.x += m_TileSelectorOffset.x;
+				m_TileSelectorPositionInCells.y += m_TileSelectorOffset.y;
+
+				D3DXVECTOR2 TileSelectorNewPosition;
+				TileSelectorNewPosition.x = static_cast<float>(ScreenPositionInCells.x * m_pMapInfo->TileSize);
+				TileSelectorNewPosition.y = static_cast<float>(ScreenPositionInCells.y * m_pMapInfo->TileSize);
+
+				D3DXVECTOR2 NewSize{ 0, 0 };
+				NewSize.x = m_SelectionSize.x + 1.0f;
+				NewSize.y = m_SelectionSize.y + 1.0f;
+				NewSize *= static_cast<float>(m_pMapInfo->TileSize);
+
+				m_TileSelector->SetPosition(TileSelectorNewPosition);
+				m_TileSelector->SetSize(NewSize);
+
+				D3DXVECTOR2 MapSelectorNewPosition = TileSelectorNewPosition;
+				MapSelectorNewPosition.x += static_cast<float>(m_TileSelectorOffset.x * m_pMapInfo->TileSize);
+				MapSelectorNewPosition.y += static_cast<float>(m_TileSelectorOffset.y * m_pMapInfo->TileSize);
+
+				m_MapSelector->SetSize(NewSize);
+				m_MapSelector->SetAtlasUV(MapSelectorNewPosition, NewSize);
 			}
-			if ((DownPositionInCells.y - PositionInCells.y) > 0)
-			{
-				// Y position flip
-				m_TileSelectorPositionInCells.y = DownPositionInCells.y - m_SelectionSize.y;
-			}
-
-			D3DXVECTOR2 NewPosition;
-			NewPosition.x = static_cast<float>(m_TileSelectorPositionInCells.x * m_pMapInfo->TileSize);
-			NewPosition.y = static_cast<float>(m_TileSelectorPositionInCells.y * m_pMapInfo->TileSize);
-
-			D3DXVECTOR2 NewSize{ 0, 0 };
-			NewSize.x = m_SelectionSize.x + 1.0f;
-			NewSize.y = m_SelectionSize.y + 1.0f;
-			NewSize *= static_cast<float>(m_pMapInfo->TileSize);
-
-			m_TileSelector->SetPosition(NewPosition);
-			m_TileSelector->SetSize(NewSize);
-
-			m_MapSelector->SetSize(NewSize);
-			m_MapSelector->SetAtlasUV(NewPosition, NewSize);
 		}
 	}
 }
 
-void DX9MapTileSelector::UpdateMapSelector(SMouseData* MouseData)
+void DX9MapTileSelector::UpdateMapSelector()
 {
+	SMouseData* MouseData = m_pMapWIndow->GetMouseData();
+
 	if (m_pMapInfo)
 	{
 		m_MapSelectorPositionInCells = ConvertPositionToCellXY(MouseData->MousePosition);
+		POINT ScreenPositionInCells = m_MapSelectorPositionInCells;
+
+		// Set offset for scrollbar movement
+		m_MapSelectorPositionInCells.x += m_MapSelectorOffset.x;
+		m_MapSelectorPositionInCells.y += m_MapSelectorOffset.y;
 
 		// @warning
 		// Restrict position in cells IAW map's max rows and cols
-		m_MapSelectorPositionInCells.x = min(m_MapSelectorPositionInCells.x, m_pMapInfo->MapCols - 1);
-		m_MapSelectorPositionInCells.y = min(m_MapSelectorPositionInCells.y, m_pMapInfo->MapRows - 1);
+		ScreenPositionInCells.x = min(ScreenPositionInCells.x, m_pMapInfo->MapCols - 1);
+		ScreenPositionInCells.y = min(ScreenPositionInCells.y, m_pMapInfo->MapRows - 1);
 
 		D3DXVECTOR2 NewPosition;
-		NewPosition.x = static_cast<float>(m_MapSelectorPositionInCells.x * m_pMapInfo->TileSize);
-		NewPosition.y = static_cast<float>(m_MapSelectorPositionInCells.y * m_pMapInfo->TileSize);
+		NewPosition.x = static_cast<float>(ScreenPositionInCells.x * m_pMapInfo->TileSize);
+		NewPosition.y = static_cast<float>(ScreenPositionInCells.y * m_pMapInfo->TileSize);
 
 		m_MapSelector->SetPosition(NewPosition);
+	}
+}
+
+void DX9MapTileSelector::UpdateMapMode(EMapMode Mode)
+{
+	switch (Mode)
+	{
+	case DX9ENGINE::EMapMode::TileMode:
+		m_MapSelector->SetTexture(m_pMapInfo->TileSheetName);
+		break;
+	case DX9ENGINE::EMapMode::MoveMode:
+		m_MapSelector->SetTexture(m_pMapInfo->MoveSheetName);
+		break;
+	default:
+		break;
+	}
+
+	InitializeSelectorPositionAndSize();
+}
+
+void DX9MapTileSelector::UpdateOffset()
+{
+	if (m_pTileSelectorWindow)
+	{
+		m_TileSelectorOffset.x = m_pTileSelectorWindow->GetHorizontalScrollbarPosition();
+		m_TileSelectorOffset.y = m_pTileSelectorWindow->GetVerticalScrollbarPosition();
+	}
+
+	if (m_pMapWIndow)
+	{
+		m_MapSelectorOffset.x = m_pMapWIndow->GetHorizontalScrollbarPosition();
+		m_MapSelectorOffset.y = m_pMapWIndow->GetVerticalScrollbarPosition();
 	}
 }
 
@@ -158,23 +212,6 @@ auto DX9MapTileSelector::SetMapInfo(SMapInfo* pInfo)->EError
 	InitializeSelectorPositionAndSize();
 
 	return EError::OK;
-}
-
-void DX9MapTileSelector::UpdateMapMode(EMapMode Mode)
-{
-	switch (Mode)
-	{
-	case DX9ENGINE::EMapMode::TileMode:
-		m_MapSelector->SetTexture(m_pMapInfo->TileSheetName);
-		break;
-	case DX9ENGINE::EMapMode::MoveMode:
-		m_MapSelector->SetTexture(m_pMapInfo->MoveSheetName);
-		break;
-	default:
-		break;
-	}
-
-	InitializeSelectorPositionAndSize();
 }
 
 PRIVATE void DX9MapTileSelector::InitializeSelectorPositionAndSize()

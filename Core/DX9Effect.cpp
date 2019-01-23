@@ -16,7 +16,7 @@ DX9Effect::DX9Effect()
 auto DX9Effect::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError
 {
 	if (pDX9Window == nullptr)
-		return EError::NULLPTR_BASE;
+		return EError::NULLPTR_WINDOW;
 
 	if (pMap == nullptr)
 		return EError::NULLPTR_MAP;
