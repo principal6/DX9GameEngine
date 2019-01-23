@@ -1,4 +1,5 @@
-#include "../Core/DX9Window.h"
+#include "../CoreBase/DX9Window.h"
+#include "../Editor/DX9MapTileSelector.h"
 #include "DX9Map.h"
 
 using namespace DX9ENGINE;
@@ -35,19 +36,24 @@ auto DX9Map::ConvertIDtoUV(int ID, int TileSize, D3DXVECTOR2 SheetSize)->STextur
 	return Result;
 }
 
-auto DX9Map::ConvertIDToXY(int MapID, int MapCols)->D3DXVECTOR2
+auto DX9Map::ConvertIDToXY(int ID, int Cols)->D3DXVECTOR2
 {
 	D3DXVECTOR2 Result = D3DXVECTOR2(0, 0);
 
-	Result.x = static_cast<float>(MapID % MapCols);
-	Result.y = static_cast<float>(MapID / MapCols);
+	Result.x = static_cast<float>(ID % Cols);
+	Result.y = static_cast<float>(ID / Cols);
 
 	return Result;
 }
 
-auto DX9Map::ConvertXYToID(D3DXVECTOR2 MapXY, int MapCols)->int
+auto DX9Map::ConvertXYToID(D3DXVECTOR2 XY, int Cols)->int
 {
-	return static_cast<int>(MapXY.x) + (static_cast<int>(MapXY.y) * MapCols);
+	return static_cast<int>(XY.x) + (static_cast<int>(XY.y) * Cols);
+}
+
+auto DX9Map::ConvertXYToID(POINT XY, int Cols)->int
+{
+	return XY.x + (XY.y * Cols);
 }
 
 auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int TileSize, bool YRoundUp)->D3DXVECTOR2
@@ -80,17 +86,17 @@ auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int T
 DX9Map::DX9Map()
 {
 	m_CurrMapMode = EMapMode::TileMode;
-	m_bMapCreated = false;
+	m_bMapExist = false;
 
 	m_MapInfo.TileSize = DEF_TILE_SIZE;
-	m_MapInfo.TileSheetSize = D3DXVECTOR2(0.0f, 0.0f);
-	m_MapInfo.MoveSheetSize = D3DXVECTOR2(0.0f, 0.0f);
+	m_MapInfo.TileSheetSize = D3DXVECTOR2(0, 0);
+	m_MapInfo.MoveSheetSize = D3DXVECTOR2(0, 0);
 
 	m_bMoveTextureLoaded = false;
 	m_pTextureMove = nullptr;
 	m_pVBMove = nullptr;
 
-	m_Offset = D3DXVECTOR2(0.0f, 0.0f);
+	m_Offset = D3DXVECTOR2(0, 0);
 	m_OffsetZeroY = 0;
 }
 
@@ -110,7 +116,7 @@ auto DX9Map::Create(DX9Window* pDX9Window, WSTRING BaseDir)->EError
 	return EError::OK;
 }
 
-void DX9Map::ClearAllData()
+PRIVATE void DX9Map::ClearAllData()
 {
 	DX9Image::ClearVertexAndIndexData();
 
@@ -126,43 +132,22 @@ void DX9Map::Destroy()
 	DX9Image::Destroy();
 }
 
-void DX9Map::SetTileTexture(WSTRING FileName)
+void DX9Map::CreateMap(SMapInfo* InPtr_Info)
 {
-	DX9Image::SetTexture(FileName);
+	m_MapInfo = *InPtr_Info;
 
-	assert(m_Size.x);
+	MakeMapBase();
 
-	if ((m_Size.x) && (m_Size.y))
+	for (int i = 0; i < m_MapInfo.MapRows; i++)
 	{
-		m_MapInfo.TileName = FileName;
-
-		m_MapInfo.TileSheetSize = m_Size; // 'm_Width = TileSheetWidth' after SetTexture() being called
+		for (int j = 0; j < m_MapInfo.MapCols; j++)
+		{
+			AddMapFragmentTile(-1, j, i);
+			AddMapFragmentMove(0, j, i);
+			m_MapData.push_back(SMapData(-1, 0));
+		}
 	}
-}
-
-void DX9Map::SetMoveTexture(WSTRING FileName)
-{
-	if (m_pTextureMove)
-	{
-		m_pTextureMove->Release();
-		m_pTextureMove = nullptr;
-	}
-
-	WSTRING NewFileName;
-	NewFileName = m_BaseDir;
-	NewFileName += ASSET_DIR;
-	NewFileName += FileName;
-
-	D3DXIMAGE_INFO tImageInfo;
-	if (FAILED(D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
-		D3DX_DEFAULT, D3DX_DEFAULT, 0, &tImageInfo, nullptr, &m_pTextureMove)))
-		return;
-
-	m_MapInfo.MoveName = FileName;
-
-	m_MapInfo.MoveSheetSize.x = static_cast<float>(tImageInfo.Width);
-	m_MapInfo.MoveSheetSize.y = static_cast<float>(tImageInfo.Height);
-	m_bMoveTextureLoaded = true;
+	AddEnd();
 }
 
 void DX9Map::LoadMap(WSTRING FileName)
@@ -188,7 +173,84 @@ void DX9Map::LoadMap(WSTRING FileName)
 	}
 	fileText = fileText.substr(0, fileText.size() - 1);
 
-	ParseMapData(fileText);
+	// Parse the loaded map data
+	ParseLoadedMapData(&fileText);
+
+	// Create map with loaded data
+	MakeLoadedMap(&fileText);
+}
+
+PRIVATE void DX9Map::ParseLoadedMapData(WSTRING* InoutPtr_WSTRING)
+{
+	size_t tempFind = -1;
+	int tempInt = 0;
+	tempFind = InoutPtr_WSTRING->find_first_of('#');
+	if (tempFind)
+	{
+		m_MapInfo.MapName = InoutPtr_WSTRING->substr(0, tempFind);
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(tempFind + 1);
+	}
+
+	tempFind = InoutPtr_WSTRING->find_first_of('#');
+	if (tempFind)
+	{
+		tempInt = _wtoi(InoutPtr_WSTRING->substr(0, tempFind).c_str());
+		m_MapInfo.TileSize = tempInt;
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(tempFind + 1);
+	}
+
+	tempFind = InoutPtr_WSTRING->find_first_of('#');
+	if (tempFind)
+	{
+		tempInt = _wtoi(InoutPtr_WSTRING->substr(0, tempFind).c_str());
+		m_MapInfo.MapCols = tempInt;
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(tempFind + 1);
+	}
+
+	tempFind = InoutPtr_WSTRING->find_first_of('#');
+	if (tempFind)
+	{
+		tempInt = _wtoi(InoutPtr_WSTRING->substr(0, tempFind).c_str());
+		m_MapInfo.MapRows = tempInt;
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(tempFind + 1);
+	}
+
+	tempFind = InoutPtr_WSTRING->find_first_of('#');
+	if (tempFind)
+	{
+		m_MapInfo.TileSheetName = InoutPtr_WSTRING->substr(0, tempFind);
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(tempFind + 2);
+	}
+}
+
+// @warning: this fuction must be called in LoadMap()
+PRIVATE void DX9Map::MakeLoadedMap(WSTRING* InoutPtr_WSTRING)
+{
+	MakeMapBase();
+
+	int tTileID = 0;
+	int tMoveID = 0;
+	for (int i = 0; i < m_MapInfo.MapRows; i++)
+	{
+		for (int j = 0; j < m_MapInfo.MapCols; j++)
+		{
+			tTileID = _wtoi(InoutPtr_WSTRING->substr(0, MAX_TILEID_LEN).c_str());
+			if (tTileID == 999)
+				tTileID = -1;
+
+			tMoveID = _wtoi(InoutPtr_WSTRING->substr(MAX_TILEID_LEN, MAX_MOVEID_LEN).c_str());
+
+			AddMapFragmentTile(tTileID, j, i);
+			AddMapFragmentMove(tMoveID, j, i);
+			m_MapData.push_back(SMapData(tTileID, tMoveID));
+
+			*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(MAX_TILEID_LEN);
+			*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(MAX_MOVEID_LEN);
+		}
+		*InoutPtr_WSTRING = InoutPtr_WSTRING->substr(1); // Delete '\n' in the string data
+	}
+	InoutPtr_WSTRING->clear();
+	AddEnd();
 }
 
 void DX9Map::SaveMap(WSTRING FileName)
@@ -205,8 +267,178 @@ void DX9Map::SaveMap(WSTRING FileName)
 	fileout.write(FileText.c_str(), FileText.size());
 }
 
-// @warning: This functions is called when a map is created or loaded
-void DX9Map::CreateMapBase()
+PRIVATE void DX9Map::GetMapDataForSave(WSTRING *OutPtr_WSTRING) const
+{
+	wchar_t tempWC[255] = { 0 };
+	*OutPtr_WSTRING = m_MapInfo.MapName;
+	*OutPtr_WSTRING += L'#';
+	_itow_s(m_MapInfo.TileSize, tempWC, 10);
+	*OutPtr_WSTRING += tempWC;
+	*OutPtr_WSTRING += L'#';
+	_itow_s(m_MapInfo.MapCols, tempWC, 10);
+	*OutPtr_WSTRING += tempWC;
+	*OutPtr_WSTRING += L'#';
+	_itow_s(m_MapInfo.MapRows, tempWC, 10);
+	*OutPtr_WSTRING += tempWC;
+	*OutPtr_WSTRING += L'#';
+	*OutPtr_WSTRING += m_MapInfo.TileSheetName;
+	*OutPtr_WSTRING += L'#';
+	*OutPtr_WSTRING += L'\n';
+
+	int tDataID = 0;
+	for (int i = 0; i < m_MapInfo.MapRows; i++)
+	{
+		for (int j = 0; j < m_MapInfo.MapCols; j++)
+		{
+			tDataID = j + (i * m_MapInfo.MapCols);
+			GetMapDataPartForSave(tDataID, tempWC, 255);
+			*OutPtr_WSTRING += tempWC;
+		}
+
+		if (i < m_MapInfo.MapRows) // To avoid '\n' at the end
+			*OutPtr_WSTRING += L'\n';
+	}
+}
+
+PRIVATE void DX9Map::GetMapDataPartForSave(int DataID, wchar_t* OutPtr_wchar, int size) const
+{
+	WSTRING tempStr;
+	wchar_t tempWC[255] = { 0 };
+
+	int tTileID = m_MapData[DataID].TileID;
+	if (tTileID == -1) tTileID = 999;
+	_itow_s(tTileID, tempWC, 10);
+	size_t tempLen = wcslen(tempWC);
+
+	switch (tempLen)
+	{
+	case 1:
+		tempStr = L"00";
+		tempStr += tempWC;
+		break;
+	case 2:
+		tempStr = L"0";
+		tempStr += tempWC;
+		break;
+	case 3:
+		tempStr = tempWC;
+		break;
+	default:
+		// @warning: Invalid length
+		return;
+	}
+
+	int tMoveID = m_MapData[DataID].MoveID;
+	_itow_s(tMoveID, tempWC, 10);
+	tempLen = wcslen(tempWC);
+
+	switch (tempLen)
+	{
+	case 1:
+		tempStr += L"0";
+		tempStr += tempWC;
+		break;
+	case 2:
+		tempStr += tempWC;
+		break;
+	default:
+		// @warning: Invalid length
+		return;
+	}
+
+	wcscpy_s(OutPtr_wchar, size, tempStr.c_str());
+}
+
+void DX9Map::EditMap(const DX9MapTileSelector* InPtr_Selector, bool bErase)
+{
+	POINT TilePos = InPtr_Selector->GetTileSelectorPositionInCells();
+	POINT MapPos = InPtr_Selector->GetMapSelectorPositionInCells();
+	POINT Size = InPtr_Selector->GetSelectionSizeInCells();
+
+	int TileID = 0;
+	POINT iter_map_pos{ 0, 0 };
+	POINT iter_tile_pos{ 0, 0 };
+	for (int iter_x = 0; iter_x <= Size.x; iter_x++)
+	{
+		for (int iter_y = 0; iter_y <= Size.y; iter_y++)
+		{
+			iter_map_pos.x = MapPos.x + iter_x;
+			iter_map_pos.y = MapPos.y + iter_y;
+
+			iter_tile_pos.x = TilePos.x + iter_x;
+			iter_tile_pos.y = TilePos.y + iter_y;
+			TileID = ConvertXYToID(iter_tile_pos, m_MapInfo.TileSheetCols);
+
+			if (bErase)
+				TileID = -1;
+
+			switch (m_CurrMapMode)
+			{
+			case DX9ENGINE::EMapMode::TileMode:
+				SetMapFragmentTile(TileID, iter_map_pos.x, iter_map_pos.y);
+				break;
+			case DX9ENGINE::EMapMode::MoveMode:
+				// @warning
+				// Erase tile ID is not -1 but 0 for MoveMode
+				if (TileID == -1)
+					TileID = 0;
+
+				SetMapFragmentMove(TileID, iter_map_pos.x, iter_map_pos.y);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	
+	
+}
+
+PRIVATE void DX9Map::SetTileTexture(WSTRING FileName)
+{
+	DX9Image::SetTexture(FileName);
+
+	assert(m_Size.x);
+
+	if ((m_Size.x) && (m_Size.y))
+	{
+		m_MapInfo.TileSheetName = FileName;
+
+		m_MapInfo.TileSheetSize = m_Size; // 'm_Width = TileSheetWidth' after SetTexture() being called
+	}
+}
+
+PRIVATE void DX9Map::SetMoveTexture(WSTRING FileName)
+{
+	if (m_pTextureMove)
+	{
+		m_pTextureMove->Release();
+		m_pTextureMove = nullptr;
+	}
+
+	WSTRING NewFileName;
+	NewFileName = m_BaseDir;
+	NewFileName += ASSET_DIR;
+	NewFileName += FileName;
+	
+	D3DXIMAGE_INFO tImageInfo;
+	if (FAILED(D3DXCreateTextureFromFileEx(m_pDevice, NewFileName.c_str(), 0, 0, 0, 0, D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
+		D3DX_DEFAULT, D3DX_DEFAULT, 0, &tImageInfo, nullptr, &m_pTextureMove)))
+		return;
+
+	m_MapInfo.MoveSheetName = FileName;
+
+	m_MapInfo.MoveSheetSize.x = static_cast<float>(tImageInfo.Width);
+	m_MapInfo.MoveSheetSize.y = static_cast<float>(tImageInfo.Height);
+	m_bMoveTextureLoaded = true;
+}
+
+// @warning
+// CreateMapBase() is called when a map is created or loaded
+// so if you want to set a generally-used data (e.g. SMapInfo)
+// for the map, do it here.
+PRIVATE void DX9Map::MakeMapBase()
 {
 	// Clear buffers
 	ClearAllData();
@@ -215,10 +447,14 @@ void DX9Map::CreateMapBase()
 	m_MapInfo.MapSize.x = static_cast<float>(m_MapInfo.MapCols * m_MapInfo.TileSize);
 	m_MapInfo.MapSize.y = static_cast<float>(m_MapInfo.MapRows * m_MapInfo.TileSize);
 
-	// Set tile texture of the map
-	SetTileTexture(m_MapInfo.TileName);
+	// Set tilesheet texture of the map
+	SetTileTexture(m_MapInfo.TileSheetName);
 
-	// Set move texture of the map
+	// Calculate tilesheet's cols and rows IAW the loaded tile texture size and the tile size
+	m_MapInfo.TileSheetCols = static_cast<int>(m_MapInfo.TileSheetSize.x) / m_MapInfo.TileSize;
+	m_MapInfo.TileSheetRows = static_cast<int>(m_MapInfo.TileSheetSize.y) / m_MapInfo.TileSize;
+
+	// Set movesheet texture of the map
 	switch (m_MapInfo.TileSize)
 	{
 	case 32:
@@ -232,55 +468,7 @@ void DX9Map::CreateMapBase()
 	}
 }
 
-void DX9Map::CreateNewMap(SMapInfo* Info)
-{
-	m_MapInfo = *Info;
-
-	CreateMapBase();
-
-	for (int i = 0; i < m_MapInfo.MapRows; i++)
-	{
-		for (int j = 0; j < m_MapInfo.MapCols; j++)
-		{
-			AddMapFragmentTile(-1, j, i);
-			AddMapFragmentMove(0, j, i);
-			m_MapData.push_back(SMapData(-1, 0));
-		}
-	}
-	AddEnd();
-}
-
-// @warning: this fuction must be called in LoadMap()
-void DX9Map::CreateLoadedMap(WSTRING Data)
-{
-	CreateMapBase();
-
-	int tTileID = 0;
-	int tMoveID = 0;
-	for (int i = 0; i < m_MapInfo.MapRows; i++)
-	{
-		for (int j = 0; j < m_MapInfo.MapCols; j++)
-		{
-			tTileID = _wtoi(Data.substr(0, MAX_TILEID_LEN).c_str());
-			if (tTileID == 999)
-				tTileID = -1;
-			
-			tMoveID = _wtoi(Data.substr(MAX_TILEID_LEN, MAX_MOVEID_LEN).c_str());
-
-			AddMapFragmentTile(tTileID, j, i);
-			AddMapFragmentMove(tMoveID, j, i);
-			m_MapData.push_back(SMapData(tTileID, tMoveID));
-
-			Data = Data.substr(MAX_TILEID_LEN);
-			Data = Data.substr(MAX_MOVEID_LEN);
-		}
-		Data = Data.substr(1); // Delete '\n' in the string data
-	}
-	Data.clear();
-	AddEnd();
-}
-
-void DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
+PRIVATE void DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 {
 	STextureUV tUV = ConvertIDtoUV(TileID, m_MapInfo.TileSize, m_MapInfo.TileSheetSize);
 
@@ -307,7 +495,7 @@ void DX9Map::AddMapFragmentTile(int TileID, int X, int Y)
 	m_Indices.push_back(SIndex3(tVertCount - 4, tVertCount - 1, tVertCount - 2));
 }
 
-void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y)
+PRIVATE void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y)
 {
 	// @warning: This function should be called only if MoveSheet is loaded first
 	if (m_MapInfo.MoveSheetSize.x && m_MapInfo.MoveSheetSize.y)
@@ -326,7 +514,7 @@ void DX9Map::AddMapFragmentMove(int MoveID, int X, int Y)
 }
 
 // @warning: AddEnd() is always called after creating any kind of maps
-void DX9Map::AddEnd()
+PRIVATE void DX9Map::AddEnd()
 {
 	DX9Image::CreateVertexBuffer();
 	DX9Image::CreateIndexBuffer();
@@ -339,13 +527,13 @@ void DX9Map::AddEnd()
 		UpdateVertexBufferMove();
 	}
 
-	m_bMapCreated = true;
+	m_bMapExist = true;
 	m_OffsetZeroY = m_pDX9Window->GetWindowData()->WindowHeight - (m_MapInfo.MapRows * m_MapInfo.TileSize);
 
 	SetGlobalPosition(D3DXVECTOR2(0, 0));
 }
 
-void DX9Map::CreateVertexBufferMove()
+PRIVATE void DX9Map::CreateVertexBufferMove()
 {
 	int rVertSize = sizeof(SVertexImage) * static_cast<int>(m_VertMove.size());
 	if (FAILED(m_pDevice->CreateVertexBuffer(rVertSize, 0,
@@ -355,7 +543,7 @@ void DX9Map::CreateVertexBufferMove()
 	}
 }
 
-void DX9Map::UpdateVertexBufferMove()
+PRIVATE void DX9Map::UpdateVertexBufferMove()
 {
 	int rVertSize = sizeof(SVertexImage) * static_cast<int>(m_VertMove.size());
 	VOID* pVertices;
@@ -365,56 +553,9 @@ void DX9Map::UpdateVertexBufferMove()
 	m_pVBMove->Unlock();
 }
 
-void DX9Map::ParseMapData(WSTRING Str)
+PRIVATE auto DX9Map::GetMapTileBoundary(int MapID, EMapDirection Dir) const->float
 {
-	size_t tempFind = -1;
-	int tempInt = 0;
-
-	tempFind = Str.find_first_of('#');
-	if (tempFind)
-	{
-		m_MapInfo.MapName = Str.substr(0, tempFind);
-		Str = Str.substr(tempFind + 1);
-	}
-
-	tempFind = Str.find_first_of('#');
-	if (tempFind)
-	{
-		tempInt = _wtoi(Str.substr(0, tempFind).c_str());
-		m_MapInfo.TileSize = tempInt;
-		Str = Str.substr(tempFind + 1);
-	}
-
-	tempFind = Str.find_first_of('#');
-	if (tempFind)
-	{
-		tempInt = _wtoi(Str.substr(0, tempFind).c_str());
-		m_MapInfo.MapCols = tempInt;
-		Str = Str.substr(tempFind + 1);
-	}
-
-	tempFind = Str.find_first_of('#');
-	if (tempFind)
-	{
-		tempInt = _wtoi(Str.substr(0, tempFind).c_str());
-		m_MapInfo.MapRows = tempInt;
-		Str = Str.substr(tempFind + 1);
-	}
-
-	tempFind = Str.find_first_of('#');
-	if (tempFind)
-	{
-		m_MapInfo.TileName = Str.substr(0, tempFind);
-		Str = Str.substr(tempFind + 2);
-	}
-
-	// Create map with loaded data
-	CreateLoadedMap(Str);
-}
-
-auto DX9Map::GetMapTileBoundary(int MapID, EMapDirection Dir) const->float
-{
-	float Result = 0.0f;
+	float Result = 0;
 
 	D3DXVECTOR2 tMapXY = ConvertIDToXY(MapID, m_MapInfo.MapCols);
 
@@ -442,7 +583,7 @@ auto DX9Map::GetMapTileBoundary(int MapID, EMapDirection Dir) const->float
 	return Result;
 }
 
-auto DX9Map::IsMovableTile(int MapID, EMapDirection Dir) const->bool
+PRIVATE auto DX9Map::IsMovableTile(int MapID, EMapDirection Dir) const->bool
 {
 	if ((MapID >= (m_MapInfo.MapCols * m_MapInfo.MapRows)) || (MapID < 0))
 		return true;
@@ -499,8 +640,8 @@ void DX9Map::SetMode(EMapMode Mode)
 void DX9Map::SetPosition(D3DXVECTOR2 Offset)
 {
 	int VertID0 = 0;
-	float tX = 0.0f;
-	float tY = 0.0f;
+	float tX = 0;
+	float tY = 0;
 
 	m_Offset = Offset;
 
@@ -549,7 +690,7 @@ void DX9Map::SetGlobalPosition(D3DXVECTOR2 Offset)
 	SetPosition(D3DXVECTOR2(Offset.x, NewOffsetY));
 }
 
-void DX9Map::SetMapFragmentTile(int TileID, int X, int Y)
+PRIVATE void DX9Map::SetMapFragmentTile(int TileID, int X, int Y)
 {
 	if ((X < m_MapInfo.MapCols) && (Y < m_MapInfo.MapRows))
 	{
@@ -587,7 +728,7 @@ void DX9Map::SetMapFragmentTile(int TileID, int X, int Y)
 	}
 }
 
-void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y)
+PRIVATE void DX9Map::SetMapFragmentMove(int MoveID, int X, int Y)
 {
 	if ((X < m_MapInfo.MapCols) && (Y < m_MapInfo.MapRows))
 	{
@@ -651,88 +792,9 @@ void DX9Map::Draw()
 	m_pDevice->SetTexture(0, nullptr);
 }
 
-void DX9Map::GetMapDataForSave(WSTRING *pStr) const
-{
-	wchar_t tempWC[255] = { 0 };
-	*pStr = m_MapInfo.MapName;
-	*pStr += L'#';
-	_itow_s(m_MapInfo.MapCols, tempWC, 10);
-	*pStr += tempWC;
-	*pStr += L'#';
-	_itow_s(m_MapInfo.MapRows, tempWC, 10);
-	*pStr += tempWC;
-	*pStr += L'#';
-	*pStr += m_MapInfo.TileName;
-	*pStr += L'#';
-	*pStr += L'\n';
-
-	int tDataID = 0;
-	for (int i = 0; i < m_MapInfo.MapRows; i++)
-	{
-		for (int j = 0; j < m_MapInfo.MapCols; j++)
-		{
-			tDataID = j + (i * m_MapInfo.MapCols);
-			GetMapDataPartForSave(tDataID, tempWC, 255);
-			*pStr += tempWC;
-		}
-
-		if (i < m_MapInfo.MapRows) // To avoid '\n' at the end
-			*pStr += L'\n';
-	}
-}
-
-void DX9Map::GetMapDataPartForSave(int DataID, wchar_t *WC, int size) const
-{
-	WSTRING tempStr;
-	wchar_t tempWC[255] = { 0 };
-
-	int tTileID = m_MapData[DataID].TileID;
-	if (tTileID == -1) tTileID = 999;
-	_itow_s(tTileID, tempWC, 10);
-	size_t tempLen = wcslen(tempWC);
-
-	switch (tempLen)
-	{
-	case 1:
-		tempStr = L"00";
-		tempStr += tempWC;
-		break;
-	case 2:
-		tempStr = L"0";
-		tempStr += tempWC;
-		break;
-	case 3:
-		tempStr = tempWC;
-		break;
-	default:
-		// @warning: Invalid length
-		return;
-	}
-
-	int tMoveID = m_MapData[DataID].MoveID;
-	_itow_s(tMoveID, tempWC, 10);
-	tempLen = wcslen(tempWC);
-
-	switch (tempLen)
-	{
-	case 1:
-		tempStr += L"0";
-		tempStr += tempWC;
-		break;
-	case 2:
-		tempStr += tempWC;
-		break;
-	default:
-		// @warning: Invalid length
-		return;
-	}
-
-	wcscpy_s(WC, size, tempStr.c_str());
-}
-
-auto DX9Map::IsMapCreated() const->bool
+auto DX9Map::DoesMapExist() const->bool
 { 
-	return m_bMapCreated;
+	return m_bMapExist;
 };
 
 auto DX9Map::GetMode() const->EMapMode
@@ -740,9 +802,9 @@ auto DX9Map::GetMode() const->EMapMode
 	return m_CurrMapMode;
 }
 
-void DX9Map::GetMapInfo(SMapInfo *pInfo) const
+void DX9Map::GetMapInfo(SMapInfo* Outptr_Info) const
 {
-	*pInfo = m_MapInfo;
+	*Outptr_Info = m_MapInfo;
 }
 
 auto DX9Map::GetMapOffset() const->D3DXVECTOR2
@@ -807,8 +869,8 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 	int tXE = static_cast<int>(tMapXYE.x);
 	int tYE = static_cast<int>(tMapXYE.y);
 
-	float fWall = 0.0f;
-	float fWallCmp = 0.0f;
+	float fWall = 0;
+	float fWallCmp = 0;
 
 	int tMapID = 0;
 

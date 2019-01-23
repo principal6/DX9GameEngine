@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="editor_main.cpp" />
+    <ClCompile Include="..\CoreBase\DX9Image.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Input.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Line.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Window.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Map.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9MapEditor.cpp" />
+    <ClCompile Include="DX9MapTileSelector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>리소스</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Common.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Image.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Input.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Line.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Window.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Map.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DX9MapEditor.h" />
+    <ClInclude Include="DX9MapTileSelector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="리소스">
+      <UniqueIdentifier>{4ee979aa-f146-4ba6-ac02-99627c41a066}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CoreBase">
+      <UniqueIdentifier>{aa8a370c-506e-46a6-8adc-e5784e11b046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2415cd3d-10d7-48e1-9d3c-e73a7aa88963}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DX9MapEditor2D.rc">
+      <Filter>리소스</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+</Project>

@@ -15,16 +15,16 @@ DX9Image::DX9Image()
 
 	ClearVertexAndIndexData();
 
-	m_Size = D3DXVECTOR2(100.0f, 100.0f);
-	m_ScaledSize = D3DXVECTOR2(0.0f, 0.0f);
+	m_Size = D3DXVECTOR2(0, 0);
+	m_ScaledSize = D3DXVECTOR2(0, 0);
 	m_VisibleRange = D3DXVECTOR2(VISIBLE_RANGE_NOT_SET, VISIBLE_RANGE_NOT_SET);
-	m_AtlasSize = D3DXVECTOR2(0.0f, 0.0f);
-	m_OffsetInAtlas = D3DXVECTOR2(0.0f, 0.0f);
+	m_AtlasSize = D3DXVECTOR2(0, 0);
+	m_OffsetInAtlas = D3DXVECTOR2(0, 0);
 
-	m_Position = D3DXVECTOR2(0.0f, 0.0f);
+	m_Position = D3DXVECTOR2(0, 0);
 	m_Scale = D3DXVECTOR2(1.0f, 1.0f);
 
-	m_BoundingBoxExtraSize = D3DXVECTOR2(0.0f, 0.0f);
+	m_BoundingBoxExtraSize = D3DXVECTOR2(0, 0);
 	m_BoundingBoxColor = DEF_BOUNDINGBOX_COLOR;
 }
 
@@ -76,10 +76,10 @@ void DX9Image::CreateVertexBuffer()
 {
 	if (m_Vertices.size() == 0)
 	{
-		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 0.0f));
-		m_Vertices.push_back(SVertexImage(m_Position.x + m_Size.x, m_Position.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 0.0f));
-		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y + m_Size.y, 0.0f, 1.0f, 0xffffffff, 0.0f, 1.0f));
-		m_Vertices.push_back(SVertexImage(m_Position.x + m_Size.x, m_Position.y + m_Size.y, 0.0f, 1.0f, 0xffffffff, 1.0f, 1.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y, 0.0f, 0.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x + m_Size.x, m_Position.y, 1.0f, 0.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x, m_Position.y + m_Size.y, 0.0f, 1.0f));
+		m_Vertices.push_back(SVertexImage(m_Position.x + m_Size.x, m_Position.y + m_Size.y, 1.0f, 1.0f));
 	}
 
 	int rVertSize = sizeof(SVertexImage) * static_cast<int>(m_Vertices.size());
@@ -200,6 +200,34 @@ void DX9Image::SetSize(D3DXVECTOR2 Size)
 	UpdateVertexData();
 }
 
+auto DX9Image::SetAlpha(BYTE Alpha)->DX9Image*
+{
+	if (m_Vertices.size())
+	{
+		for (SVertexImage& iterator : m_Vertices)
+		{
+			SetColorAlpha(&iterator.color, Alpha);
+		}
+		UpdateVertexBuffer();
+	}
+
+	return this;
+}
+
+auto DX9Image::SetXRGB(DWORD Color)->DX9Image*
+{
+	if(m_Vertices.size())
+	{
+		for (SVertexImage& iterator : m_Vertices)
+		{
+			SetColorXRGB(&iterator.color, Color);
+		}
+		UpdateVertexBuffer();
+	}
+
+	return this;
+}
+
 void DX9Image::SetTexture(WSTRING FileName)
 {
 	if (m_pTexture)
@@ -293,23 +321,6 @@ auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*
 	if (m_Vertices.size())
 	{
 		UpdateVertexData(u1, v1, u2, v2);
-	}
-
-	return this;
-}
-
-auto DX9Image::SetAlpha(int Alpha)->DX9Image*
-{
-	if (m_Vertices.size())
-	{
-		Alpha = min(255, Alpha);
-		Alpha = max(0, Alpha);
-
-		for (SVertexImage& iterator : m_Vertices)
-		{
-			iterator.color = D3DCOLOR_ARGB(Alpha, 255, 255, 255);
-		}
-		UpdateVertexBuffer();
 	}
 
 	return this;

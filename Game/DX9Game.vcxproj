@@ -21,9 +21,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BC4350A5-FAD2-4092-B499-6948319A43D7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DX9GameEngine</RootNamespace>
+    <RootNamespace>DX9Game</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>DX9GameEngine</ProjectName>
+    <ProjectName>DX9Game</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -112,6 +112,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,32 +156,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Core\DX9Window.h" />
-    <ClInclude Include="Core\DX9Common.h" />
-    <ClInclude Include="Core\DX9Image.h" />
-    <ClInclude Include="Core\DX9Input.h" />
-    <ClInclude Include="Core\DX9Line.h" />
+    <ClInclude Include="..\CoreBase\DX9Common.h" />
+    <ClInclude Include="..\CoreBase\DX9Image.h" />
+    <ClInclude Include="..\CoreBase\DX9Input.h" />
+    <ClInclude Include="..\CoreBase\DX9Line.h" />
+    <ClInclude Include="..\CoreBase\DX9Window.h" />
+    <ClInclude Include="..\Core\DX9Background.h" />
+    <ClInclude Include="..\Core\DX9Effect.h" />
+    <ClInclude Include="..\Core\DX9Font.h" />
+    <ClInclude Include="..\Core\DX9Life.h" />
+    <ClInclude Include="..\Core\DX9Map.h" />
+    <ClInclude Include="..\Core\DX9Monsters.h" />
+    <ClInclude Include="..\Editor\DX9MapTileSelector.h" />
     <ClInclude Include="DX9Game.h" />
-    <ClInclude Include="Game\DX9Background.h" />
-    <ClInclude Include="Game\DX9Effect.h" />
-    <ClInclude Include="Game\DX9Font.h" />
-    <ClInclude Include="Game\DX9Life.h" />
-    <ClInclude Include="Game\DX9Map.h" />
-    <ClInclude Include="Game\DX9Monsters.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\DX9Window.cpp" />
-    <ClCompile Include="Core\DX9Image.cpp" />
-    <ClCompile Include="Core\DX9Input.cpp" />
-    <ClCompile Include="Core\DX9Line.cpp" />
+    <ClCompile Include="..\CoreBase\DX9Image.cpp" />
+    <ClCompile Include="..\CoreBase\DX9Input.cpp" />
+    <ClCompile Include="..\CoreBase\DX9Line.cpp" />
+    <ClCompile Include="..\CoreBase\DX9Window.cpp" />
+    <ClCompile Include="..\Core\DX9Background.cpp" />
+    <ClCompile Include="..\Core\DX9Effect.cpp" />
+    <ClCompile Include="..\Core\DX9Font.cpp" />
+    <ClCompile Include="..\Core\DX9Life.cpp" />
+    <ClCompile Include="..\Core\DX9Map.cpp" />
+    <ClCompile Include="..\Core\DX9Monsters.cpp" />
+    <ClCompile Include="..\Editor\DX9MapTileSelector.cpp" />
     <ClCompile Include="DX9Game.cpp" />
-    <ClCompile Include="Game\DX9Background.cpp" />
-    <ClCompile Include="Game\DX9Effect.cpp" />
-    <ClCompile Include="Game\DX9Font.cpp" />
-    <ClCompile Include="Game\DX9Life.cpp" />
-    <ClCompile Include="Game\DX9Map.cpp" />
-    <ClCompile Include="Game\DX9Monsters.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="game_main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

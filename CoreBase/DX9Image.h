@@ -16,8 +16,14 @@ namespace DX9ENGINE
 		DWORD color;
 		FLOAT u, v;
 
-		SVertexImage() : x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
-		SVertexImage(float _x, float _y, float _u, float _v) : x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
+		SVertexImage() :
+			x(0), y(0), z(0), rhw(1), color(0xFFFFFFFF), u(0), v(0) {};
+		SVertexImage(float _x, float _y, float _u, float _v) :
+			x(_x), y(_y), z(0), rhw(1), color(0xFFFFFFFF), u(_u), v(_v) {};
+		SVertexImage(float _x, float _y, DWORD _color) :
+			x(_x), y(_y), z(0), rhw(1), color(_color), u(0), v(0) {};
+		SVertexImage(float _x, float _y, DWORD _color, float _u, float _v) :
+			x(_x), y(_y), z(0), rhw(1), color(_color), u(_u), v(_v) {};
 		SVertexImage(float _x, float _y, float _z, float _rhw, DWORD _color, float _u, float _v) :
 			x(_x), y(_y), z(_z), rhw(_rhw), color(_color), u(_u), v(_v) {};
 	};
@@ -26,8 +32,10 @@ namespace DX9ENGINE
 	{
 		WORD _0, _1, _2;
 
-		SIndex3() : _0(0), _1(0), _2(0) {};
-		SIndex3(int ID0, int ID1, int ID2) : _0(ID0), _1(ID1), _2(ID2) {};
+		SIndex3() :
+			_0(0), _1(0), _2(0) {};
+		SIndex3(int ID0, int ID1, int ID2) :
+			_0(ID0), _1(ID1), _2(ID2) {};
 	};
 
 	struct SBoundingBox
@@ -54,20 +62,19 @@ namespace DX9ENGINE
 		virtual void DX9Image::FlipHorizontal();
 		virtual void DX9Image::FlipVertical();
 
-#ifdef DX9MAPEDITOR
 		// @warning: SetSize() is used publicly only in Map Editor
 		virtual void DX9Image::SetSize(D3DXVECTOR2 Size);
-#endif
-
-		virtual void DX9Image::SetTexture(WSTRING FileName);
+		
 		virtual void DX9Image::SetPosition(D3DXVECTOR2 Position);
 		virtual void DX9Image::SetPositionCentered(D3DXVECTOR2 Position);
+		virtual void DX9Image::SetTexture(WSTRING FileName);
+		virtual auto DX9Image::SetAlpha(BYTE Alpha)->DX9Image*;
+		virtual auto DX9Image::SetXRGB(DWORD Color)->DX9Image*;;
 		virtual auto DX9Image::SetScale(D3DXVECTOR2 Scale)->DX9Image*;
 		virtual auto DX9Image::SetVisibleRange(D3DXVECTOR2 Range)->DX9Image*;
 		virtual auto DX9Image::SetAtlasUV(D3DXVECTOR2 OffsetInAtlas, D3DXVECTOR2 Size,
 			bool bSetSize = true)->DX9Image*;
 		virtual auto DX9Image::SetUVRange(float u1, float u2, float v1, float v2)->DX9Image*;
-		virtual auto DX9Image::SetAlpha(int Alpha)->DX9Image*;
 		virtual auto DX9Image::SetBoundingBox(D3DXVECTOR2 ExtraSize)->DX9Image*;
 		virtual auto DX9Image::SetBoundingBoxColor(DWORD Color)->DX9Image*;
 
@@ -87,10 +94,6 @@ namespace DX9ENGINE
 		virtual void DX9Image::UpdateIndexBuffer();
 		virtual void DX9Image::UpdateVertexData();
 		virtual void DX9Image::UpdateVertexData(float u1, float v1, float u2, float v2);
-
-#ifndef DX9MAPEDITOR
-		virtual void DX9Image::SetSize(D3DXVECTOR2 Size);
-#endif
 
 	protected:
 		static const int VISIBLE_RANGE_NOT_SET = -1;

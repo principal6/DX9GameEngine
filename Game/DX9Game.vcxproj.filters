@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="game_main.cpp" />
+    <ClCompile Include="..\Core\DX9Background.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Effect.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Font.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Life.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Map.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Core\DX9Monsters.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Image.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Input.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Line.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CoreBase\DX9Window.cpp">
+      <Filter>CoreBase</Filter>
+    </ClCompile>
+    <ClCompile Include="DX9Game.cpp" />
+    <ClCompile Include="..\Editor\DX9MapTileSelector.cpp">
+      <Filter>/Editor</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Core\DX9Background.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Effect.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Font.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Life.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Map.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Core\DX9Monsters.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Common.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Image.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Input.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Line.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="..\CoreBase\DX9Window.h">
+      <Filter>CoreBase</Filter>
+    </ClInclude>
+    <ClInclude Include="DX9Game.h" />
+    <ClInclude Include="..\Editor\DX9MapTileSelector.h">
+      <Filter>/Editor</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{8c357a1c-cd6a-4938-8201-fb53d96479a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CoreBase">
+      <UniqueIdentifier>{75a27493-75b9-42e5-85a8-aa450156a321}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="/Editor">
+      <UniqueIdentifier>{decda88d-d3df-4e32-aade-39c6239a1167}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

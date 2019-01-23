@@ -1,4 +1,4 @@
-#include "../Core/DX9Window.h"
+#include "../CoreBase/DX9Window.h"
 #include "DX9Font.h"
 
 using namespace DX9ENGINE;
@@ -46,7 +46,7 @@ void DX9Font::MakeFont(EFontID ID, WSTRING FontName, int FontSize, bool IsBold)
 	m_Fonts.emplace_back(ID, tpFont);
 }
 
-auto DX9Font::SelectFont(EFontID ID)->DX9Font*
+auto DX9Font::SelectFontByID(EFontID ID)->DX9Font*
 {
 	int iterator_n = 0;
 	for (SFontInstance& iterator : m_Fonts)

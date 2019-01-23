@@ -24,6 +24,7 @@ auto DX9Game::Create(int Width, int Height)->EError
 	wchar_t tempDir[MAX_FILE_LEN]{};
 	GetCurrentDirectoryW(MAX_FILE_LEN, tempDir);
 	m_BaseDir = tempDir;
+	m_BaseDir = m_BaseDir.substr(0, m_BaseDir.find_last_not_of(PROJECT_FOLDER));
 
 	// Create base (window and initialize Direct3D9)
 	if (m_Window = MAKE_UNIQUE(DX9Window)())
@@ -223,14 +224,14 @@ void DX9Game::DetectInput()
 
 void DX9Game::Destroy()
 {
-	DX_DESTROY_UNIQUE(m_FontManager);
-	DX_DESTROY_UNIQUE(m_EffectManager);
-	DX_DESTROY_UNIQUE(m_MonsterManager);
-	DX_DESTROY_UNIQUE(m_Sprite);
-	DX_DESTROY_UNIQUE(m_Map);
-	DX_DESTROY_UNIQUE(m_Background);
-	DX_DESTROY_UNIQUE(m_Input);
-	DX_DESTROY_UNIQUE(m_Window);
+	DX_DESTROY_SMART(m_FontManager);
+	DX_DESTROY_SMART(m_EffectManager);
+	DX_DESTROY_SMART(m_MonsterManager);
+	DX_DESTROY_SMART(m_Sprite);
+	DX_DESTROY_SMART(m_Map);
+	DX_DESTROY_SMART(m_Background);
+	DX_DESTROY_SMART(m_Input);
+	DX_DESTROY_SMART(m_Window);
 }
 
 void DX9Game::SetBackground(WSTRING TextureFN)

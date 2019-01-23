@@ -1,18 +1,20 @@
 #pragma once
 
-#include "Core/DX9Window.h"
-#include "Core/DX9Input.h"
-#include "Game/DX9Background.h"
-#include "Game/DX9Life.h"
-#include "Game/DX9Monsters.h"
-#include "Game/DX9Effect.h"
-#include "Game/DX9Map.h"
-#include "Game/DX9Font.h"
+#include "../CoreBase/DX9Window.h"
+#include "../CoreBase/DX9Input.h"
+#include "../Core/DX9Background.h"
+#include "../Core/DX9Life.h"
+#include "../Core/DX9Monsters.h"
+#include "../Core/DX9Effect.h"
+#include "../Core/DX9Map.h"
+#include "../Core/DX9Font.h"
 
 namespace DX9ENGINE
 {
 	using PF_RENDER = void(*)();
 	using PF_KEYBOARD = void(*)(DWORD DIK_KeyCode);
+
+	static const wchar_t PROJECT_FOLDER[]{ L"Game" };
 
 	class DX9Game final
 	{

@@ -1,4 +1,4 @@
-#include "../Core/DX9Common.h"
+#include "../CoreBase/DX9Common.h"
 
 namespace DX9ENGINE
 {
@@ -40,7 +40,7 @@ namespace DX9ENGINE
 		void DX9Font::MakeFont(EFontID ID, WSTRING FontName, int FontSize, bool IsBold);
 
 		// Select a font
-		auto DX9Font::SelectFont(EFontID ID)->DX9Font*;
+		auto DX9Font::SelectFontByID(EFontID ID)->DX9Font*;
 
 		// Set font color
 		auto DX9Font::SetFontColor(DWORD Color)->DX9Font*;

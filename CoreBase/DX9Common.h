@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <Windows.h>
+#include <windowsx.h>
 #include <d3dx9.h>
 #include <cassert>
 #include <vector>
@@ -31,12 +32,17 @@
 	#define MAKE_SHARED(T) std::make_shared<T>
 #endif
 
+// To distinguish protected functions from others in cpp files
+#define PROTECTED
+// To distinguish private functions from others in cpp files
+#define PRIVATE
+
 namespace DX9ENGINE
 {
 	#define DX_SUCCEEDED(func) (func == EError::OK)
 	#define DX_FAILED(func) (func != EError::OK)
 	#define DX_DESTROY(obj) {if(obj) {obj->Destroy(); delete obj; obj = nullptr;}}
-	#define DX_DESTROY_UNIQUE(obj) {if(obj) {obj->Destroy();}}
+	#define DX_DESTROY_SMART(obj) {if(obj) {obj->Destroy();}}
 	#define DX_RELEASE(obj) {if(obj) {obj->Release(); obj = nullptr;}}
 
 	using CINT = const int;
@@ -82,6 +88,7 @@ namespace DX9ENGINE
 		NULLPTR_DEVICE,
 		NULLPTR_MAP,
 		NULLPTR_BASE,
+		NULLPTR_MAP_INFO,
 	};
 
 	struct STextureUV
@@ -110,7 +117,25 @@ namespace DX9ENGINE
 		*TileRows = static_cast<int>(SheetHeight / TileHeight);
 	}
 
+	inline void SetColorAlpha(DWORD* Color, BYTE Alpha)
+	{
+		*Color = (Alpha << 24) | ((*Color << 8) >> 8);
+	}
+	inline void SetColorXRGB(DWORD* Color, DWORD XRGB)
+	{
+		*Color = ((*Color >> 24) << 24) | ((XRGB << 8) >> 8);
+	}
 	inline auto GetColorR(DWORD Color)->BYTE { return ((Color << 8) >> 24); }
 	inline auto GetColorG(DWORD Color)->BYTE { return ((Color << 16) >> 24); }
 	inline auto GetColorB(DWORD Color)->BYTE { return ((Color << 24) >> 24); }
+	inline auto GetColorAlpha(DWORD Color)->BYTE { return (Color >> 24); }
+	inline auto GetColorXRGB(DWORD Color)->DWORD { return ((Color << 8) >> 8); }
+	inline auto ConvertIntToWSTRING(int In)->WSTRING
+	{
+		WSTRING Result;
+		wchar_t temp[MAX_FILE_LEN]{};
+		_itow_s(In, temp, 10);
+		Result = temp;
+		return Result;
+	}
 };

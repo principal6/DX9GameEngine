@@ -1,4 +1,4 @@
-#include "../Core/DX9Window.h"
+#include "../CoreBase/DX9Window.h"
 #include "DX9Life.h"
 #include "DX9Map.h"
 

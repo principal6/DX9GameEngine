@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Core/DX9Image.h"
+#include "../CoreBase/DX9Image.h"
 
 namespace DX9ENGINE
 {

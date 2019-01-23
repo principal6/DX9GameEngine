@@ -38,6 +38,19 @@ namespace DX9ENGINE
 		int WindowHeight;
 		float WindowHalfWidth;
 		float WindowHalfHeight;
+
+		SWindowData() : WindowWidth(0), WindowHeight(0), WindowHalfWidth(0), WindowHalfHeight(0) {};
+	};
+
+	struct SMouseData
+	{
+		POINT MousePosition;
+		POINT MouseDownPosition;
+		bool bMouseLeftButtonPressed;
+		bool bMouseRightButtonPressed;
+		bool bOnMouseMove;
+
+		SMouseData() : bMouseLeftButtonPressed(false), bOnMouseMove(false) {};
 	};
 
 	class DX9Window final
@@ -53,6 +66,7 @@ namespace DX9ENGINE
 			DWORD Color, WNDPROC Proc)->EError;
 		void DX9Window::Destroy();
 
+		void DX9Window::SetWindowCaption(WSTRING Caption);
 		void DX9Window::SetBackgroundColor(D3DCOLOR color);
 		void DX9Window::Resize();
 
@@ -63,6 +77,7 @@ namespace DX9ENGINE
 		auto DX9Window::GethWnd()->HWND;
 		auto DX9Window::GethInstance()->HINSTANCE;
 		auto DX9Window::GetWindowData()->SWindowData*;
+		auto DX9Window::GetMouseData()->SMouseData*;
 
 		// Dialog
 		void DX9Window::SetDlgBase();
@@ -70,6 +85,12 @@ namespace DX9ENGINE
 		auto DX9Window::SaveFileDlg(LPCWSTR Filter)->BOOL;
 		auto DX9Window::GetDlgFileName()->WSTRING;
 		auto DX9Window::GetDlgFileTitle()->WSTRING;
+
+		// Editor message handler
+		void DX9Window::EditorChildWindowMessageHandler(UINT Message, WPARAM wParam, LPARAM lParam);
+		auto DX9Window::IsMouseLeftButtonPressed() const->bool;
+		auto DX9Window::IsMouseRightButtonPressed() const->bool;
+		auto DX9Window::OnMouseMove()->bool;
 
 	private:
 		auto DX9Window::CreateWINAPIWindow(const wchar_t* Name, CINT X, CINT Y, CINT Width, CINT Height,
@@ -93,5 +114,7 @@ namespace DX9ENGINE
 		OPENFILENAME m_OFN;
 		TCHAR m_FileName[MAX_FILE_LEN];
 		TCHAR m_FileTitle[MAX_FILE_LEN];
+
+		SMouseData m_MouseData;
 	};
 };
