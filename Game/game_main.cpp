@@ -21,7 +21,7 @@ int main()
 	g_MyGame.SetBackground(L"colored_talltrees.png");
 
 	g_MyGame.LoadMap(L"map01.jwm");
-	g_MyGame.SpriteCreate(L"kit_from_firefox_56x80.png", POINT{ 56, 80 }, 3, 9, 1.0f)
+	g_MyGame.SpriteCreate(L"firefox_56x80_creek23.png", POINT{ 56, 80 }, 3, 9, 1.0f)
 		->AddAnimation(EAnimationID::Idle, 0, 2)
 		->AddAnimation(EAnimationID::Walk, 3, 5)
 		->AddAnimation(EAnimationID::Jumping, 7, 7)
