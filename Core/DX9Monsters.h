@@ -12,6 +12,7 @@ namespace DX9ENGINE
 	public:
 		WSTRING m_Name;
 		WSTRING m_TextureFileName;
+		POINT m_UnitSize;
 		int m_TextureNumCols;
 		int m_TextureNumRows;
 		int m_HPMax;
@@ -20,9 +21,9 @@ namespace DX9ENGINE
 
 	public:
 		DX9MonsterType() {};
-		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, int TextureNumCols, int TextureNumRows, int HP,
+		DX9MonsterType(WSTRING Name, WSTRING TextureFileName, POINT LifeSize, int TextureNumCols, int TextureNumRows, int HP,
 			D3DXVECTOR2 BoundingBoxExtraSize) :
-			m_Name(Name), m_TextureFileName(TextureFileName), m_TextureNumCols(TextureNumCols),
+			m_Name(Name), m_TextureFileName(TextureFileName), m_UnitSize(LifeSize), m_TextureNumCols(TextureNumCols),
 			m_TextureNumRows(TextureNumRows), m_HPMax(HP), m_BoundingBoxExtraSize(BoundingBoxExtraSize){};
 		~DX9MonsterType() {};
 

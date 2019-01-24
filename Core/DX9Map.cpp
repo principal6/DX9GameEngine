@@ -30,7 +30,8 @@ auto DX9Map::ConvertIDtoUV(int ID, int TileSize, D3DXVECTOR2 SheetSize)->STextur
 	}
 	else
 	{
-		ConvertFrameIDIntoUV(ID, tTileCols, tTileRows, &Result);
+		ConvertFrameIDIntoUV(ID, D3DXVECTOR2{ static_cast<float>(TileSize), static_cast<float>(TileSize) },
+			SheetSize, tTileCols, tTileRows, &Result);
 	}
 
 	return Result;

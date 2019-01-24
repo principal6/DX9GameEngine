@@ -36,7 +36,7 @@ namespace DX9ENGINE
 
 		void DX9Game::SetBackground(WSTRING TextureFN);
 
-		auto DX9Game::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Life*;
+		auto DX9Game::SpriteCreate(WSTRING TextureFN, POINT UnitSize, int numCols, int numRows, float Scale = 1.0f)->DX9Life*;
 		void DX9Game::SpriteWalk(EAnimationDirection Direction);
 		void DX9Game::SpriteJump();
 		void DX9Game::SpriteSetAnimation(EAnimationID AnimationID);

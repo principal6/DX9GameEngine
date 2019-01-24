@@ -20,20 +20,20 @@ int main()
 
 	g_MyGame.SetBackground(L"colored_talltrees.png");
 
-	g_MyGame.LoadMap(L"map02.jwm");
-	g_MyGame.SpriteCreate(L"advnt_full.png", 16, 8, 1.6f)
-		->AddAnimation(EAnimationID::Idle, 0, 0)
-		->AddAnimation(EAnimationID::Walk, 1, 6)
-		->AddAnimation(EAnimationID::Jumping, 23, 23)
-		->AddAnimation(EAnimationID::Falling, 24, 24)
-		->AddAnimation(EAnimationID::Landing, 25, 25)
-		->AddAnimation(EAnimationID::Attack1, 39, 40) // Punch
-		->AddAnimation(EAnimationID::Attack2, 36, 38) // HorzAttack
+	g_MyGame.LoadMap(L"map01.jwm");
+	g_MyGame.SpriteCreate(L"kit_from_firefox_56x80.png", POINT{ 56, 80 }, 3, 9, 1.0f)
+		->AddAnimation(EAnimationID::Idle, 0, 2)
+		->AddAnimation(EAnimationID::Walk, 3, 5)
+		->AddAnimation(EAnimationID::Jumping, 7, 7)
+		->AddAnimation(EAnimationID::Falling, 8, 8)
+		->AddAnimation(EAnimationID::Landing, 6, 6)
+		->AddAnimation(EAnimationID::Attack1, 12, 14) // Punch
+		->AddAnimation(EAnimationID::Attack2, 15, 17) // Kick
 		->SetGlobalPosition(D3DXVECTOR2(30.0f, 250.0f))
-		->SetBoundingBox(D3DXVECTOR2(-24, -24));
+		->SetBoundingBox(D3DXVECTOR2(-12, -12));
 
 	g_MyGame.GetMonsterManagerObject()
-		->AddMonsterType(DX9MonsterType(L"Mage", L"mage.png", 4, 2, 200, D3DXVECTOR2(-40, -30)))
+		->AddMonsterType(DX9MonsterType(L"Mage", L"mage.png", POINT{ 128, 128 }, 4, 2, 200, D3DXVECTOR2(-40, -30)))
 		->AddAnimation(SAnimationData(EAnimationID::Idle, 0, 7));
 
 	g_MyGame.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 80.0f))
@@ -77,9 +77,10 @@ void Keyboard(DWORD Key)
 		g_MyGame.SpriteWalk(EAnimationDirection::Left);
 		break;
 	case DIK_LCONTROL:
-		g_MyGame.SpriteSetAnimation(EAnimationID::Attack1);
+		g_MyGame.SpriteSetAnimation(EAnimationID::Attack2);
 		break;
 	case DIK_LALT:
+		g_MyGame.SpriteSetAnimation(EAnimationID::Attack1);
 		g_MyGame.SpawnEffect(0, 30);
 		break;
 	case DIK_UPARROW:

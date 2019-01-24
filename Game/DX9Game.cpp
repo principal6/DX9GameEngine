@@ -131,10 +131,8 @@ void DX9Game::Run()
 			TranslateMessage(&m_MSG);
 			DispatchMessage(&m_MSG);
 		}
-		else
-		{
-			MainLoop();
-		}
+		
+		MainLoop();
 	}
 
 	Destroy();
@@ -245,10 +243,10 @@ void DX9Game::SetBackground(WSTRING TextureFN)
 	m_Background->SetTexture(TextureFN);
 }
 
-auto DX9Game::SpriteCreate(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Life*
+auto DX9Game::SpriteCreate(WSTRING TextureFN, POINT UnitSize, int numCols, int numRows, float Scale)->DX9Life*
 {
 	assert(m_Sprite);
-	return m_Sprite->MakeLife(TextureFN, numCols, numRows, Scale);
+	return m_Sprite->MakeLife(TextureFN, UnitSize, numCols, numRows, Scale);
 }
 
 void DX9Game::SpriteWalk(EAnimationDirection Direction)

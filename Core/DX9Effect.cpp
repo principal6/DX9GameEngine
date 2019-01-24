@@ -178,7 +178,7 @@ void DX9Effect::Update()
 		int tCurrFrame = iterator->GetCurrFrame();
 
 		STextureUV tUV;
-		ConvertFrameIDIntoUV(tCurrFrame, m_TextureAtlasCols, m_TextureAtlasRows, &tUV);
+		ConvertFrameIDIntoUV(tCurrFrame, m_UnitSize, m_AtlasSize, m_TextureAtlasCols, m_TextureAtlasRows, &tUV);
 
 		int tCurrRepeatCount = iterator->GetCurrRepeatCount();
 		int tMaxRepeatCount = m_TypeData[tTypeDataID].GetRepeatCount();

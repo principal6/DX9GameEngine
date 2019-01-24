@@ -11,8 +11,8 @@ const float DX9Life::STRIDE = 5.0f;
 
 DX9Life::DX9Life()
 {
-	m_NumRows = 0;
-	m_NumCols = 0;
+	m_SheetRows = 0;
+	m_SheetCols = 0;
 
 	m_AnimDir = EAnimationDirection::Right;
 	m_CurrAnimID = EAnimationID::Idle;
@@ -21,7 +21,7 @@ DX9Life::DX9Life()
 	m_bBeingAnimated = false;
 	m_bRepeating = false;
 
-	m_LifeSize = D3DXVECTOR2(0.0f, 0.0f);
+	m_UnitSize = D3DXVECTOR2(0.0f, 0.0f);
 
 	m_GlobalPos = D3DXVECTOR2(0.0f, 0.0f);
 	m_GlobalPosInverse = D3DXVECTOR2(0.0f, 0.0f);
@@ -44,11 +44,11 @@ auto DX9Life::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EErr
 	return EError::IMAGE_NOT_CREATED;
 }
 
-auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale)->DX9Life*
+auto DX9Life::MakeLife(WSTRING TextureFN, POINT UnitSize, int numCols, int numRows, float Scale)->DX9Life*
 {
 	DX9Image::SetTexture(TextureFN);
 	DX9Image::SetScale(D3DXVECTOR2(Scale, Scale));
-	SetNumRowsAndCols(numCols, numRows); // m_UnitWidth & m_UnitHeight are set here
+	SetNumRowsAndCols(UnitSize, numCols, numRows); // m_UnitSize is set here
 
 	DX9Image::SetPosition(D3DXVECTOR2(0.0f, 0.0f));
 	DX9Image::SetBoundingBox(D3DXVECTOR2(0.0f, 0.0f));
@@ -56,29 +56,39 @@ auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale)
 	return this;
 }
 
-void DX9Life::SetNumRowsAndCols(int numCols, int numRows)
+PRIVATE void DX9Life::SetNumRowsAndCols(POINT UnitSize, int numCols, int numRows)
 {
-	m_NumCols = numCols;
-	m_NumRows = numRows;
+	m_SheetCols = numCols;
+	m_SheetRows = numRows;
 
+	m_UnitSize.x = static_cast<float>(UnitSize.x);
+	m_UnitSize.y = static_cast<float>(UnitSize.y);
+	
+	// Below we calculate automatically the life's size IAW/ the texture size and cols and rows
+	// but this way, we always adjust the unit size proportional to the texture sheet size,
+	// which is an unnecessary work if we just set absolute unit size like above
+
+	/*
 	m_LifeSize.x = m_Size.x / static_cast<float>(numCols);
 	m_LifeSize.y = m_Size.y / static_cast<float>(numRows);
+	*/
 
-	SetSize(m_LifeSize);
+	SetSize(m_UnitSize);
 	SetFrame(0);
 }
 
 void DX9Life::SetFrame(int FrameID)
 {
-	if ((m_NumRows == 0) || (m_NumCols == 0))
+	if ((m_SheetRows == 0) || (m_SheetCols == 0))
 		return;
 
 	STextureUV tUV;
-	ConvertFrameIDIntoUV(FrameID, m_NumCols, m_NumRows, &tUV);
+	ConvertFrameIDIntoUV(FrameID, m_UnitSize, m_AtlasSize, m_SheetCols, m_SheetRows, &tUV);
 
 	switch (m_AnimDir)
 	{
 	case EAnimationDirection::Left:
+		// Set the UV with the u value flipped
 		UpdateVertexData(tUV.u2, tUV.v1, tUV.u1, tUV.v2);
 		break;
 	case EAnimationDirection::Right:
@@ -321,18 +331,36 @@ void DX9Life::Gravitate()
 		else
 		{
 			m_bHitGround = true;
-			//SetAnimation(AnimationID::Landing, true, true); // This is only for main Sprite
+			
+			// This is only for main Sprite
+			/*
+			SetAnimation(AnimationID::Landing, true, true);
+			*/
+
 			SetAnimation(EAnimationID::Idle, true, true);
 		}
 	}
 	else
 	{
 		if (m_Velocity.y < 0)
-			SetAnimation(EAnimationID::Jumping, true, true);
+		{
+			if ((m_CurrAnimID == EAnimationID::Idle) || (m_CurrAnimID == EAnimationID::Walk))
+			{
+				// Idle or Walk is ignored when jumping
+				SetAnimation(EAnimationID::Jumping, true, false);
+			}
+		}
+			
 
 		if (m_Velocity.y > 0)
-			SetAnimation(EAnimationID::Falling, true, true);
-
+		{
+			if ((m_CurrAnimID == EAnimationID::Idle) || (m_CurrAnimID == EAnimationID::Walk))
+			{
+				// Idle or Walk is ignored when falling
+				SetAnimation(EAnimationID::Falling, true, false);
+			}
+		}
+		
 		m_bHitGround = false;
 	}
 

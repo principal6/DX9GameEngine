@@ -47,7 +47,7 @@ namespace DX9ENGINE
 
 		virtual auto DX9Life::Create(DX9Window* pDX9Window, WSTRING BaseDir, DX9Map* pMap)->EError;
 
-		virtual auto DX9Life::MakeLife(WSTRING TextureFN, int numCols, int numRows, float Scale = 1.0f)->DX9Life*;
+		virtual auto DX9Life::MakeLife(WSTRING TextureFN, POINT UnitSize, int numCols, int numRows, float Scale = 1.0f)->DX9Life*;
 
 		virtual auto DX9Life::SetGlobalPosition(D3DXVECTOR2 Position)->DX9Life*;
 
@@ -93,14 +93,14 @@ namespace DX9ENGINE
 		D3DXVECTOR2 m_Velocity;
 		bool m_bHitGround;
 
-		D3DXVECTOR2 m_LifeSize;
+		D3DXVECTOR2 m_UnitSize;
 
 	private:
-		virtual void DX9Life::SetNumRowsAndCols(int numCols, int numRows);
+		virtual void DX9Life::SetNumRowsAndCols(POINT UnitSize, int numCols, int numRows);
 
 	private:
-		int m_NumRows;
-		int m_NumCols;
+		int m_SheetRows;
+		int m_SheetCols;
 
 		EAnimationDirection m_AnimDir;
 		EAnimationID m_CurrAnimID;

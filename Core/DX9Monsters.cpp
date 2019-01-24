@@ -180,7 +180,8 @@ auto DX9MonsterManager::Spawn(WSTRING MonsterName, D3DXVECTOR2 GlobalPosition)->
 			DX9Monster Temp;
 			Temp.Create(m_pDX9Window, m_BaseDir, m_pMap);
 			Temp.SetMonsterType(TypeIterator);
-			Temp.MakeLife(TypeIterator.m_TextureFileName, TypeIterator.m_TextureNumCols, TypeIterator.m_TextureNumRows, 1.0f);
+			Temp.MakeLife(TypeIterator.m_TextureFileName, TypeIterator.m_UnitSize, TypeIterator.m_TextureNumCols,
+				TypeIterator.m_TextureNumRows, 1.0f);
 
 			for (SAnimationData& AnimIterator : TypeIterator.m_AnimData)
 			{

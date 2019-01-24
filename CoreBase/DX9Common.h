@@ -101,12 +101,27 @@ namespace DX9ENGINE
 		STextureUV(float U1, float U2, float V1, float V2) : u1(U1), u2(U2), v1(V1), v2(V2) {};
 	};
 
-	inline static void ConvertFrameIDIntoUV(int FrameID, int NumCols, int NumRows, STextureUV* UV)
+	inline static void ConvertFrameIDIntoUV(int FrameID, POINT SpriteSize, POINT SheetSize, int NumCols, int NumRows, STextureUV* UV)
 	{
-		UV->u1 = static_cast<float>(FrameID % NumCols) / static_cast<float>(NumCols);
-		UV->u2 = UV->u1 + (1.0f / static_cast<float>(NumCols));
-		UV->v1 = static_cast<float>(FrameID / NumCols) / static_cast<float>(NumRows);
-		UV->v2 = UV->v1 + (1.0f / static_cast<float>(NumRows));
+		int FrameXPos = FrameID % NumCols;
+		int FrameYPos = FrameID / NumCols;
+
+		UV->u1 = static_cast<float>(FrameXPos * SpriteSize.x) / static_cast<float>(SheetSize.x);
+		UV->u2 = UV->u1 + (static_cast<float>(SpriteSize.x) / static_cast<float>(SheetSize.x));
+		UV->v1 = static_cast<float>(FrameYPos * SpriteSize.y) / static_cast<float>(SheetSize.y);
+		UV->v2 = UV->v1 + (static_cast<float>(SpriteSize.y) / static_cast<float>(SheetSize.y));
+	}
+
+	inline static void ConvertFrameIDIntoUV(int FrameID, D3DXVECTOR2 UnitSize, D3DXVECTOR2 SheetSize, int NumCols, int NumRows,
+		STextureUV* UV)
+	{
+		int FrameXPos = FrameID % NumCols;
+		int FrameYPos = FrameID / NumCols;
+
+		UV->u1 = (static_cast<float>(FrameXPos) * UnitSize.x) / SheetSize.x;
+		UV->u2 = UV->u1 + (UnitSize.x / SheetSize.x);
+		UV->v1 = (static_cast<float>(FrameYPos) * UnitSize.y) / SheetSize.y;
+		UV->v2 = UV->v1 + (UnitSize.y / SheetSize.y);
 	}
 
 	inline static void GetTileCols(int SheetWidth, int TileWidth, int* TileCols)
