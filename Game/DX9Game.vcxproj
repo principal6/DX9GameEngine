@@ -167,7 +167,7 @@
     <ClInclude Include="..\Core\DX9Life.h" />
     <ClInclude Include="..\Core\DX9Map.h" />
     <ClInclude Include="..\Core\DX9Monsters.h" />
-    <ClInclude Include="..\Editor\DX9MapTileSelector.h" />
+    <ClInclude Include="..\TileMapEditor\DX9TileMapSelector.h" />
     <ClInclude Include="DX9Game.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,12 +181,9 @@
     <ClCompile Include="..\Core\DX9Life.cpp" />
     <ClCompile Include="..\Core\DX9Map.cpp" />
     <ClCompile Include="..\Core\DX9Monsters.cpp" />
-    <ClCompile Include="..\Editor\DX9MapTileSelector.cpp" />
+    <ClCompile Include="..\TileMapEditor\DX9TileMapSelector.cpp" />
     <ClCompile Include="DX9Game.cpp" />
     <ClCompile Include="game_main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

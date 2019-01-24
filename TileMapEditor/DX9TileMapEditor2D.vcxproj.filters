@@ -57,9 +57,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="DX9TileMapEditor2D.rc">
       <Filter>리소스</Filter>
     </ResourceCompile>
