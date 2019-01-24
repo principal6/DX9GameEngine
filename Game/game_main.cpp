@@ -20,7 +20,7 @@ int main()
 
 	g_MyGame.SetBackground(L"colored_talltrees.png");
 
-	g_MyGame.LoadMap(L"map01.jwm");
+	g_MyGame.LoadMap(L"map02.jwm");
 	g_MyGame.SpriteCreate(L"advnt_full.png", 16, 8, 1.6f)
 		->AddAnimation(EAnimationID::Idle, 0, 0)
 		->AddAnimation(EAnimationID::Walk, 1, 6)

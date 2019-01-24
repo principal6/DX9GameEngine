@@ -191,7 +191,6 @@ void DX9Game::MainLoop()
 
 	if ((m_EffectManager) && (m_MonsterManager))
 	{
-		// TODO: collision with multiple monsters needed
 		m_EffectManager->CheckCollisionWithMonsters(m_MonsterManager.get());
 	}
 

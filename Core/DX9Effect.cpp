@@ -312,6 +312,7 @@ void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters)
 	{
 		VECTOR<DX9Monster>* pInstances = pMonsters->GetInstancePointer();
 
+		// We are gonna do hit test for all monster instances
 		for (int i = 0; i < pInstances->size(); i++)
 		{
 			// Check collision per each DX9Effect
@@ -333,17 +334,22 @@ void DX9Effect::CheckCollisionWithMonsters(DX9MonsterManager* pMonsters)
 				{
 					bCollision = true;
 					(*pInstances)[i].Damage(iterator->GetDamage());
-					iterator->SetDamage(0);
-
-					// @warning: The codes below make disappear the effect immediately
-					//EffectInstanceData* temp = iterator_prev;
-					//DeleteInstance(iterator);
-					//iterator = temp;
 				}
 			}
 		}
 
+		// We set the damage of the effect to zero after the hit test,
+		// because we need to damgage all the monsters that are in the damage zone of the effect!
+		// and if we set the damage to zero inside the loop, we just hit one monster per effect,
+		// and that's not what we want :)
+		iterator->SetDamage(0);
 
+		// @warning: The codes below make disappear the effect immediately when it touches monster
+		//EffectInstanceData* temp = iterator_prev;
+		//DeleteInstance(iterator);
+		//iterator = temp;
+
+		// Now iterate.
 		iterator_prev = iterator;
 		if (iterator)
 			iterator = iterator->GetNext();
