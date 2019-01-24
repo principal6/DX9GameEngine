@@ -1,4 +1,4 @@
-#include "DX9MapEditor.h"
+#include "DX9TileMapEditor.h"
 #include "resource.h"
 
 using namespace DX9ENGINE;
@@ -17,7 +17,7 @@ UNIQUE_PTR<DX9Image> DX9MapEditor::ms_TileBG;
 UNIQUE_PTR<DX9Map> DX9MapEditor::ms_Map;
 UNIQUE_PTR<DX9Image> DX9MapEditor::ms_MapBG;
 
-UNIQUE_PTR<DX9MapTileSelector> DX9MapEditor::ms_MapTileSelector;
+UNIQUE_PTR<DX9TileMapSelector> DX9MapEditor::ms_MapTileSelector;
 
 auto DX9ENGINE::GetLeftChildPositionAndSizeFromParent(RECT Rect)->RECT
 {
@@ -427,7 +427,7 @@ auto DX9MapEditor::Create(int Width, int Height)->EError
 	}
 
 	// Create map-tile selector
-	if (ms_MapTileSelector = MAKE_UNIQUE(DX9MapTileSelector)())
+	if (ms_MapTileSelector = MAKE_UNIQUE(DX9TileMapSelector)())
 	{
 		if (DX_FAILED(ms_MapTileSelector->Create(ms_WindowLeft.get(), ms_WindowRight.get(), m_BaseDir)))
 			return EError::TILESELECTOR_NOT_CREATED;

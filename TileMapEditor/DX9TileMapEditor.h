@@ -3,12 +3,12 @@
 #include "resource.h"
 #include "../CoreBase/DX9Window.h"
 #include "../Core/DX9Map.h"
-#include "DX9MapTileSelector.h"
+#include "DX9TileMapSelector.h"
 
 namespace DX9ENGINE
 {
-	static const wchar_t MAP_EDITOR_NAME[]{ L"JW Map Editor" };
-	static const wchar_t PROJECT_FOLDER[]{ L"\\Editor" };
+	static const wchar_t MAP_EDITOR_NAME[]{ L"JW Tile Map Editor" };
+	static const wchar_t PROJECT_FOLDER[]{ L"\\TileMapEditor" };
 
 	class DX9MapEditor final
 	{
@@ -34,7 +34,7 @@ namespace DX9ENGINE
 		static UNIQUE_PTR<DX9Image> ms_MapBG;
 
 		// For both child windows
-		static UNIQUE_PTR<DX9MapTileSelector> ms_MapTileSelector;
+		static UNIQUE_PTR<DX9TileMapSelector> ms_MapTileSelector;
 
 		WSTRING m_BaseDir;
 		bool m_Keys[NUM_KEYS];

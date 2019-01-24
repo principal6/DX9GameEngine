@@ -1,13 +1,13 @@
-#include "DX9MapTileSelector.h"
+#include "DX9TileMapSelector.h"
 #include "../CoreBase/DX9Window.h"
 #include "../Core/DX9Map.h"
 
 using namespace DX9ENGINE;
 
 // Static member variable
-const wchar_t* DX9MapTileSelector::SEL_FN = L"tilesel.png";
+const wchar_t* DX9TileMapSelector::SEL_FN = L"tilesel.png";
 
-PRIVATE auto DX9MapTileSelector::ConvertPositionToCellXY(POINT Position)->POINT
+PRIVATE auto DX9TileMapSelector::ConvertPositionToCellXY(POINT Position)->POINT
 {
 	POINT Result{ 0, 0 };
 	
@@ -23,7 +23,7 @@ PRIVATE auto DX9MapTileSelector::ConvertPositionToCellXY(POINT Position)->POINT
 	return Result;
 }
 
-DX9MapTileSelector::DX9MapTileSelector()
+DX9TileMapSelector::DX9TileMapSelector()
 {
 	m_pMapInfo = nullptr;
 	m_pTileSelectorWindow = nullptr;
@@ -36,7 +36,7 @@ DX9MapTileSelector::DX9MapTileSelector()
 	m_MapSelectorPositionInCells = { 0, 0 };
 }
 
-auto DX9MapTileSelector::Create(DX9Window* pTileSelectorWindow, DX9Window* pMapWindow, WSTRING BaseDir)->EError
+auto DX9TileMapSelector::Create(DX9Window* pTileSelectorWindow, DX9Window* pMapWindow, WSTRING BaseDir)->EError
 {
 	if (nullptr == (m_pTileSelectorWindow = pTileSelectorWindow))
 		return EError::NULLPTR_WINDOW;
@@ -66,12 +66,12 @@ auto DX9MapTileSelector::Create(DX9Window* pTileSelectorWindow, DX9Window* pMapW
 	return EError::OK;
 }
 
-void DX9MapTileSelector::Destroy()
+void DX9TileMapSelector::Destroy()
 {
 
 }
 
-void DX9MapTileSelector::UpdateTileSelector()
+void DX9TileMapSelector::UpdateTileSelector()
 {
 	SMouseData* MouseData = m_pTileSelectorWindow->GetMouseData();
 
@@ -129,7 +129,7 @@ void DX9MapTileSelector::UpdateTileSelector()
 	}
 }
 
-void DX9MapTileSelector::UpdateMapSelector()
+void DX9TileMapSelector::UpdateMapSelector()
 {
 	SMouseData* MouseData = m_pMapWIndow->GetMouseData();
 
@@ -155,15 +155,19 @@ void DX9MapTileSelector::UpdateMapSelector()
 	}
 }
 
-void DX9MapTileSelector::UpdateMapMode(EMapMode Mode)
+void DX9TileMapSelector::UpdateMapMode(EMapMode Mode)
 {
 	switch (Mode)
 	{
 	case DX9ENGINE::EMapMode::TileMode:
+		m_TileSelector->SetSize(m_pMapInfo->TileSheetSize);
 		m_MapSelector->SetTexture(m_pMapInfo->TileSheetName);
+		
 		break;
 	case DX9ENGINE::EMapMode::MoveMode:
+		m_TileSelector->SetSize(m_pMapInfo->MoveSheetSize);
 		m_MapSelector->SetTexture(m_pMapInfo->MoveSheetName);
+		
 		break;
 	default:
 		break;
@@ -172,7 +176,7 @@ void DX9MapTileSelector::UpdateMapMode(EMapMode Mode)
 	InitializeSelectorPositionAndSize();
 }
 
-void DX9MapTileSelector::UpdateOffset()
+void DX9TileMapSelector::UpdateOffset()
 {
 	if (m_pTileSelectorWindow)
 	{
@@ -187,7 +191,7 @@ void DX9MapTileSelector::UpdateOffset()
 	}
 }
 
-void DX9MapTileSelector::Draw()
+void DX9TileMapSelector::Draw()
 {
 	if (m_TileSelector)
 	{
@@ -201,7 +205,7 @@ void DX9MapTileSelector::Draw()
 	}
 }
 
-auto DX9MapTileSelector::SetMapInfo(SMapInfo* pInfo)->EError
+auto DX9TileMapSelector::SetMapInfo(SMapInfo* pInfo)->EError
 {
 	if (nullptr == (m_pMapInfo = pInfo))
 		return EError::NULLPTR_MAP_INFO;
@@ -214,7 +218,7 @@ auto DX9MapTileSelector::SetMapInfo(SMapInfo* pInfo)->EError
 	return EError::OK;
 }
 
-PRIVATE void DX9MapTileSelector::InitializeSelectorPositionAndSize()
+PRIVATE void DX9TileMapSelector::InitializeSelectorPositionAndSize()
 {
 	if (m_pMapInfo)
 	{
@@ -227,17 +231,17 @@ PRIVATE void DX9MapTileSelector::InitializeSelectorPositionAndSize()
 	}
 }
 
-auto DX9MapTileSelector::GetTileSelectorPositionInCells() const->POINT
+auto DX9TileMapSelector::GetTileSelectorPositionInCells() const->POINT
 {
 	return m_TileSelectorPositionInCells;
 }
 
-auto DX9MapTileSelector::GetMapSelectorPositionInCells() const->POINT
+auto DX9TileMapSelector::GetMapSelectorPositionInCells() const->POINT
 {
 	return m_MapSelectorPositionInCells;
 }
 
-auto DX9MapTileSelector::GetSelectionSizeInCells() const->POINT
+auto DX9TileMapSelector::GetSelectionSizeInCells() const->POINT
 {
 	return m_SelectionSize;
 }

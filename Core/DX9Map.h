@@ -8,7 +8,7 @@ namespace DX9ENGINE
 	// ***
 	// *** Forward declaration ***
 	class DX9Window;
-	class DX9MapTileSelector;
+	class DX9TileMapSelector;
 	// ***
 
 	enum class EMapMode
@@ -64,7 +64,7 @@ namespace DX9ENGINE
 		void DX9Map::CreateMap(SMapInfo* InPtr_Info);
 		void DX9Map::LoadMap(WSTRING FileName);
 		void DX9Map::SaveMap(WSTRING FileName);
-		void DX9Map::EditMap(const DX9MapTileSelector* InPtr_Selector, bool bErase = false);
+		void DX9Map::EditMap(const DX9TileMapSelector* InPtr_Selector, bool bErase = false);
 
 		void DX9Map::Draw() override;
 

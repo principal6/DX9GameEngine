@@ -1,5 +1,5 @@
 #include "../CoreBase/DX9Window.h"
-#include "../Editor/DX9MapTileSelector.h"
+#include "../TileMapEditor/DX9TileMapSelector.h"
 #include "DX9Map.h"
 
 using namespace DX9ENGINE;
@@ -355,7 +355,7 @@ PRIVATE void DX9Map::GetMapDataPartForSave(int DataID, wchar_t* OutPtr_wchar, in
 	wcscpy_s(OutPtr_wchar, size, tempStr.c_str());
 }
 
-void DX9Map::EditMap(const DX9MapTileSelector* InPtr_Selector, bool bErase)
+void DX9Map::EditMap(const DX9TileMapSelector* InPtr_Selector, bool bErase)
 {
 	POINT TilePos = InPtr_Selector->GetTileSelectorPositionInCells();
 	POINT MapPos = InPtr_Selector->GetMapSelectorPositionInCells();

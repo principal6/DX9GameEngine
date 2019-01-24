@@ -12,11 +12,11 @@ namespace DX9ENGINE
 	enum class EMapMode;
 	// ***
 
-	class DX9MapTileSelector final
+	class DX9TileMapSelector final
 	{
 	public:
-		DX9MapTileSelector();
-		~DX9MapTileSelector() {};
+		DX9TileMapSelector();
+		~DX9TileMapSelector() {};
 
 		auto Create(DX9Window* pTileSelectorWindow, DX9Window* pMapWindow, WSTRING BaseDir)->EError;
 		void Destroy();
