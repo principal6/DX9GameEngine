@@ -63,14 +63,15 @@ auto DX9Map::ConvertPositionToXY(D3DXVECTOR2 Position, D3DXVECTOR2 Offset, int T
 	float tX = -Offset.x + Position.x;
 	float tY = -Offset.y + Position.y;
 
-	int tYR = static_cast<int>(tX) % TileSize;
+	int tYRemain = static_cast<int>(tY) % TileSize;
+
 	int tMapX = static_cast<int>(tX / TileSize);
 	int tMapY = static_cast<int>(tY / TileSize);
 
 	if (YRoundUp)
 	{
 		// @warning: round-up the Y value (If it gets a little bit down, it should be recognized as in the next row)
-		if (tYR)
+		if (tYRemain)
 			tMapY++;
 	}
 
@@ -178,6 +179,8 @@ void DX9Map::LoadMap(WSTRING FileName)
 
 	// Create map with loaded data
 	MakeLoadedMap(&fileText);
+
+	filein.close();
 }
 
 PRIVATE void DX9Map::ParseLoadedMapData(WSTRING* InoutPtr_WSTRING)
@@ -265,6 +268,8 @@ void DX9Map::SaveMap(WSTRING FileName)
 	GetMapDataForSave(&FileText);
 
 	fileout.write(FileText.c_str(), FileText.size());
+
+	fileout.close();
 }
 
 PRIVATE void DX9Map::GetMapDataForSave(WSTRING *OutPtr_WSTRING) const
@@ -821,10 +826,10 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 {
 	D3DXVECTOR2 NewVelocity = Velocity;
 
-	D3DXVECTOR2 tSprPosS;
-	D3DXVECTOR2 tSprPosE;
-	D3DXVECTOR2 tMapXYS;
-	D3DXVECTOR2 tMapXYE;
+	D3DXVECTOR2 tSprPosS{ 0, 0 };
+	D3DXVECTOR2 tSprPosE{ 0, 0 };
+	D3DXVECTOR2 tMapXYS{ 0, 0 };
+	D3DXVECTOR2 tMapXYE{ 0, 0 };
 
 	if (Velocity.x > 0)
 	{
@@ -834,6 +839,9 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 		tSprPosE = tSprPosS;
 		tSprPosE.x += Velocity.x;
 		tSprPosE.y += BB.Size.y;
+
+		tMapXYS = ConvertPositionToXY(tSprPosS, m_Offset, m_MapInfo.TileSize);
+		tMapXYE = ConvertPositionToXY(tSprPosE, m_Offset, m_MapInfo.TileSize);
 	}
 	else if (Velocity.x < 0)
 	{
@@ -842,6 +850,9 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 		tSprPosE = tSprPosS;
 		tSprPosE.x += Velocity.x;
 		tSprPosE.y += BB.Size.y;
+
+		tMapXYS = ConvertPositionToXY(tSprPosS, m_Offset, m_MapInfo.TileSize);
+		tMapXYE = ConvertPositionToXY(tSprPosE, m_Offset, m_MapInfo.TileSize);
 	}
 	else if (Velocity.y > 0)
 	{
@@ -849,20 +860,23 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 		tSprPosS = BB.PositionOffset;
 		tSprPosS.y += BB.Size.y; // ¦¦ (Left Down)
 		tSprPosE = tSprPosS;
+		tSprPosE.x += BB.Size.x; // ¦¥ (Right down)
 		tSprPosE.y += Velocity.y;
-		tSprPosE.x += BB.Size.x;
+
+		tMapXYS = ConvertPositionToXY(tSprPosS, m_Offset, m_MapInfo.TileSize, true);
+		tMapXYE = ConvertPositionToXY(tSprPosE, m_Offset, m_MapInfo.TileSize, true);
 	}
 	else if (Velocity.y < 0)
 	{
 		// Go Up
 		tSprPosS = BB.PositionOffset; // ¦£ (Left Up)
 		tSprPosE = tSprPosS;
+		tSprPosE.x += BB.Size.x; // ¦¤ (Right up)
 		tSprPosE.y += Velocity.y;
-		tSprPosE.x += BB.Size.x;
-	}
 
-	tMapXYS = ConvertPositionToXY(tSprPosS, m_Offset, m_MapInfo.TileSize);
-	tMapXYE = ConvertPositionToXY(tSprPosE, m_Offset, m_MapInfo.TileSize);
+		tMapXYS = ConvertPositionToXY(tSprPosS, m_Offset, m_MapInfo.TileSize);
+		tMapXYE = ConvertPositionToXY(tSprPosE, m_Offset, m_MapInfo.TileSize);
+	}
 
 	int tXS = static_cast<int>(tMapXYS.x);
 	int tYS = static_cast<int>(tMapXYS.y);
@@ -874,14 +888,14 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 
 	int tMapID = 0;
 
-	// Check if the life is inside the map's Y range
+	// Check if the life is inside the map's Y range (rows)
 	if ((tYS > m_MapInfo.MapRows + DEPTH_HELL) && (tYE > m_MapInfo.MapRows + DEPTH_HELL))
 	{
 		// If the life reaches the bottom of the hell, make it stop falling
 		NewVelocity.y = 0;
 	}
 
-	// Check if the life is inside the map's X range
+	// Check if the life is inside the map's X range (cols)
 	// If it's outside, it should fall (= no changes in NewVelocity)
 	if (((tXS >= 0) || (tXE >= 0)) && ((tXS < m_MapInfo.MapCols) || (tXE < m_MapInfo.MapCols)))
 	{
@@ -948,9 +962,11 @@ auto DX9Map::GetVelocityAfterCollision(SBoundingBox BB, D3DXVECTOR2 Velocity) co
 		else if (Velocity.y > 0)
 		{
 			// Go Down
-			for (int i = tXS; i <= tXE; i++)
+			for (int j = tYS; j <= tYE; j++)
 			{
-				for (int j = tYS; j <= tYE; j++)
+				fWallCmp = 0;
+
+				for (int i = tXS; i <= tXE; i++)
 				{
 					tMapID = ConvertXYToID(D3DXVECTOR2(static_cast<float>(i), static_cast<float>(j)), m_MapInfo.MapCols);
 					if (IsMovableTile(tMapID, EMapDirection::Down) == false)

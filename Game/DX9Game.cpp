@@ -202,6 +202,9 @@ void DX9Game::MainLoop()
 
 	m_Window->EndRender();
 	m_FPS++;
+
+	/** Slow down the process for debugging */
+	//Sleep(100);
 }
 
 void DX9Game::DetectInput()

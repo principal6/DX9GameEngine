@@ -293,8 +293,8 @@ void DX9Life::Walk(EAnimationDirection Direction)
 	D3DXVECTOR2 tNewVel = m_pMap->GetVelocityAfterCollision(GetBoundingBox(), Velocity);
 
 	MoveConst(tNewVel);
-
 }
+
 void DX9Life::Jump()
 {
 	if ((m_bHitGround == false) || (m_Velocity.y > 0)) // Currently the sprite is falling down
@@ -309,6 +309,7 @@ void DX9Life::Jump()
 void DX9Life::Gravitate()
 {
 	Accelerate(GRAVITY);
+
 	D3DXVECTOR2 tNewVel = m_pMap->GetVelocityAfterCollision(GetBoundingBox(), m_Velocity);
 
 	if (tNewVel.y < m_Velocity.y)
@@ -336,6 +337,5 @@ void DX9Life::Gravitate()
 	}
 
 	SetVelocity(tNewVel);
-
 	MoveWithVelocity();
 }

@@ -20,8 +20,7 @@ int main()
 
 	g_MyGame.SetBackground(L"colored_talltrees.png");
 
-	// TODO: sprite jumps on edge ... but why..?????
-	g_MyGame.LoadMap(L"map02.jwm");
+	g_MyGame.LoadMap(L"map01.jwm");
 	g_MyGame.SpriteCreate(L"advnt_full.png", 16, 8, 1.6f)
 		->AddAnimation(EAnimationID::Idle, 0, 0)
 		->AddAnimation(EAnimationID::Walk, 1, 6)
@@ -30,14 +29,14 @@ int main()
 		->AddAnimation(EAnimationID::Landing, 25, 25)
 		->AddAnimation(EAnimationID::Attack1, 39, 40) // Punch
 		->AddAnimation(EAnimationID::Attack2, 36, 38) // HorzAttack
-		->SetGlobalPosition(D3DXVECTOR2(30.0f, 60.0f))
+		->SetGlobalPosition(D3DXVECTOR2(30.0f, 250.0f))
 		->SetBoundingBox(D3DXVECTOR2(-24, -24));
 
 	g_MyGame.GetMonsterManagerObject()
 		->AddMonsterType(DX9MonsterType(L"Mage", L"mage.png", 4, 2, 200, D3DXVECTOR2(-40, -30)))
 		->AddAnimation(SAnimationData(EAnimationID::Idle, 0, 7));
 
-	g_MyGame.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 60.0f))
+	g_MyGame.SpawnMonster(L"Mage", D3DXVECTOR2(560.0f, 80.0f))
 		->SetAnimation(EAnimationID::Idle);
 	g_MyGame.SpawnMonster(L"Mage", D3DXVECTOR2(400.0f, 300.0f))
 		->SetAnimation(EAnimationID::Idle);
