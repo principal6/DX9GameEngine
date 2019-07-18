@@ -167,7 +167,7 @@
     <ClInclude Include="..\Core\DX9Life.h" />
     <ClInclude Include="..\Core\DX9Map.h" />
     <ClInclude Include="..\Core\DX9Monsters.h" />
-    <ClInclude Include="..\TileMapEditor\DX9TileMapSelector.h" />
+    <ClInclude Include="..\MapEditor\DX9TileMapSelector.h" />
     <ClInclude Include="DX9Game.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,7 +181,7 @@
     <ClCompile Include="..\Core\DX9Life.cpp" />
     <ClCompile Include="..\Core\DX9Map.cpp" />
     <ClCompile Include="..\Core\DX9Monsters.cpp" />
-    <ClCompile Include="..\TileMapEditor\DX9TileMapSelector.cpp" />
+    <ClCompile Include="..\MapEditor\DX9TileMapSelector.cpp" />
     <ClCompile Include="DX9Game.cpp" />
     <ClCompile Include="game_main.cpp" />
   </ItemGroup>

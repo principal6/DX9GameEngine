@@ -7,8 +7,8 @@
 
 namespace DX9ENGINE
 {
-	static const wchar_t MAP_EDITOR_NAME[]{ L"JW Tile Map Editor" };
-	static const wchar_t PROJECT_FOLDER[]{ L"\\TileMapEditor" };
+	static const wchar_t MAP_EDITOR_NAME[]{ L"JW Map Editor" };
+	static const wchar_t PROJECT_FOLDER[]{ L"\\MapEditor" };
 
 	class DX9MapEditor final
 	{

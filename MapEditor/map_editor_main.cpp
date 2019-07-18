@@ -1,4 +1,4 @@
-#include "DX9TileMapEditor.h"
+#include "DX9MapEditor.h"
 #include <crtdbg.h>
 
 #ifdef _DEBUG

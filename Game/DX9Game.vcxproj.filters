@@ -33,8 +33,8 @@
       <Filter>CoreBase</Filter>
     </ClCompile>
     <ClCompile Include="DX9Game.cpp" />
-    <ClCompile Include="..\TileMapEditor\DX9TileMapSelector.cpp">
-      <Filter>/TileMapEditor</Filter>
+    <ClCompile Include="..\MapEditor\DX9TileMapSelector.cpp">
+      <Filter>/MapEditor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,8 +72,8 @@
       <Filter>CoreBase</Filter>
     </ClInclude>
     <ClInclude Include="DX9Game.h" />
-    <ClInclude Include="..\TileMapEditor\DX9TileMapSelector.h">
-      <Filter>/TileMapEditor</Filter>
+    <ClInclude Include="..\MapEditor\DX9TileMapSelector.h">
+      <Filter>/MapEditor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +83,7 @@
     <Filter Include="CoreBase">
       <UniqueIdentifier>{75a27493-75b9-42e5-85a8-aa450156a321}</UniqueIdentifier>
     </Filter>
-    <Filter Include="/TileMapEditor">
+    <Filter Include="/MapEditor">
       <UniqueIdentifier>{a594f8c4-c43b-4f4c-a283-eb4b7ba16b6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

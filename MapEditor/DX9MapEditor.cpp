@@ -1,4 +1,4 @@
-#include "DX9TileMapEditor.h"
+#include "DX9MapEditor.h"
 #include "resource.h"
 
 using namespace DX9ENGINE;

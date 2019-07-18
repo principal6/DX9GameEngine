@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX9Game", "Game\DX9Game.vcxproj", "{BC4350A5-FAD2-4092-B499-6948319A43D7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX9TileMapEditor2D", "TileMapEditor\DX9TileMapEditor2D.vcxproj", "{C069A9C5-7CC1-4E4C-A680-BA0573274629}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DX9MapEditor", "MapEditor\DX9MapEditor.vcxproj", "{C069A9C5-7CC1-4E4C-A680-BA0573274629}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

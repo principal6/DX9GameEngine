@@ -16,9 +16,9 @@
     <ClCompile Include="..\Core\DX9Map.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="tile_editor_main.cpp" />
-    <ClCompile Include="DX9TileMapEditor.cpp" />
     <ClCompile Include="DX9TileMapSelector.cpp" />
+    <ClCompile Include="map_editor_main.cpp" />
+    <ClCompile Include="DX9MapEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -42,8 +42,8 @@
     <ClInclude Include="..\Core\DX9Map.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="DX9TileMapEditor.h" />
     <ClInclude Include="DX9TileMapSelector.h" />
+    <ClInclude Include="DX9MapEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="리소스">
@@ -57,7 +57,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="DX9TileMapEditor2D.rc">
+    <ResourceCompile Include="DX9MapEditor.rc">
       <Filter>리소스</Filter>
     </ResourceCompile>
   </ItemGroup>

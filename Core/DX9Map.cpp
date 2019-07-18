@@ -1,5 +1,5 @@
 #include "../CoreBase/DX9Window.h"
-#include "../TileMapEditor/DX9TileMapSelector.h"
+#include "../MapEditor/DX9TileMapSelector.h"
 #include "DX9Map.h"
 
 using namespace DX9ENGINE;
